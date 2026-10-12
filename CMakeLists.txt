@@ -1,13 +1,13 @@
 cmake_minimum_required(VERSION 3.19)
 
 file(READ "${CMAKE_SOURCE_DIR}/VERSION" VER_RAW)
-string(STRIP ${VER_RAW} HYPRTOOLKIT_VERSION)
+string(STRIP ${VER_RAW} ABYSSTOOLKIT_VERSION)
 
-add_compile_definitions(HYPRTOOLKIT_VERSION="${HYPRTOOLKIT_VERSION}")
+add_compile_definitions(ABYSSTOOLKIT_VERSION="${ABYSSTOOLKIT_VERSION}")
 
 project(
-  hyprtoolkit
-  VERSION ${HYPRTOOLKIT_VERSION}
+  abysstoolkit
+  VERSION ${ABYSSTOOLKIT_VERSION}
   DESCRIPTION "A modern C++ Wayland-native GUI toolkit")
 
 include(CTest)
@@ -20,7 +20,7 @@ set(LIBDIR ${CMAKE_INSTALL_FULL_LIBDIR})
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED COMPONENTS "GLES3")
-find_package(hyprwayland-scanner 0.4.0 REQUIRED)
+find_package(abyss-scanner 0.4.0 REQUIRED)
 pkg_check_modules(
   deps
   REQUIRED
@@ -28,8 +28,8 @@ pkg_check_modules(
   wayland-client
   wayland-protocols
   egl
-  hyprutils>=0.11.0
-  hyprlang>=0.6.0
+  abyssutils>=0.11.0
+  abyssparse>=0.6.0
   pixman-1
   libdrm
   gbm
@@ -38,10 +38,10 @@ pkg_check_modules(
   cairo
   pangocairo
   iniparser
-  hyprgraphics>=0.3.0
-  aquamarine>=0.10.0)
+  abyssgraphics>=0.3.0
+  abyssal>=0.10.0)
 
-configure_file(hyprtoolkit.pc.in hyprtoolkit.pc @ONLY)
+configure_file(abysstoolkit.pc.in abysstoolkit.pc @ONLY)
 
 set(CMAKE_CXX_STANDARD 23)
 add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-value
@@ -49,12 +49,12 @@ add_compile_options(-Wall -Wextra -Wno-unused-parameter -Wno-unused-value
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES DEBUG)
-  message(STATUS "Configuring hyprtoolkit in Debug")
-  add_compile_definitions(HYPRTOOLKIT_DEBUG)
+  message(STATUS "Configuring abysstoolkit in Debug")
+  add_compile_definitions(ABYSSTOOLKIT_DEBUG)
   set(BUILD_TESTING ON)
 else()
   add_compile_options(-O3)
-  message(STATUS "Configuring hyprtoolkit in Release")
+  message(STATUS "Configuring abysstoolkit in Release")
   set(BUILD_TESTING OFF)
 endif()
 
@@ -66,26 +66,26 @@ file(GLOB_RECURSE PUBLIC_HEADERS CONFIGURE_DEPENDS "include/*.hpp")
 execute_process(COMMAND ./scripts/generateShaderIncludes.sh
                 WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
-add_library(hyprtoolkit SHARED ${SRCFILES})
+add_library(abysstoolkit SHARED ${SRCFILES})
 target_include_directories(
-  hyprtoolkit
+  abysstoolkit
   PUBLIC "./include"
   PRIVATE "./src" "./src/include" "./protocols" "${CMAKE_BINARY_DIR}")
-set_target_properties(hyprtoolkit PROPERTIES VERSION ${HYPRTOOLKIT_VERSION}
+set_target_properties(abysstoolkit PROPERTIES VERSION ${ABYSSTOOLKIT_VERSION}
                                              SOVERSION 5)
-target_link_libraries(hyprtoolkit PUBLIC OpenGL::EGL OpenGL::OpenGL
+target_link_libraries(abysstoolkit PUBLIC OpenGL::EGL OpenGL::OpenGL
                                          PkgConfig::deps)
 
 check_include_file("sys/timerfd.h" HAS_TIMERFD)
 pkg_check_modules(epoll IMPORTED_TARGET epoll-shim)
 if(NOT HAS_TIMERFD AND epoll_FOUND)
-  target_link_libraries(hyprtoolkit PUBLIC PkgConfig::epoll)
+  target_link_libraries(abysstoolkit PUBLIC PkgConfig::epoll)
 endif()
 
 check_include_file("sys/inotify.h" HAS_INOTIFY)
 pkg_check_modules(inotify IMPORTED_TARGET libinotify)
 if(NOT HAS_INOTIFY AND inotify_FOUND)
-  target_link_libraries(hyprtoolkit PUBLIC PkgConfig::inotify)
+  target_link_libraries(abysstoolkit PUBLIC PkgConfig::inotify)
 endif()
 
 # Protocols
@@ -104,10 +104,10 @@ function(protocolNew protoPath protoName external)
   add_custom_command(
     OUTPUT ${CMAKE_SOURCE_DIR}/protocols/${protoName}.cpp
            ${CMAKE_SOURCE_DIR}/protocols/${protoName}.hpp
-    COMMAND hyprwayland-scanner --client ${path}/${protoName}.xml
+    COMMAND abyss-scanner --client ${path}/${protoName}.xml
             ${CMAKE_SOURCE_DIR}/protocols/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-  target_sources(hyprtoolkit PRIVATE protocols/${protoName}.cpp
+  target_sources(abysstoolkit PRIVATE protocols/${protoName}.cpp
                                      protocols/${protoName}.hpp)
 endfunction()
 function(protocolWayland)
@@ -115,10 +115,10 @@ function(protocolWayland)
     OUTPUT ${CMAKE_SOURCE_DIR}/protocols/wayland.cpp
            ${CMAKE_SOURCE_DIR}/protocols/wayland.hpp
     COMMAND
-      hyprwayland-scanner --wayland-enums --client
+      abyss-scanner --wayland-enums --client
       ${WAYLAND_SCANNER_PKGDATA_DIR}/wayland.xml ${CMAKE_SOURCE_DIR}/protocols/
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-  target_sources(hyprtoolkit PRIVATE protocols/wayland.cpp
+  target_sources(abysstoolkit PRIVATE protocols/wayland.cpp
                                      protocols/wayland.hpp)
 endfunction()
 
@@ -143,19 +143,19 @@ if(BUILD_TESTING)
   add_custom_target(tests)
 
   add_executable(simpleWindow "tests/SimpleWindow.cpp")
-  target_link_libraries(simpleWindow PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(simpleWindow PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests simpleWindow)
 
   add_executable(dialog "tests/Dialog.cpp")
-  target_link_libraries(dialog PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(dialog PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests dialog)
 
   add_executable(controls "tests/Controls.cpp")
-  target_link_libraries(controls PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(controls PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests controls)
 
   add_executable(simpleSessionLock "tests/SimpleSessionLock.cpp")
-  target_link_libraries(simpleSessionLock PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(simpleSessionLock PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests simpleSessionLock)
 
 
@@ -163,26 +163,26 @@ if(BUILD_TESTING)
   find_package(GTest CONFIG REQUIRED)
   include(GoogleTest)
   file(GLOB_RECURSE TESTFILES CONFIGURE_DEPENDS "tests/unit/*.cpp")
-  add_executable(hyprtoolkit_tests ${TESTFILES})
-  target_compile_options(hyprtoolkit_tests PRIVATE --coverage)
-  target_link_options(hyprtoolkit_tests PRIVATE --coverage)
+  add_executable(abysstoolkit_tests ${TESTFILES})
+  target_compile_options(abysstoolkit_tests PRIVATE --coverage)
+  target_link_options(abysstoolkit_tests PRIVATE --coverage)
   target_include_directories(
-    hyprtoolkit_tests
+    abysstoolkit_tests
     PUBLIC "./include"
     PRIVATE "./src" "./src/include" "./protocols" "${CMAKE_BINARY_DIR}")
   target_link_libraries(
-    hyprtoolkit_tests PRIVATE hyprtoolkit GTest::gtest_main OpenGL::EGL
+    abysstoolkit_tests PRIVATE abysstoolkit GTest::gtest_main OpenGL::EGL
                                      OpenGL::OpenGL PkgConfig::deps)
 
-  gtest_discover_tests(hyprtoolkit_tests)
+  gtest_discover_tests(abysstoolkit_tests)
 
-  # Add coverage to hyprtoolkit
-  target_compile_options(hyprtoolkit PRIVATE --coverage)
-  target_link_options(hyprtoolkit PRIVATE --coverage)
+  # Add coverage to abysstoolkit
+  target_compile_options(abysstoolkit PRIVATE --coverage)
+  target_link_options(abysstoolkit PRIVATE --coverage)
 endif()
 
 # Installation
-install(TARGETS hyprtoolkit)
-install(DIRECTORY "include/hyprtoolkit" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-install(FILES ${CMAKE_BINARY_DIR}/hyprtoolkit.pc
+install(TARGETS abysstoolkit)
+install(DIRECTORY "include/abysstoolkit" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(FILES ${CMAKE_BINARY_DIR}/abysstoolkit.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)

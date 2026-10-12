@@ -1,14 +1,14 @@
 #pragma once
 
-#include <hyprtoolkit/core/LogTypes.hpp>
-#include <hyprtoolkit/core/Backend.hpp>
+#include <abysstoolkit/core/LogTypes.hpp>
+#include <abysstoolkit/core/Backend.hpp>
 
-#include <hyprutils/cli/Logger.hpp>
+#include <abyssutils/cli/Logger.hpp>
 #include <optional>
 
 #include "../helpers/Env.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CLogger {
       public:
         CLogger();
@@ -38,11 +38,11 @@ namespace Hyprtoolkit {
 
         void                                                                 updateLogLevel();
 
-        Hyprutils::CLI::CLogger                                              m_logger;
+        Abyssutils::CLI::CLogger                                              m_logger;
         IBackend::LogFn                                                      m_logFn;
-        Hyprutils::Memory::CSharedPointer<Hyprutils::CLI::CLoggerConnection> m_loggerConnection;
-        Hyprutils::Memory::CSharedPointer<Hyprutils::CLI::CLoggerConnection> m_aqLoggerConnection;
+        Abyssutils::Memory::CSharedPointer<Abyssutils::CLI::CLoggerConnection> m_loggerConnection;
+        Abyssutils::Memory::CSharedPointer<Abyssutils::CLI::CLoggerConnection> m_aqLoggerConnection;
     };
 
-    inline Hyprutils::Memory::CSharedPointer<CLogger> g_logger;
+    inline Abyssutils::Memory::CSharedPointer<CLogger> g_logger;
 };

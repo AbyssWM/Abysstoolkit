@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IWaylandWindow.hpp"
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CWaylandWindow : public IWaylandWindow {
       public:

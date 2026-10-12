@@ -1,6 +1,6 @@
 #include "RowLayout.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CRowLayoutBuilder> CRowLayoutBuilder::begin() {
     SP<CRowLayoutBuilder> p = SP<CRowLayoutBuilder>(new CRowLayoutBuilder());

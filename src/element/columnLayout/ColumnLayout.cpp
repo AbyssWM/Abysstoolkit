@@ -9,7 +9,7 @@
 #include "../Element.hpp"
 #include "../LinearLayout.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CColumnLayoutElement> CColumnLayoutElement::create(const SColumnLayoutData& data) {
     auto p          = SP<CColumnLayoutElement>(new CColumnLayoutElement(data));
@@ -41,16 +41,16 @@ void CColumnLayoutElement::replaceData(const SColumnLayoutData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-void CColumnLayoutElement::reposition(const Hyprutils::Math::CBox& sbox, const Hyprutils::Math::Vector2D& maxSize) {
+void CColumnLayoutElement::reposition(const Abyssutils::Math::CBox& sbox, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(sbox);
     LinearLayout::reposition<false>(this, impl->position, impl->children, m_impl->data.gap, [this](SP<IElement> c) { return childSize(c); });
 }
 
-Hyprutils::Math::Vector2D CColumnLayoutElement::size() {
+Abyssutils::Math::Vector2D CColumnLayoutElement::size() {
     return impl->position.size();
 }
 
-Hyprutils::Math::Vector2D CColumnLayoutElement::childSize(Hyprutils::Memory::CSharedPointer<IElement> child) {
+Abyssutils::Math::Vector2D CColumnLayoutElement::childSize(Abyssutils::Memory::CSharedPointer<IElement> child) {
     if (child->preferredSize(impl->position.size()))
         return *child->preferredSize(impl->position.size());
     else if (child->minimumSize(impl->position.size()))
@@ -58,7 +58,7 @@ Hyprutils::Math::Vector2D CColumnLayoutElement::childSize(Hyprutils::Memory::CSh
     return {-1, -1};
 }
 
-std::optional<Hyprutils::Math::Vector2D> CColumnLayoutElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> CColumnLayoutElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto calc = m_impl->data.size.calculate(parent);
 
     if (calc.x != -1 && calc.y != -1)
@@ -87,7 +87,7 @@ std::optional<Hyprutils::Math::Vector2D> CColumnLayoutElement::preferredSize(con
     return calc;
 }
 
-std::optional<Hyprutils::Math::Vector2D> CColumnLayoutElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> CColumnLayoutElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     Vector2D min;
     for (const auto& child : impl->children) {
         min.x = std::max(min.x, childSize(child).x);

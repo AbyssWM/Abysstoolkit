@@ -1,8 +1,8 @@
 #include "UTF8.hpp"
 #include <string_view>
 
-using namespace Hyprtoolkit;
-using namespace Hyprtoolkit::UTF8;
+using namespace Abysstoolkit;
+using namespace Abysstoolkit::UTF8;
 
 size_t UTF8::codepointLen(const char* utf8Char, size_t max) {
     size_t len = 1;

@@ -1,6 +1,6 @@
 #include "Text.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CTextBuilder> CTextBuilder::begin() {
     SP<CTextBuilder> p = SP<CTextBuilder>(new CTextBuilder());
@@ -40,7 +40,7 @@ SP<CTextBuilder> CTextBuilder::fontFamily(std::string&& x) {
     return m_self.lock();
 }
 
-SP<CTextBuilder> CTextBuilder::clampSize(Hyprutils::Math::Vector2D&& x) {
+SP<CTextBuilder> CTextBuilder::clampSize(Abyssutils::Math::Vector2D&& x) {
     m_data->clampSize = std::move(x);
     return m_self.lock();
 }

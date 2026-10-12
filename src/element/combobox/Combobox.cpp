@@ -1,10 +1,10 @@
 #include "Combobox.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
-#include <hyprtoolkit/element/ScrollArea.hpp>
-#include <hyprtoolkit/element/RowLayout.hpp>
-#include <hyprtoolkit/element/ColumnLayout.hpp>
-#include <hyprtoolkit/element/Button.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
+#include <abysstoolkit/element/ScrollArea.hpp>
+#include <abysstoolkit/element/RowLayout.hpp>
+#include <abysstoolkit/element/ColumnLayout.hpp>
+#include <abysstoolkit/element/Button.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -16,8 +16,8 @@
 
 #include "../../Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CComboboxElement> CComboboxElement::create(const SComboboxData& data) {
     auto p          = SP<CComboboxElement>(new CComboboxElement(data));
@@ -241,25 +241,25 @@ SP<CComboboxBuilder> CComboboxElement::rebuild() {
     return p;
 }
 
-void CComboboxElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CComboboxElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
 }
 
-Hyprutils::Math::Vector2D CComboboxElement::size() {
+Abyssutils::Math::Vector2D CComboboxElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CComboboxElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CComboboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CComboboxElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CComboboxElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CComboboxElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CComboboxElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 

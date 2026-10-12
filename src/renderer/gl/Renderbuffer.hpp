@@ -2,17 +2,17 @@
 
 #include "../../helpers/Memory.hpp"
 #include "Framebuffer.hpp"
-#include <aquamarine/buffer/Buffer.hpp>
-#include <hyprutils/signal/Listener.hpp>
+#include <abyssal/buffer/Buffer.hpp>
+#include <abyssutils/signal/Listener.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CSyncTimeline;
     class CEGLSync;
 
     class CRenderbuffer {
       public:
-        CRenderbuffer(SP<Aquamarine::IBuffer> buffer, uint32_t format);
+        CRenderbuffer(SP<Abyssal::IBuffer> buffer, uint32_t format);
         ~CRenderbuffer();
 
         bool                    good();
@@ -22,7 +22,7 @@ namespace Hyprtoolkit {
         CFramebuffer*           getFB();
         uint32_t                getFormat();
 
-        WP<Aquamarine::IBuffer> m_hlBuffer;
+        WP<Abyssal::IBuffer> m_hlBuffer;
 
         SP<CSyncTimeline>       m_syncTimeline;
 
@@ -34,7 +34,7 @@ namespace Hyprtoolkit {
         bool         m_good      = false;
 
         struct {
-            Hyprutils::Signal::CHyprSignalListener destroyBuffer;
+            Abyssutils::Signal::CAbyssSignalListener destroyBuffer;
         } m_listeners;
     };
 }

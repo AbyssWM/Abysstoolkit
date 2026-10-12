@@ -1,6 +1,6 @@
 #include "Spinbox.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CSpinboxBuilder> CSpinboxBuilder::begin() {
     SP<CSpinboxBuilder> p = SP<CSpinboxBuilder>(new CSpinboxBuilder());
@@ -29,7 +29,7 @@ SP<CSpinboxBuilder> CSpinboxBuilder::fill(bool x) {
     return m_self.lock();
 }
 
-SP<CSpinboxBuilder> CSpinboxBuilder::onChanged(std::function<void(Hyprutils::Memory::CSharedPointer<CSpinboxElement>, size_t)>&& x) {
+SP<CSpinboxBuilder> CSpinboxBuilder::onChanged(std::function<void(Abyssutils::Memory::CSharedPointer<CSpinboxElement>, size_t)>&& x) {
     m_data->onChanged = std::move(x);
     return m_self.lock();
 }

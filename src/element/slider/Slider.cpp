@@ -1,6 +1,6 @@
 #include "Slider.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 #include <cmath>
 
 #include "../../core/InternalBackend.hpp"
@@ -10,8 +10,8 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CSliderElement> CSliderElement::create(const SSliderData& data) {
     auto p          = SP<CSliderElement>(new CSliderElement(data));
@@ -130,7 +130,7 @@ bool CSliderElement::sliding() {
     return m_impl->dragging;
 }
 
-void CSliderElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CSliderElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -183,11 +183,11 @@ std::string SSliderImpl::valueAsText() {
     return std::format("{:.1f}", data.current);
 }
 
-Hyprutils::Math::Vector2D CSliderElement::size() {
+Abyssutils::Math::Vector2D CSliderElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CSliderElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSliderElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
 
     if (s.x != -1 && s.y != -1)
@@ -203,7 +203,7 @@ std::optional<Vector2D> CSliderElement::preferredSize(const Hyprutils::Math::Vec
     return s;
 }
 
-std::optional<Vector2D> CSliderElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSliderElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
@@ -218,7 +218,7 @@ std::optional<Vector2D> CSliderElement::minimumSize(const Hyprutils::Math::Vecto
     return s;
 }
 
-std::optional<Vector2D> CSliderElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSliderElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

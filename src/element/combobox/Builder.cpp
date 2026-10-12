@@ -1,6 +1,6 @@
 #include "Combobox.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CComboboxBuilder> CComboboxBuilder::begin() {
     SP<CComboboxBuilder> p = SP<CComboboxBuilder>(new CComboboxBuilder());
@@ -19,7 +19,7 @@ SP<CComboboxBuilder> CComboboxBuilder::currentItem(size_t x) {
     return m_self.lock();
 }
 
-SP<CComboboxBuilder> CComboboxBuilder::onChanged(std::function<void(Hyprutils::Memory::CSharedPointer<CComboboxElement>, size_t)>&& x) {
+SP<CComboboxBuilder> CComboboxBuilder::onChanged(std::function<void(Abyssutils::Memory::CSharedPointer<CComboboxElement>, size_t)>&& x) {
     m_data->onChanged = std::move(x);
     return m_self.lock();
 }

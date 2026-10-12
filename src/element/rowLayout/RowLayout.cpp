@@ -9,7 +9,7 @@
 #include "../Element.hpp"
 #include "../LinearLayout.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CRowLayoutElement> CRowLayoutElement::create(const SRowLayoutData& data) {
     auto p          = SP<CRowLayoutElement>(new CRowLayoutElement(data));
@@ -33,12 +33,12 @@ void CRowLayoutElement::replaceData(const SRowLayoutData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-void CRowLayoutElement::reposition(const Hyprutils::Math::CBox& sbox, const Hyprutils::Math::Vector2D& maxSize) {
+void CRowLayoutElement::reposition(const Abyssutils::Math::CBox& sbox, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(sbox);
     LinearLayout::reposition<true>(this, impl->position, impl->children, m_impl->data.gap, [this](SP<IElement> c) { return childSize(c); });
 }
 
-Hyprutils::Math::Vector2D CRowLayoutElement::childSize(Hyprutils::Memory::CSharedPointer<IElement> child) {
+Abyssutils::Math::Vector2D CRowLayoutElement::childSize(Abyssutils::Memory::CSharedPointer<IElement> child) {
     if (child->preferredSize(impl->position.size()))
         return *child->preferredSize(impl->position.size());
     else if (child->minimumSize(impl->position.size()))
@@ -46,11 +46,11 @@ Hyprutils::Math::Vector2D CRowLayoutElement::childSize(Hyprutils::Memory::CShare
     return {-1, -1};
 }
 
-Hyprutils::Math::Vector2D CRowLayoutElement::size() {
+Abyssutils::Math::Vector2D CRowLayoutElement::size() {
     return impl->position.size();
 }
 
-std::optional<Hyprutils::Math::Vector2D> CRowLayoutElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> CRowLayoutElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto calc = m_impl->data.size.calculate(parent);
 
     if (calc.x != -1 && calc.y != -1)
@@ -79,7 +79,7 @@ std::optional<Hyprutils::Math::Vector2D> CRowLayoutElement::preferredSize(const 
     return calc;
 }
 
-std::optional<Hyprutils::Math::Vector2D> CRowLayoutElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> CRowLayoutElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     Vector2D min;
     for (const auto& child : impl->children) {
         min.y = std::max(min.y, childSize(child).y);

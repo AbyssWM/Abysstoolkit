@@ -1,6 +1,6 @@
 #include "Rectangle.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CRectangleBuilder> CRectangleBuilder::begin() {
     SP<CRectangleBuilder> p = SP<CRectangleBuilder>(new CRectangleBuilder());

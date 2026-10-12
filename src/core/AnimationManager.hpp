@@ -1,12 +1,12 @@
 #pragma once
 
-#include <hyprutils/animation/AnimationManager.hpp>
-#include <hyprutils/animation/AnimatedVariable.hpp>
+#include <abyssutils/animation/AnimationManager.hpp>
+#include <abyssutils/animation/AnimatedVariable.hpp>
 
 #include "AnimatedVariable.hpp"
 
-namespace Hyprtoolkit {
-    class CHTAnimationManager : public Hyprutils::Animation::CAnimationManager {
+namespace Abysstoolkit {
+    class CHTAnimationManager : public Abyssutils::Animation::CAnimationManager {
       public:
         CHTAnimationManager();
 
@@ -14,18 +14,18 @@ namespace Hyprtoolkit {
         virtual void scheduleTick();
         virtual void onTicked();
 
-        using SAnimationPropertyConfig = Hyprutils::Animation::SAnimationPropertyConfig;
+        using SAnimationPropertyConfig = Abyssutils::Animation::SAnimationPropertyConfig;
 
         template <Animable VarType>
         void createAnimation(const VarType& v, PHLANIMVAR<VarType>& pav, SP<SAnimationPropertyConfig> pConfig) {
             constexpr const eAnimatedVarType EAVTYPE = typeToeAnimatedVarType<VarType>;
             pav                                      = makeUnique<CAnimatedVariable<VarType>>();
 
-            pav->create2(EAVTYPE, static_cast<Hyprutils::Animation::CAnimationManager*>(this), pav, v);
+            pav->create2(EAVTYPE, static_cast<Abyssutils::Animation::CAnimationManager*>(this), pav, v);
             pav->setConfig(pConfig);
         }
 
-        Hyprutils::Animation::CAnimationConfigTree m_animationTree;
+        Abyssutils::Animation::CAnimationConfigTree m_animationTree;
     };
 
     inline SP<CHTAnimationManager> g_animationManager;

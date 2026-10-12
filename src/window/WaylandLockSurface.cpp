@@ -1,8 +1,8 @@
 #include "WaylandLockSurface.hpp"
 
-#include <aquamarine/allocator/Swapchain.hpp>
-#include <hyprtoolkit/element/Null.hpp>
-#include <aquamarine/output/Output.hpp>
+#include <abyssal/allocator/Swapchain.hpp>
+#include <abysstoolkit/element/Null.hpp>
+#include <abyssal/output/Output.hpp>
 
 #include "../core/AnimationManager.hpp"
 #include "../core/InternalBackend.hpp"
@@ -14,8 +14,8 @@
 
 #include "../Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 CWaylandLockSurface::CWaylandLockSurface(const SWindowCreationData& data) : m_outputHandle(data.prefferedOutputId) {
     m_rootElement = CNullBuilder::begin()->commence();

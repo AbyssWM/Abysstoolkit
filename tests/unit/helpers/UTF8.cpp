@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 TEST(UTF8, codepointLen) {
     const auto str = std::string("世 hello 🧑‍🌾");

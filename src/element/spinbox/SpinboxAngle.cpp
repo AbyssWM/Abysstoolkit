@@ -1,6 +1,6 @@
 #include "Spinbox.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -9,8 +9,8 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CSpinboxAngleElement> CSpinboxAngleElement::create(const SSpinboxAngleData& data) {
     auto p        = SP<CSpinboxAngleElement>(new CSpinboxAngleElement(data));
@@ -57,25 +57,25 @@ void CSpinboxAngleElement::paint() {
     });
 }
 
-void CSpinboxAngleElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CSpinboxAngleElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
 }
 
-Hyprutils::Math::Vector2D CSpinboxAngleElement::size() {
+Abyssutils::Math::Vector2D CSpinboxAngleElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CSpinboxAngleElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSpinboxAngleElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CSpinboxAngleElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSpinboxAngleElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CSpinboxAngleElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSpinboxAngleElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 

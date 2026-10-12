@@ -8,21 +8,21 @@
 #include "../element/rectangle/Rectangle.hpp"
 #include "../Macros.hpp"
 
-#include <hyprtoolkit/core/Timer.hpp>
+#include <abysstoolkit/core/Timer.hpp>
 
 #include <algorithm>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
-struct Hyprtoolkit::SToolkitWindowData {
-    void         lock(const Hyprutils::Math::Vector2D& coord = {});
+struct Abysstoolkit::SToolkitWindowData {
+    void         lock(const Abyssutils::Math::Vector2D& coord = {});
     void         unlock();
 
     size_t       cursorFocusLocks = 0;
     WP<IElement> self;
 };
 
-void SToolkitWindowData::lock(const Hyprutils::Math::Vector2D& coord) {
+void SToolkitWindowData::lock(const Abyssutils::Math::Vector2D& coord) {
     cursorFocusLocks++;
 
     if (cursorFocusLocks == 1)
@@ -37,7 +37,7 @@ void SToolkitWindowData::unlock() {
         self->impl->m_externalEvents.mouseLeave.emit();
 }
 
-SToolkitFocusLock::SToolkitFocusLock(SP<IElement> e, const Hyprutils::Math::Vector2D& coord) : m_el(e) {
+SToolkitFocusLock::SToolkitFocusLock(SP<IElement> e, const Abyssutils::Math::Vector2D& coord) : m_el(e) {
     m_el->impl->toolkitWindowData->lock(coord);
 }
 
@@ -46,7 +46,7 @@ SToolkitFocusLock::~SToolkitFocusLock() {
         m_el->impl->toolkitWindowData->unlock();
 }
 
-void IToolkitWindow::damage(Hyprutils::Math::CRegion&& rg) {
+void IToolkitWindow::damage(Abyssutils::Math::CRegion&& rg) {
     rg.scale(scale());
 
     if (m_damageRing.damage(std::move(rg)))
@@ -146,7 +146,7 @@ void IToolkitWindow::initElementIfNeeded(SP<IElement> e) {
     e->impl->toolkitWindowData->self = e;
 }
 
-void IToolkitWindow::updateFocus(const Hyprutils::Math::Vector2D& coords) {
+void IToolkitWindow::updateFocus(const Abyssutils::Math::Vector2D& coords) {
     m_mousePos = coords;
 
     SP<IElement>                       el;
@@ -211,7 +211,7 @@ void IToolkitWindow::updateFocus(const Hyprutils::Math::Vector2D& coords) {
         m_tooltip.hoverTooltipTimer.reset();
 }
 
-void IToolkitWindow::mouseEnter(const Hyprutils::Math::Vector2D& local) {
+void IToolkitWindow::mouseEnter(const Abyssutils::Math::Vector2D& local) {
     updateFocus(local);
 
     if (m_mainHoverElement && m_mainHoverElement->m_el)
@@ -224,7 +224,7 @@ void IToolkitWindow::mouseEnter(const Hyprutils::Math::Vector2D& local) {
     }
 }
 
-void IToolkitWindow::mouseMove(const Hyprutils::Math::Vector2D& local) {
+void IToolkitWindow::mouseMove(const Abyssutils::Math::Vector2D& local) {
     updateFocus(local);
 
     if (m_tooltip.tooltipPopup)
@@ -314,7 +314,7 @@ void IToolkitWindow::setKeyboardFocus(SP<IElement> e) {
     e->impl->m_externalEvents.keyboardEnter.emit();
 }
 
-void IToolkitWindow::setIMTo(const Hyprutils::Math::CBox& box, const std::string& str, size_t cursor) {
+void IToolkitWindow::setIMTo(const Abyssutils::Math::CBox& box, const std::string& str, size_t cursor) {
     ;
 }
 
@@ -322,11 +322,11 @@ void IToolkitWindow::resetIM() {
     ;
 }
 
-Hyprutils::Math::Vector2D IToolkitWindow::cursorPos() {
+Abyssutils::Math::Vector2D IToolkitWindow::cursorPos() {
     return m_mousePos;
 }
 
-void IToolkitWindow::openTooltip(const std::string& s, const Hyprutils::Math::Vector2D& pos) {
+void IToolkitWindow::openTooltip(const std::string& s, const Abyssutils::Math::Vector2D& pos) {
     if (m_tooltip.tooltipPopup)
         return;
 
@@ -358,7 +358,7 @@ void IToolkitWindow::openTooltip(const std::string& s, const Hyprutils::Math::Ve
     m_tooltip.tooltipPopup = reinterpretPointerCast<IToolkitWindow>(CWindowBuilder::begin()
                                                                         ->type(eWindowType::HT_WINDOW_POPUP)
                                                                         ->pos(pos)
-                                                                        ->preferredSize(EXPECTED_TEXT_SIZE + Hyprutils::Math::Vector2D{30, 10})
+                                                                        ->preferredSize(EXPECTED_TEXT_SIZE + Abyssutils::Math::Vector2D{30, 10})
                                                                         ->parent(m_self.lock())
                                                                         ->commence());
 

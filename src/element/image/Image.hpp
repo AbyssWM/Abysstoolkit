@@ -1,9 +1,9 @@
-#include <hyprtoolkit/element/Image.hpp>
+#include <abysstoolkit/element/Image.hpp>
 
 #include "../../helpers/Memory.hpp"
 #include "../../resource/assetCache/AssetCacheEntry.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     struct SImageData {
         std::string                path;
         float                      a        = 1.F;
@@ -22,23 +22,23 @@ namespace Hyprtoolkit {
 
         float                                                                 lastScale = 1.F;
 
-        Hyprutils::Memory::CSharedPointer<Asset::CAssetCacheEntry>            cacheEntry;
-        Hyprutils::Memory::CSharedPointer<Asset::CAssetCacheEntry>            oldCacheEntry; // while loading a new one
-        Hyprutils::Memory::CAtomicSharedPointer<Hyprgraphics::CImageResource> resource;
-        Hyprutils::Math::Vector2D                                             size;
+        Abyssutils::Memory::CSharedPointer<Asset::CAssetCacheEntry>            cacheEntry;
+        Abyssutils::Memory::CSharedPointer<Asset::CAssetCacheEntry>            oldCacheEntry; // while loading a new one
+        Abyssutils::Memory::CAtomicSharedPointer<Abyssgraphics::CImageResource> resource;
+        Abyssutils::Math::Vector2D                                             size;
 
         bool                                                                  waitingForTex = false, failed = false;
 
         std::string                                                           lastPath = "";
         void*                                                                 lastData = nullptr;
 
-        Hyprutils::Math::Vector2D                                             preferredSvgSize();
+        Abyssutils::Math::Vector2D                                             preferredSvgSize();
         void                                                                  postImageLoad();
         void                                                                  postImageScheduleRecalc();
         std::string                                                           getCacheString();
 
         struct {
-            Hyprutils::Signal::CHyprSignalListener cacheEntryDone;
+            Abyssutils::Signal::CAbyssSignalListener cacheEntryDone;
         } listeners;
     };
 }

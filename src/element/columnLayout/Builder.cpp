@@ -1,6 +1,6 @@
 #include "ColumnLayout.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CColumnLayoutBuilder> CColumnLayoutBuilder::begin() {
     SP<CColumnLayoutBuilder> p = SP<CColumnLayoutBuilder>(new CColumnLayoutBuilder());

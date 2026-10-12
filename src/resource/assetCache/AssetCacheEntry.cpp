@@ -1,7 +1,7 @@
 #include "AssetCacheEntry.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprtoolkit::Asset;
+using namespace Abysstoolkit;
+using namespace Abysstoolkit::Asset;
 
 CAssetCacheEntry::CAssetCacheEntry(const std::string_view& source, const SP<IRendererTexture> tex) : m_source(source), m_tex(tex), m_status(CACHE_ENTRY_DONE) {
     ;

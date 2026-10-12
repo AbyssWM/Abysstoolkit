@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <hyprtoolkit/element/Text.hpp>
+#include <abysstoolkit/element/Text.hpp>
 #include <pango/pangocairo.h>
 
 #include <mutex>
@@ -10,7 +10,7 @@
 #include "../../helpers/Memory.hpp"
 #include "../../core/InternalBackend.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     struct STextData {
         std::string                              text;
         std::string                              fontFamily = g_palette ? g_palette->m_vars.fontFamily : "Sans Serif";
@@ -19,7 +19,7 @@ namespace Hyprtoolkit {
         colorFn                                  color       = [] { return g_backend->getPalette()->m_colors.text; };
         float                                    a           = 1.F;
         bool                                     noEllipsize = false;
-        std::optional<Hyprutils::Math::Vector2D> clampSize;
+        std::optional<Abyssutils::Math::Vector2D> clampSize;
         CDynamicSize                             size{CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1, 1}};
         std::function<void()>                    callback; // called after resource is loaded
         bool                                     async = true;
@@ -29,7 +29,7 @@ namespace Hyprtoolkit {
     struct STextLink {
         uint64_t                 begin = 0, end = 0;
         std::string              link;
-        Hyprutils::Math::CRegion region;
+        Abyssutils::Math::CRegion region;
     };
 
     struct STextImpl {
@@ -45,24 +45,24 @@ namespace Hyprtoolkit {
         float                                                                                          lastScale            = 1.F;
         bool                                                                                           needsTexRefresh = false, newTex = false;
 
-        Hyprutils::Math::Vector2D                                                                      lastMaxSize;
+        Abyssutils::Math::Vector2D                                                                      lastMaxSize;
 
         SP<IRendererTexture>                                                                           tex;
         SP<IRendererTexture>                                                                           oldTex; // while loading a new one
-        ASP<Hyprgraphics::CTextResource>                                                               resource;
-        Hyprutils::Math::Vector2D                                                                      size, preferred;
+        ASP<Abyssgraphics::CTextResource>                                                               resource;
+        Abyssutils::Math::Vector2D                                                                      size, preferred;
 
-        Hyprutils::Math::Vector2D                                                                      lastCursorPos;
+        Abyssutils::Math::Vector2D                                                                      lastCursorPos;
 
         bool                                                                                           waitingForTex = false;
 
-        Hyprutils::Math::Vector2D                                                                      getTextSizePreferred();
-        Hyprutils::Math::CBox                                                                          getCharBox(size_t offset);
-        std::optional<size_t>                                                                          vecToOffset(const Hyprutils::Math::Vector2D& vec);
+        Abyssutils::Math::Vector2D                                                                      getTextSizePreferred();
+        Abyssutils::Math::CBox                                                                          getCharBox(size_t offset);
+        std::optional<size_t>                                                                          vecToOffset(const Abyssutils::Math::Vector2D& vec);
         float                                                                                          getCursorPos(size_t offset);
-        float                                                                                          getCursorPos(const Hyprutils::Math::Vector2D& click);
-        Hyprutils::Math::Vector2D                                                                      unscale(const Hyprutils::Math::Vector2D& x);
-        std::tuple<UP<Hyprgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Hyprutils::Math::Vector2D> prepPangoLayout();
+        float                                                                                          getCursorPos(const Abyssutils::Math::Vector2D& click);
+        Abyssutils::Math::Vector2D                                                                      unscale(const Abyssutils::Math::Vector2D& x);
+        std::tuple<UP<Abyssgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Abyssutils::Math::Vector2D> prepPangoLayout();
         void                                                                                           scheduleTexRefresh();
         void                                                                                           renderTex();
         void                                                                                           postTexLoad();

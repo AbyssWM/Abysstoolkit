@@ -1,9 +1,9 @@
 #include "Window.hpp"
 #include "../core/InternalBackend.hpp"
-#include <hyprtoolkit/core/Output.hpp>
+#include <abysstoolkit/core/Output.hpp>
 #include "ToolkitWindow.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CWindowBuilder> CWindowBuilder::begin() {
     SP<CWindowBuilder> p = SP<CWindowBuilder>(new CWindowBuilder());
@@ -27,17 +27,17 @@ SP<CWindowBuilder> CWindowBuilder::appClass(std::string&& x) {
     return m_self.lock();
 }
 
-SP<CWindowBuilder> CWindowBuilder::preferredSize(const Hyprutils::Math::Vector2D& x) {
+SP<CWindowBuilder> CWindowBuilder::preferredSize(const Abyssutils::Math::Vector2D& x) {
     m_data->preferredSize = x;
     return m_self.lock();
 }
 
-SP<CWindowBuilder> CWindowBuilder::minSize(const Hyprutils::Math::Vector2D& x) {
+SP<CWindowBuilder> CWindowBuilder::minSize(const Abyssutils::Math::Vector2D& x) {
     m_data->minSize = x;
     return m_self.lock();
 }
 
-SP<CWindowBuilder> CWindowBuilder::maxSize(const Hyprutils::Math::Vector2D& x) {
+SP<CWindowBuilder> CWindowBuilder::maxSize(const Abyssutils::Math::Vector2D& x) {
     m_data->maxSize = x;
     return m_self.lock();
 }
@@ -52,17 +52,17 @@ SP<CWindowBuilder> CWindowBuilder::parent(const SP<IWindow>& x) {
     return m_self.lock();
 }
 
-SP<CWindowBuilder> CWindowBuilder::pos(const Hyprutils::Math::Vector2D& x) {
+SP<CWindowBuilder> CWindowBuilder::pos(const Abyssutils::Math::Vector2D& x) {
     m_data->pos = x;
     return m_self.lock();
 }
 
-SP<CWindowBuilder> CWindowBuilder::marginTopLeft(const Hyprutils::Math::Vector2D& x) {
+SP<CWindowBuilder> CWindowBuilder::marginTopLeft(const Abyssutils::Math::Vector2D& x) {
     m_data->marginTopLeft = x;
     return m_self.lock();
 }
 
-SP<CWindowBuilder> CWindowBuilder::marginBottomRight(const Hyprutils::Math::Vector2D& x) {
+SP<CWindowBuilder> CWindowBuilder::marginBottomRight(const Abyssutils::Math::Vector2D& x) {
     m_data->marginBottomRight = x;
     return m_self.lock();
 }

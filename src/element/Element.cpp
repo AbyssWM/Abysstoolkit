@@ -1,7 +1,7 @@
 #include "Element.hpp"
 
-#include <hyprutils/math/Box.hpp>
-#include <hyprtoolkit/types/SizeType.hpp>
+#include <abyssutils/math/Box.hpp>
+#include <abysstoolkit/types/SizeType.hpp>
 
 #include "../helpers/Memory.hpp"
 #include "../window/ToolkitWindow.hpp"
@@ -9,8 +9,8 @@
 
 #include <algorithm>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 IElement::IElement() {
     impl = UP<SElementInternalData>(new SElementInternalData());
@@ -70,7 +70,7 @@ void IElement::setPositionFlag(ePositionFlag flag, bool set) {
         impl->window->scheduleReposition(impl->self);
 }
 
-void IElement::setAbsolutePosition(const Hyprutils::Math::Vector2D& offset) {
+void IElement::setAbsolutePosition(const Abyssutils::Math::Vector2D& offset) {
     impl->absoluteOffset = offset;
     if (impl->window)
         impl->window->scheduleReposition(impl->self);
@@ -81,15 +81,15 @@ void IElement::setTooltip(std::string&& x) {
     impl->hasTooltip = !impl->tooltip.empty();
 }
 
-std::optional<Hyprutils::Math::Vector2D> IElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> IElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return std::nullopt;
 }
 
-std::optional<Hyprutils::Math::Vector2D> IElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> IElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return std::nullopt;
 }
 
-std::optional<Hyprutils::Math::Vector2D> IElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Abyssutils::Math::Vector2D> IElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return std::nullopt;
 }
 
@@ -103,7 +103,7 @@ void IElement::setGrow(bool growH, bool growV) {
     impl->growV = growV;
 }
 
-void IElement::addChild(Hyprutils::Memory::CSharedPointer<IElement> child) {
+void IElement::addChild(Abyssutils::Memory::CSharedPointer<IElement> child) {
     if (std::ranges::find(impl->children, child) != impl->children.end())
         return;
 
@@ -116,7 +116,7 @@ void IElement::addChild(Hyprutils::Memory::CSharedPointer<IElement> child) {
         impl->window->scheduleReposition(child);
 }
 
-void IElement::removeChild(Hyprutils::Memory::CSharedPointer<IElement> child) {
+void IElement::removeChild(Abyssutils::Memory::CSharedPointer<IElement> child) {
     if (std::ranges::find(impl->children, child) == impl->children.end())
         return;
 
@@ -158,7 +158,7 @@ void IElement::setMargin(float thick) {
     impl->margin = thick;
 }
 
-void IElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void IElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     impl->setPosition(box);
 
     if (impl->userFns.repositioned)
@@ -185,7 +185,7 @@ void IElement::setReceivesMouse(bool x) {
     impl->userRequestedMouseInput = true;
 }
 
-void IElement::setMouseEnter(std::function<void(const Hyprutils::Math::Vector2D&)>&& fn) {
+void IElement::setMouseEnter(std::function<void(const Abyssutils::Math::Vector2D&)>&& fn) {
     impl->userFns.mouseEnter = std::move(fn);
 }
 
@@ -193,7 +193,7 @@ void IElement::setMouseLeave(std::function<void()>&& fn) {
     impl->userFns.mouseLeave = std::move(fn);
 }
 
-void IElement::setMouseMove(std::function<void(const Hyprutils::Math::Vector2D&)>&& fn) {
+void IElement::setMouseMove(std::function<void(const Abyssutils::Math::Vector2D&)>&& fn) {
     impl->userFns.mouseMove = std::move(fn);
 }
 

@@ -1,7 +1,7 @@
 #include "WaylandPopup.hpp"
 #include "WaylandWindow.hpp"
 
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/element/Null.hpp>
 
 #include "../element/Element.hpp"
 #include "../core/platforms/WaylandPlatform.hpp"
@@ -12,8 +12,8 @@
 
 #include "../Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 CWaylandPopup::CWaylandPopup(const SWindowCreationData& data, SP<CWaylandWindow> window) : m_parent(window), m_creationData(data) {
     m_rootElement = CNullBuilder::begin()->commence();

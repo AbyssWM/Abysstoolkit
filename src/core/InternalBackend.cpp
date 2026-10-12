@@ -5,7 +5,7 @@
 #include <print>
 #include <cstdio>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 IBackend::~IBackend() = default;
 IBackend::IBackend()  = default;

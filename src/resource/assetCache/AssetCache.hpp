@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace Hyprtoolkit::Asset {
+namespace Abysstoolkit::Asset {
 
     // AssetCache is a cache for loading assets. Since we keep assets (images) as
     // textures in VRAM, we don't want to load the same raster asset multiple times.

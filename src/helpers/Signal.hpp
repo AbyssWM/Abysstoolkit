@@ -1,5 +1,5 @@
 #pragma once
 
-#include <hyprutils/signal/Listener.hpp>
+#include <abyssutils/signal/Listener.hpp>
 
-using namespace Hyprutils::Signal;
+using namespace Abyssutils::Signal;

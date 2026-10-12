@@ -1,7 +1,7 @@
 #include "DamageRing.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 void CDamageRing::setSize(const Vector2D& size_) {
     if (size_ == m_size)

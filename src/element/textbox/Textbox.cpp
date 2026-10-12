@@ -1,7 +1,7 @@
 #include "Textbox.hpp"
 
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/Null.hpp>
 #include <tuple>
 #include <xkbcommon/xkbcommon-keysyms.h>
 #include <pango/pangocairo.h>
@@ -14,7 +14,7 @@
 #include "../text/Text.hpp"
 #include "../../helpers/UTF8.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CTextboxElement> CTextboxElement::create(const STextboxData& data) {
     auto p          = SP<CTextboxElement>(new CTextboxElement(data));
@@ -604,7 +604,7 @@ size_t STextboxImpl::moveCharForwards() const {
     return inputState.cursor + UTF8::codepointLen(&data.text[inputState.cursor], data.text.length() - inputState.cursor);
 }
 
-void CTextboxElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CTextboxElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -630,22 +630,22 @@ void CTextboxElement::replaceData(const STextboxData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-Hyprutils::Math::Vector2D CTextboxElement::size() {
+Abyssutils::Math::Vector2D CTextboxElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CTextboxElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CTextboxElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextboxElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
     return Vector2D{0, 0};
 }
 
-std::optional<Vector2D> CTextboxElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextboxElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

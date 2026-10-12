@@ -2,10 +2,10 @@
 
 #include <cstddef>
 
-#include <hyprtoolkit/types/ImageTypes.hpp>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abysstoolkit/types/ImageTypes.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class IRendererTexture {
       public:
         IRendererTexture()          = default;
@@ -19,6 +19,6 @@ namespace Hyprtoolkit {
         virtual eTextureType              type()    = 0;
         virtual void                      destroy() = 0;
         virtual eImageFitMode             fitMode() = 0;
-        virtual Hyprutils::Math::Vector2D size()    = 0;
+        virtual Abyssutils::Math::Vector2D size()    = 0;
     };
 }

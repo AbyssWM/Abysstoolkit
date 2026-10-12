@@ -1,6 +1,6 @@
 #include "Spinbox.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -11,8 +11,8 @@
 
 #include "../../Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CSpinboxElement> CSpinboxElement::create(const SSpinboxData& data) {
     auto p          = SP<CSpinboxElement>(new CSpinboxElement(data));
@@ -54,7 +54,7 @@ void CSpinboxElement::paint() {
     ;
 }
 
-void CSpinboxElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CSpinboxElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -90,11 +90,11 @@ void CSpinboxElement::setCurrent(size_t current) {
         ->commence();
 }
 
-Hyprutils::Math::Vector2D CSpinboxElement::size() {
+Abyssutils::Math::Vector2D CSpinboxElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CSpinboxElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSpinboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
 
     if (s.x != -1 && s.y != -1)
@@ -110,7 +110,7 @@ std::optional<Vector2D> CSpinboxElement::preferredSize(const Hyprutils::Math::Ve
     return s;
 }
 
-std::optional<Vector2D> CSpinboxElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSpinboxElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
@@ -125,7 +125,7 @@ std::optional<Vector2D> CSpinboxElement::minimumSize(const Hyprutils::Math::Vect
     return s;
 }
 
-std::optional<Vector2D> CSpinboxElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CSpinboxElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 CWaylandSessionLockState::CWaylandSessionLockState(SP<CCExtSessionLockV1> lock) : m_lock(lock) {
     m_lock->setLocked([this](CCExtSessionLockV1* r) { m_sessionLocked = true; });

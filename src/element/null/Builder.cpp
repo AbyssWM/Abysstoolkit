@@ -1,6 +1,6 @@
 #include "Null.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CNullBuilder> CNullBuilder::begin() {
     SP<CNullBuilder> p = SP<CNullBuilder>(new CNullBuilder());

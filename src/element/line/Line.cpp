@@ -6,7 +6,7 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CLineElement> CLineElement::create(const SLineData& data) {
     auto p          = SP<CLineElement>(new CLineElement(data));
@@ -28,7 +28,7 @@ void CLineElement::paint() {
     });
 }
 
-void CLineElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CLineElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -53,22 +53,22 @@ void CLineElement::recheckColor() {
     ;
 }
 
-Hyprutils::Math::Vector2D CLineElement::size() {
+Abyssutils::Math::Vector2D CLineElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CLineElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CLineElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 
-std::optional<Vector2D> CLineElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CLineElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
     return Vector2D{0, 0};
 }
 
-std::optional<Vector2D> CLineElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CLineElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

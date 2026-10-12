@@ -1,9 +1,9 @@
 #pragma once
 
-#include <hyprtoolkit/types/PointerShape.hpp>
-#include <hyprtoolkit/core/Input.hpp>
-#include <hyprtoolkit/core/Timer.hpp>
-#include <hyprtoolkit/core/SessionLock.hpp>
+#include <abysstoolkit/types/PointerShape.hpp>
+#include <abysstoolkit/core/Input.hpp>
+#include <abysstoolkit/core/Timer.hpp>
+#include <abysstoolkit/core/SessionLock.hpp>
 
 #include "../../helpers/Memory.hpp"
 
@@ -26,10 +26,10 @@
 #include <linux-drm-syncobj-v1.hpp>
 #include <ext-session-lock-v1.hpp>
 
-#include <aquamarine/allocator/GBM.hpp>
-#include <aquamarine/backend/Misc.hpp>
+#include <abyssal/allocator/GBM.hpp>
+#include <abyssal/backend/Misc.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     typedef std::function<void(void)> FIdleCallback;
 
     class CWaylandWindow;
@@ -65,32 +65,32 @@ namespace Hyprtoolkit {
         SP<CWaylandSessionLockState> aquireSessionLock();
 
         // dmabuf formats
-        std::vector<Aquamarine::SDRMFormat> m_dmabufFormats;
+        std::vector<Abyssal::SDRMFormat> m_dmabufFormats;
 
-        SP<Aquamarine::CGBMAllocator>       m_allocator;
+        SP<Abyssal::CGBMAllocator>       m_allocator;
 
         struct {
             wl_display* display = nullptr;
 
             // hw-s types
-            Hyprutils::Memory::CSharedPointer<CCWlRegistry>                 registry;
-            Hyprutils::Memory::CSharedPointer<CCWlSeat>                     seat;
-            Hyprutils::Memory::CSharedPointer<CCWlShm>                      shm;
-            Hyprutils::Memory::CSharedPointer<CCXdgWmBase>                  xdg;
-            Hyprutils::Memory::CSharedPointer<CCWlCompositor>               compositor;
-            Hyprutils::Memory::CSharedPointer<CCZwpLinuxDmabufV1>           dmabuf;
-            Hyprutils::Memory::CSharedPointer<CCZwpLinuxDmabufFeedbackV1>   dmabufFeedback;
-            Hyprutils::Memory::CSharedPointer<CCWpFractionalScaleManagerV1> fractional;
-            Hyprutils::Memory::CSharedPointer<CCWpViewporter>               viewporter;
-            Hyprutils::Memory::CSharedPointer<CCWlKeyboard>                 keyboard;
-            Hyprutils::Memory::CSharedPointer<CCWlPointer>                  pointer;
-            Hyprutils::Memory::CSharedPointer<CCWpCursorShapeManagerV1>     cursorShapeMgr;
-            Hyprutils::Memory::CSharedPointer<CCWpCursorShapeDeviceV1>      cursorShapeDev;
-            Hyprutils::Memory::CSharedPointer<CCZwpTextInputManagerV3>      textInputManager;
-            Hyprutils::Memory::CSharedPointer<CCZwpTextInputV3>             textInput;
-            Hyprutils::Memory::CSharedPointer<CCZwlrLayerShellV1>           layerShell;
-            Hyprutils::Memory::CSharedPointer<CCWpLinuxDrmSyncobjManagerV1> syncobj;
-            Hyprutils::Memory::CSharedPointer<CCExtSessionLockManagerV1>    sessionLock;
+            Abyssutils::Memory::CSharedPointer<CCWlRegistry>                 registry;
+            Abyssutils::Memory::CSharedPointer<CCWlSeat>                     seat;
+            Abyssutils::Memory::CSharedPointer<CCWlShm>                      shm;
+            Abyssutils::Memory::CSharedPointer<CCXdgWmBase>                  xdg;
+            Abyssutils::Memory::CSharedPointer<CCWlCompositor>               compositor;
+            Abyssutils::Memory::CSharedPointer<CCZwpLinuxDmabufV1>           dmabuf;
+            Abyssutils::Memory::CSharedPointer<CCZwpLinuxDmabufFeedbackV1>   dmabufFeedback;
+            Abyssutils::Memory::CSharedPointer<CCWpFractionalScaleManagerV1> fractional;
+            Abyssutils::Memory::CSharedPointer<CCWpViewporter>               viewporter;
+            Abyssutils::Memory::CSharedPointer<CCWlKeyboard>                 keyboard;
+            Abyssutils::Memory::CSharedPointer<CCWlPointer>                  pointer;
+            Abyssutils::Memory::CSharedPointer<CCWpCursorShapeManagerV1>     cursorShapeMgr;
+            Abyssutils::Memory::CSharedPointer<CCWpCursorShapeDeviceV1>      cursorShapeDev;
+            Abyssutils::Memory::CSharedPointer<CCZwpTextInputManagerV3>      textInputManager;
+            Abyssutils::Memory::CSharedPointer<CCZwpTextInputV3>             textInput;
+            Abyssutils::Memory::CSharedPointer<CCZwlrLayerShellV1>           layerShell;
+            Abyssutils::Memory::CSharedPointer<CCWpLinuxDrmSyncobjManagerV1> syncobj;
+            Abyssutils::Memory::CSharedPointer<CCExtSessionLockManagerV1>    sessionLock;
 
             // control
             bool initialized  = false;

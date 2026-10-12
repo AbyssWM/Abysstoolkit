@@ -8,7 +8,7 @@
 
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CScrollAreaElement> CScrollAreaElement::create(const SScrollAreaData& data) {
     auto p          = SP<CScrollAreaElement>(new CScrollAreaElement(data));
@@ -55,7 +55,7 @@ void CScrollAreaElement::replaceData(const SScrollAreaData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-void CScrollAreaElement::reposition(const Hyprutils::Math::CBox& sbox, const Vector2D& maxSize) {
+void CScrollAreaElement::reposition(const Abyssutils::Math::CBox& sbox, const Vector2D& maxSize) {
     IElement::reposition(sbox);
 
     m_impl->clampMaxScroll();
@@ -76,7 +76,7 @@ Vector2D CScrollAreaElement::getCurrentScroll() {
     return m_impl->data.currentScroll;
 }
 
-void CScrollAreaElement::setScroll(const Hyprutils::Math::Vector2D& x) {
+void CScrollAreaElement::setScroll(const Abyssutils::Math::Vector2D& x) {
     m_impl->data.currentScroll = x;
     m_impl->clampMaxScroll();
 

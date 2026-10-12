@@ -1,6 +1,6 @@
 #include "Image.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CImageBuilder> CImageBuilder::begin() {
     SP<CImageBuilder> p = SP<CImageBuilder>(new CImageBuilder());
@@ -19,7 +19,7 @@ SP<CImageBuilder> CImageBuilder::a(float a) {
     return m_self.lock();
 }
 
-Hyprutils::Memory::CSharedPointer<CImageBuilder> CImageBuilder::sync(bool x) {
+Abyssutils::Memory::CSharedPointer<CImageBuilder> CImageBuilder::sync(bool x) {
     m_data->sync = x;
     return m_self.lock();
 }

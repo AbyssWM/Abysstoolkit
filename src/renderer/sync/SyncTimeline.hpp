@@ -3,18 +3,18 @@
 #include <cstdint>
 #include <optional>
 #include <functional>
-#include <hyprutils/os/FileDescriptor.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
 #include "../../helpers/Memory.hpp"
 
 /*
-    Yoinked from Hyprland.
+    Yoinked from Abyssland.
 */
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CSyncTimeline {
       public:
         static SP<CSyncTimeline> create(int drmFD_);
-        static SP<CSyncTimeline> create(int drmFD_, Hyprutils::OS::CFileDescriptor&& drmSyncobjFD);
+        static SP<CSyncTimeline> create(int drmFD_, Abyssutils::OS::CFileDescriptor&& drmSyncobjFD);
         ~CSyncTimeline();
 
         // check if the timeline point has been signaled
@@ -23,13 +23,13 @@ namespace Hyprtoolkit {
         std::optional<bool>            check(uint64_t point, uint32_t flags);
 
         bool                           addWaiter(std::function<void()>&& waiter, uint64_t point, uint32_t flags);
-        Hyprutils::OS::CFileDescriptor exportAsSyncFileFD(uint64_t src);
-        bool                           importFromSyncFileFD(uint64_t dst, Hyprutils::OS::CFileDescriptor& fd);
+        Abyssutils::OS::CFileDescriptor exportAsSyncFileFD(uint64_t src);
+        bool                           importFromSyncFileFD(uint64_t dst, Abyssutils::OS::CFileDescriptor& fd);
         bool                           transfer(SP<CSyncTimeline> from, uint64_t fromPoint, uint64_t toPoint);
         void                           signal(uint64_t point);
 
         int                            m_drmFD = -1;
-        Hyprutils::OS::CFileDescriptor m_syncobjFD;
+        Abyssutils::OS::CFileDescriptor m_syncobjFD;
         uint32_t                       m_handle = 0;
         WP<CSyncTimeline>              m_self;
 

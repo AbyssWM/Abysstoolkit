@@ -1,28 +1,28 @@
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/window/Window.hpp>
-#include <hyprtoolkit/system/Icons.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/RowLayout.hpp>
-#include <hyprtoolkit/element/ColumnLayout.hpp>
-#include <hyprtoolkit/element/Text.hpp>
-#include <hyprtoolkit/element/Image.hpp>
-#include <hyprtoolkit/element/Button.hpp>
-#include <hyprtoolkit/element/Null.hpp>
-#include <hyprtoolkit/element/Checkbox.hpp>
-#include <hyprtoolkit/element/Spinbox.hpp>
-#include <hyprtoolkit/element/Slider.hpp>
-#include <hyprtoolkit/element/ScrollArea.hpp>
-#include <hyprtoolkit/element/Combobox.hpp>
-#include <hyprtoolkit/element/Textbox.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/window/Window.hpp>
+#include <abysstoolkit/system/Icons.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/RowLayout.hpp>
+#include <abysstoolkit/element/ColumnLayout.hpp>
+#include <abysstoolkit/element/Text.hpp>
+#include <abysstoolkit/element/Image.hpp>
+#include <abysstoolkit/element/Button.hpp>
+#include <abysstoolkit/element/Null.hpp>
+#include <abysstoolkit/element/Checkbox.hpp>
+#include <abysstoolkit/element/Spinbox.hpp>
+#include <abysstoolkit/element/Slider.hpp>
+#include <abysstoolkit/element/ScrollArea.hpp>
+#include <abysstoolkit/element/Combobox.hpp>
+#include <abysstoolkit/element/Textbox.hpp>
 
-#include <hyprutils/memory/SharedPtr.hpp>
-#include <hyprutils/memory/UniquePtr.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/UniquePtr.hpp>
 
 #include <print>
 
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
-using namespace Hyprtoolkit;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
+using namespace Abysstoolkit;
 
 #define SP CSharedPointer
 #define WP CWeakPointer
@@ -63,7 +63,7 @@ static void toggleTextVisibility() {
 
 static void openPopup() {
     popup = CWindowBuilder::begin() //
-                ->type(Hyprtoolkit::HT_WINDOW_POPUP)
+                ->type(Abysstoolkit::HT_WINDOW_POPUP)
                 ->preferredSize({350, 600})
                 ->pos({200, 200})
                 ->parent(window)
@@ -81,8 +81,8 @@ static void openPopup() {
                        ->color([] { return backend->getPalette()->m_colors.text; })
                        ->commence();
 
-    poptext->setPositionMode(Hyprtoolkit::IElement::HT_POSITION_ABSOLUTE);
-    poptext->setPositionFlag(Hyprtoolkit::IElement::HT_POSITION_FLAG_CENTER, true);
+    poptext->setPositionMode(Abysstoolkit::IElement::HT_POSITION_ABSOLUTE);
+    poptext->setPositionFlag(Abysstoolkit::IElement::HT_POSITION_FLAG_CENTER, true);
 
     popup->m_rootElement->addChild(popbg);
     popbg->addChild(poptext);
@@ -129,7 +129,7 @@ int main(int argc, char** argv, char** envp) {
                  ->minSize({480, 480})
                  ->maxSize({1280, 720})
                  ->appTitle("Controls")
-                 ->appClass("hyprtoolkit-controls")
+                 ->appClass("abysstoolkit-controls")
                  ->commence();
 
     auto bg = CRectangleBuilder::begin()->color([] { return backend->getPalette()->m_colors.background; })->commence();
@@ -141,8 +141,8 @@ int main(int argc, char** argv, char** envp) {
     mainLayout = CColumnLayoutBuilder::begin()->gap(3)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_AUTO, {0.7F, 1.F}})->commence();
 
     mainLayout->setMargin(3);
-    mainLayout->setPositionMode(Hyprtoolkit::IElement::HT_POSITION_ABSOLUTE);
-    mainLayout->setPositionFlag(Hyprtoolkit::IElement::HT_POSITION_FLAG_HCENTER, true);
+    mainLayout->setPositionMode(Abysstoolkit::IElement::HT_POSITION_ABSOLUTE);
+    mainLayout->setPositionFlag(Abysstoolkit::IElement::HT_POSITION_FLAG_HCENTER, true);
 
     bg->addChild(scroll);
     scroll->addChild(mainLayout);
@@ -155,7 +155,7 @@ int main(int argc, char** argv, char** envp) {
     title->setTooltip("Example tooltip!! Woo!");
 
     auto hr = CRectangleBuilder::begin() //
-                  ->color([] { return CHyprColor{backend->getPalette()->m_colors.text.darken(0.65)}; })
+                  ->color([] { return CAbyssColor{backend->getPalette()->m_colors.text.darken(0.65)}; })
                   ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_ABSOLUTE, {0.5F, 9.F}})
                   ->commence();
 
@@ -219,7 +219,7 @@ int main(int argc, char** argv, char** envp) {
     auto textboxCont = stretchLayout("Textbox", textbox);
 
     auto text = CTextBuilder::begin()
-                    ->text("This is a link test: <a href=\"https://hypr.land\">click me</a>! Test overflow as well woo woo woo woo woo woo woo woo I am vaxry")
+                    ->text("This is a link test: <a href=\"https://github.com/AbyssWM">click me</a>! Test overflow as well woo woo woo woo woo woo woo woo I am vaxry")
                     ->commence();
     text->setTooltip("Example tooltip!");
 

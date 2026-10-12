@@ -1,14 +1,14 @@
 #pragma once
 
-#include <hyprutils/math/Mat3x3.hpp>
+#include <abyssutils/math/Mat3x3.hpp>
 
 #include "../Renderer.hpp"
 
 #include "Shader.hpp"
 
-#include <hyprutils/math/Region.hpp>
-#include <hyprutils/os/FileDescriptor.hpp>
-#include <aquamarine/buffer/Buffer.hpp>
+#include <abyssutils/math/Region.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
+#include <abyssal/buffer/Buffer.hpp>
 
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -16,7 +16,7 @@
 #include <EGL/eglext.h>
 #include <gbm.h>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class IToolkitWindow;
     class IElement;
     class CGLTexture;
@@ -29,7 +29,7 @@ namespace Hyprtoolkit {
         COpenGLRenderer(int drmFD);
         virtual ~COpenGLRenderer();
 
-        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Aquamarine::IBuffer> buf);
+        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Abyssal::IBuffer> buf);
         virtual void                 render(bool ignoreSync);
         virtual void                 endRendering();
         virtual void                 renderRectangle(const SRectangleRenderData& data);
@@ -38,7 +38,7 @@ namespace Hyprtoolkit {
         virtual void                 renderBorder(const SBorderRenderData& data);
         virtual void                 renderPolygon(const SPolygonRenderData& data);
         virtual void                 renderLine(const SLineRenderData& data);
-        virtual SP<CSyncTimeline>    exportSync(SP<Aquamarine::IBuffer> buf);
+        virtual SP<CSyncTimeline>    exportSync(SP<Abyssal::IBuffer> buf);
         virtual void                 signalRenderPoint(SP<CSyncTimeline> timeline);
 
         virtual bool                 explicitSyncSupported();
@@ -55,13 +55,13 @@ namespace Hyprtoolkit {
 
         void                           initEGL(bool gbm);
         EGLDeviceEXT                   eglDeviceFromDRMFD(int drmFD);
-        EGLImageKHR                    createEGLImage(const Aquamarine::SDMABUFAttrs& attrs);
+        EGLImageKHR                    createEGLImage(const Abyssal::SDMABUFAttrs& attrs);
         void                           makeEGLCurrent();
         void                           unsetEGL();
-        SP<CRenderbuffer>              getRBO(SP<Aquamarine::IBuffer> buf);
+        SP<CRenderbuffer>              getRBO(SP<Abyssal::IBuffer> buf);
         void                           onRenderbufferDestroy(CRenderbuffer* p);
 
-        Hyprutils::OS::CFileDescriptor m_gbmFD;
+        Abyssutils::OS::CFileDescriptor m_gbmFD;
         gbm_device*                    m_gbmDevice        = nullptr;
         EGLContext                     m_eglContext       = nullptr;
         EGLDisplay                     m_eglDisplay       = nullptr;

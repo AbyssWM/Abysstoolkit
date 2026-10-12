@@ -4,9 +4,9 @@
 #include <palette/ConfigManager.hpp>
 #include <system/Icons.hpp>
 
-using namespace Hyprtoolkit::Tests::Tricks;
-using namespace Hyprtoolkit::Tests;
-using namespace Hyprutils::Memory;
+using namespace Abysstoolkit::Tests::Tricks;
+using namespace Abysstoolkit::Tests;
+using namespace Abyssutils::Memory;
 
 void Tricks::createBackendSupport() {
     g_logger = makeShared<CLogger>();

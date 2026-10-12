@@ -6,7 +6,7 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CNullElement> CNullElement::create(const SNullData& data) {
     auto p          = SP<CNullElement>(new CNullElement(data));
@@ -23,7 +23,7 @@ void CNullElement::paint() {
     ;
 }
 
-void CNullElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CNullElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -44,22 +44,22 @@ void CNullElement::replaceData(const SNullData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-Hyprutils::Math::Vector2D CNullElement::size() {
+Abyssutils::Math::Vector2D CNullElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CNullElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CNullElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 
-std::optional<Vector2D> CNullElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CNullElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
     return Vector2D{0, 0};
 }
 
-std::optional<Vector2D> CNullElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CNullElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

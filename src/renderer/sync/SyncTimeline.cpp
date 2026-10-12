@@ -6,8 +6,8 @@
 #include <xf86drm.h>
 #include <sys/eventfd.h>
 
-using namespace Hyprutils::OS;
-using namespace Hyprtoolkit;
+using namespace Abyssutils::OS;
+using namespace Abysstoolkit;
 
 SP<CSyncTimeline> CSyncTimeline::create(int drmFD_) {
     RASSERT(g_renderer->explicitSyncSupported(), "Tried to create a sync timeline without ES support");
@@ -27,7 +27,7 @@ SP<CSyncTimeline> CSyncTimeline::create(int drmFD_) {
         return nullptr;
     }
 
-    timeline->m_syncobjFD = Hyprutils::OS::CFileDescriptor(objFd);
+    timeline->m_syncobjFD = Abyssutils::OS::CFileDescriptor(objFd);
 
     return timeline;
 }

@@ -4,22 +4,22 @@
 #include "../layout/Positioner.hpp"
 #include "Element.hpp"
 
-#include <hyprutils/math/Box.hpp>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Box.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
 #include <cstddef>
 #include <cstdint>
 #include <functional>
 #include <vector>
 
-namespace Hyprtoolkit::LinearLayout {
+namespace Abysstoolkit::LinearLayout {
     // axis-agnostic reposition for row / column layouts. Horizontal=true means
     // children flow along x (row layout); false means they flow along y (column).
     // childSize must return the layout's preferred-or-minimum size for a child.
     template <bool Horizontal>
-    inline void reposition(IElement* self, const Hyprutils::Math::CBox& box, const std::vector<SP<IElement>>& C, float gap, const std::function<Hyprutils::Math::Vector2D(SP<IElement>)>& childSize) {
-        using Vector2D = Hyprutils::Math::Vector2D;
-        using CBox     = Hyprutils::Math::CBox;
+    inline void reposition(IElement* self, const Abyssutils::Math::CBox& box, const std::vector<SP<IElement>>& C, float gap, const std::function<Abyssutils::Math::Vector2D(SP<IElement>)>& childSize) {
+        using Vector2D = Abyssutils::Math::Vector2D;
+        using CBox     = Abyssutils::Math::CBox;
 
         auto axisPrimary = [](const Vector2D& v) -> double { return Horizontal ? v.x : v.y; };
         auto boxPrimary  = [](const CBox& b) -> double { return Horizontal ? b.w : b.h; };

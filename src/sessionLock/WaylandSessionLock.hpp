@@ -3,10 +3,10 @@
 #include "wayland.hpp"
 
 #include "../helpers/Memory.hpp"
-#include <hyprtoolkit/core/SessionLock.hpp>
+#include <abysstoolkit/core/SessionLock.hpp>
 #include <ext-session-lock-v1.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CWaylandLockSurface;
 
     class CWaylandSessionLockState : public ISessionLockState {

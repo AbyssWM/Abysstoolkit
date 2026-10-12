@@ -1,9 +1,9 @@
 #include "Polygon.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
-CPolygon::CPolygon(std::vector<Hyprutils::Math::Vector2D> points) : m_points(points) {
+CPolygon::CPolygon(std::vector<Abyssutils::Math::Vector2D> points) : m_points(points) {
     ;
 }
 

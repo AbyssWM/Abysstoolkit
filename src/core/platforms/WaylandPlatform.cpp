@@ -1,7 +1,7 @@
 #include "WaylandPlatform.hpp"
 
 #include <algorithm>
-#include <hyprutils/memory/Casts.hpp>
+#include <abyssutils/memory/Casts.hpp>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
 #include "../InternalBackend.hpp"
@@ -20,8 +20,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 static std::string fourccToName(uint32_t drmFormat) {
     auto        fmt  = drmGetFormatName(drmFormat);
@@ -500,7 +500,7 @@ bool CWaylandPlatform::initDmabuf() {
 
             auto it = std::ranges::find_if(m_dmabufFormats, [&fmt](const auto& e) { return e.drmFormat == fmt.drmFormat; });
             if (it == m_dmabufFormats.end()) {
-                m_dmabufFormats.emplace_back(Aquamarine::SDRMFormat{.drmFormat = fmt.drmFormat, .modifiers = {fmt.modifier}});
+                m_dmabufFormats.emplace_back(Abyssal::SDRMFormat{.drmFormat = fmt.drmFormat, .modifiers = {fmt.modifier}});
                 continue;
             }
 
@@ -522,9 +522,9 @@ bool CWaylandPlatform::initDmabuf() {
         g_logger->log(HT_LOG_DEBUG, "zwp_linux_dmabuf_v1: opened node {} with fd {}", m_drmState.nodeName, m_drmState.fd);
     }
 
-    m_allocator = Aquamarine::CGBMAllocator::create(m_drmState.fd, g_backend->m_aqBackend);
+    m_allocator = Abyssal::CGBMAllocator::create(m_drmState.fd, g_backend->m_aqBackend);
 
-    auto nullBackend = reinterpretPointerCast<Aquamarine::CNullBackend>(g_backend->m_aqBackend->getImplementations().at(0));
+    auto nullBackend = reinterpretPointerCast<Abyssal::CNullBackend>(g_backend->m_aqBackend->getImplementations().at(0));
 
     nullBackend->setFormats(m_dmabufFormats);
 

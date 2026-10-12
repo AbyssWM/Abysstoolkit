@@ -3,7 +3,7 @@
 #include "IWaylandWindow.hpp"
 #include <ext-session-lock-v1.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CWaylandLockSurface : public IWaylandWindow {
       public:
         CWaylandLockSurface(const SWindowCreationData& data);

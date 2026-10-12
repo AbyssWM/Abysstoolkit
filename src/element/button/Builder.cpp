@@ -1,6 +1,6 @@
 #include "Button.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CButtonBuilder> CButtonBuilder::begin() {
     SP<CButtonBuilder> p = SP<CButtonBuilder>(new CButtonBuilder());
@@ -39,12 +39,12 @@ SP<CButtonBuilder> CButtonBuilder::alignText(eFontAlignment x) {
     return m_self.lock();
 }
 
-SP<CButtonBuilder> CButtonBuilder::onMainClick(std::function<void(Hyprutils::Memory::CSharedPointer<CButtonElement>)>&& f) {
+SP<CButtonBuilder> CButtonBuilder::onMainClick(std::function<void(Abyssutils::Memory::CSharedPointer<CButtonElement>)>&& f) {
     m_data->onMainClick = std::move(f);
     return m_self.lock();
 }
 
-SP<CButtonBuilder> CButtonBuilder::onRightClick(std::function<void(Hyprutils::Memory::CSharedPointer<CButtonElement>)>&& f) {
+SP<CButtonBuilder> CButtonBuilder::onRightClick(std::function<void(Abyssutils::Memory::CSharedPointer<CButtonElement>)>&& f) {
     m_data->onRightClick = std::move(f);
     return m_self.lock();
 }

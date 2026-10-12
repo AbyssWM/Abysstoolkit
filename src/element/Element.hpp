@@ -1,34 +1,34 @@
 #pragma once
 
-#include <hyprtoolkit/element/Element.hpp>
-#include <hyprutils/signal/Signal.hpp>
+#include <abysstoolkit/element/Element.hpp>
+#include <abyssutils/signal/Signal.hpp>
 
 #include <functional>
 
 #include "../helpers/Memory.hpp"
 #include "../core/Input.hpp"
 
-#include <hyprutils/math/Box.hpp>
+#include <abyssutils/math/Box.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class IToolkitWindow;
     struct SPositionerData;
     struct SToolkitWindowData;
     class CDynamicSize;
 
     struct SElementInternalData {
-        Hyprutils::Memory::CWeakPointer<IElement>                self;
-        Hyprutils::Memory::CWeakPointer<IToolkitWindow>          window;
-        Hyprutils::Math::CBox                                    position;
+        Abyssutils::Memory::CWeakPointer<IElement>                self;
+        Abyssutils::Memory::CWeakPointer<IToolkitWindow>          window;
+        Abyssutils::Math::CBox                                    position;
 
         UP<SPositionerData>                                      positionerData;
         UP<SToolkitWindowData>                                   toolkitWindowData;
 
-        std::vector<Hyprutils::Memory::CSharedPointer<IElement>> children;
+        std::vector<Abyssutils::Memory::CSharedPointer<IElement>> children;
 
         IElement::ePositionMode                                  positionMode  = IElement::HT_POSITION_AUTO;
         uint8_t                                                  positionFlags = 0;
-        Hyprutils::Math::Vector2D                                absoluteOffset;
+        Abyssutils::Math::Vector2D                                absoluteOffset;
         bool                                                     growV                   = false;
         bool                                                     growH                   = false;
         float                                                    margin                  = 0;
@@ -47,20 +47,20 @@ namespace Hyprtoolkit {
         bool         failedPositioning = false;
 
         struct {
-            Hyprutils::Signal::CSignalT<Hyprutils::Math::Vector2D> mouseEnter; // local coords
-            Hyprutils::Signal::CSignalT<Hyprutils::Math::Vector2D> mouseMove;  // local coords
-            Hyprutils::Signal::CSignalT<Input::eMouseButton, bool> mouseButton;
-            Hyprutils::Signal::CSignalT<>                          mouseLeave;
-            Hyprutils::Signal::CSignalT<Input::eAxisAxis, float>   mouseAxis;
-            Hyprutils::Signal::CSignalT<Input::SKeyboardKeyEvent>  key;
-            Hyprutils::Signal::CSignalT<>                          keyboardEnter;
-            Hyprutils::Signal::CSignalT<>                          keyboardLeave;
+            Abyssutils::Signal::CSignalT<Abyssutils::Math::Vector2D> mouseEnter; // local coords
+            Abyssutils::Signal::CSignalT<Abyssutils::Math::Vector2D> mouseMove;  // local coords
+            Abyssutils::Signal::CSignalT<Input::eMouseButton, bool> mouseButton;
+            Abyssutils::Signal::CSignalT<>                          mouseLeave;
+            Abyssutils::Signal::CSignalT<Input::eAxisAxis, float>   mouseAxis;
+            Abyssutils::Signal::CSignalT<Input::SKeyboardKeyEvent>  key;
+            Abyssutils::Signal::CSignalT<>                          keyboardEnter;
+            Abyssutils::Signal::CSignalT<>                          keyboardLeave;
         } m_externalEvents;
 
         struct {
-            std::function<void(const Hyprutils::Math::Vector2D&)> mouseEnter;
+            std::function<void(const Abyssutils::Math::Vector2D&)> mouseEnter;
             std::function<void()>                                 mouseLeave;
-            std::function<void(const Hyprutils::Math::Vector2D&)> mouseMove;
+            std::function<void(const Abyssutils::Math::Vector2D&)> mouseMove;
             std::function<void(Input::eMouseButton, bool)>        mouseButton;
             std::function<void(Input::eAxisAxis, float)>          mouseAxis;
             std::function<void()>                                 repositioned;
@@ -71,10 +71,10 @@ namespace Hyprtoolkit {
         void                      breadthfirst(const std::function<void(SP<IElement>)>& fn);
         void                      setWindow(SP<IToolkitWindow> w);
         void                      damageEntire();
-        void                      setPosition(const Hyprutils::Math::CBox& box);
+        void                      setPosition(const Abyssutils::Math::CBox& box);
         void                      setFailedPositioning(bool set);
-        Hyprutils::Math::Vector2D maxChildSize(const Hyprutils::Math::Vector2D& parent);
-        Hyprutils::Math::Vector2D getPreferredSizeGeneric(const CDynamicSize& size, const Hyprutils::Math::Vector2D& parent);
+        Abyssutils::Math::Vector2D maxChildSize(const Abyssutils::Math::Vector2D& parent);
+        Abyssutils::Math::Vector2D getPreferredSizeGeneric(const CDynamicSize& size, const Abyssutils::Math::Vector2D& parent);
     };
 
 }

@@ -11,17 +11,17 @@
 #include "Sync.hpp"
 
 #include <cmath>
-#include <hyprutils/memory/Casts.hpp>
-#include <hyprutils/string/String.hpp>
+#include <abyssutils/memory/Casts.hpp>
+#include <abyssutils/string/String.hpp>
 
 #include <xf86drm.h>
 
 #include <algorithm>
 #include <cstring>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::OS;
-using namespace Hyprutils::String;
+using namespace Abysstoolkit;
+using namespace Abyssutils::OS;
+using namespace Abyssutils::String;
 
 inline const float fullVerts[] = {
     1, 0, // top right
@@ -30,7 +30,7 @@ inline const float fullVerts[] = {
     0, 1, // bottom left
 };
 
-static enum Hyprtoolkit::eLogLevel eglLogToLevel(EGLint type) {
+static enum Abysstoolkit::eLogLevel eglLogToLevel(EGLint type) {
     switch (type) {
         case EGL_DEBUG_MSG_CRITICAL_KHR: return HT_LOG_CRITICAL;
         case EGL_DEBUG_MSG_ERROR_KHR: return HT_LOG_ERROR;
@@ -112,13 +112,13 @@ static GLuint createProgram(const std::string& vert, const std::string& frag) {
 static void glMessageCallbackA(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
     if (type != GL_DEBUG_TYPE_ERROR)
         return;
-    g_logger->log(Hyprtoolkit::HT_LOG_DEBUG, "[gl] {}", (const char*)message);
+    g_logger->log(Abysstoolkit::HT_LOG_DEBUG, "[gl] {}", (const char*)message);
 }
 
 static inline void loadGLProc(void* pProc, const char* name) {
     void* proc = rc<void*>(eglGetProcAddress(name));
     if (proc == nullptr) {
-        g_logger->log(Hyprtoolkit::HT_LOG_CRITICAL, "[GL] eglGetProcAddress({}) failed", name);
+        g_logger->log(Abysstoolkit::HT_LOG_CRITICAL, "[GL] eglGetProcAddress({}) failed", name);
         abort();
     }
     *sc<void**>(pProc) = proc;
@@ -131,7 +131,7 @@ static int openRenderNode(int drmFd) {
         // primary node
         renderName = drmGetPrimaryDeviceNameFromFd(drmFd);
         if (!renderName) {
-            g_logger->log(Hyprtoolkit::HT_LOG_ERROR, "drmGetPrimaryDeviceNameFromFd failed");
+            g_logger->log(Abysstoolkit::HT_LOG_ERROR, "drmGetPrimaryDeviceNameFromFd failed");
             return -1;
         }
         g_logger->log(HT_LOG_DEBUG, "DRM dev {} has no render node, falling back to primary", renderName);
@@ -221,7 +221,7 @@ void COpenGLRenderer::initEGL(bool gbm) {
     eglMakeCurrent(m_eglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, m_eglContext);
 }
 
-EGLImageKHR COpenGLRenderer::createEGLImage(const Aquamarine::SDMABUFAttrs& attrs) {
+EGLImageKHR COpenGLRenderer::createEGLImage(const Abyssal::SDMABUFAttrs& attrs) {
     std::array<uint32_t, 50> attribs;
     size_t                   idx = 0;
 
@@ -400,7 +400,7 @@ COpenGLRenderer::COpenGLRenderer(int drmFD) : m_drmFD(drmFD) {
         m_proc.eglDebugMessageControlKHR(::eglLog, debugAttrs);
     }
 
-    RASSERT(eglBindAPI(EGL_OPENGL_ES_API) != EGL_FALSE, "Couldn't bind to EGL's opengl ES API. This means your gpu driver f'd up. This is not a hyprland issue.");
+    RASSERT(eglBindAPI(EGL_OPENGL_ES_API) != EGL_FALSE, "Couldn't bind to EGL's opengl ES API. This means your gpu driver f'd up. This is not a abyssland issue.");
 
     bool success = false;
     if (EGLEXTENSIONS.contains("EXT_platform_device") || !m_proc.eglQueryDevicesEXT || !m_proc.eglQueryDeviceStringEXT) {
@@ -453,7 +453,7 @@ COpenGLRenderer::COpenGLRenderer(int drmFD) : m_drmFD(drmFD) {
     g_logger->log(HT_LOG_DEBUG, "DRM syncobj timeline support: no (not linux)");
 #endif
 
-#ifdef HYPRTOOLKIT_DEBUG
+#ifdef ABYSSTOOLKIT_DEBUG
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(glMessageCallbackA, nullptr);
 #endif
@@ -549,11 +549,11 @@ CBox COpenGLRenderer::logicalToGL(const CBox& box, bool transform) {
     auto b = box.copy();
     b.scale(m_scale).round();
     if (transform)
-        b.transform(Hyprutils::Math::HYPRUTILS_TRANSFORM_FLIPPED_180, m_currentViewport.x, m_currentViewport.y);
+        b.transform(Abyssutils::Math::ABYSSUTILS_TRANSFORM_FLIPPED_180, m_currentViewport.x, m_currentViewport.y);
     return b;
 }
 
-SP<CRenderbuffer> COpenGLRenderer::getRBO(SP<Aquamarine::IBuffer> buf) {
+SP<CRenderbuffer> COpenGLRenderer::getRBO(SP<Abyssal::IBuffer> buf) {
     for (const auto& r : m_rbos) {
         if (r->m_hlBuffer == buf)
             return r;
@@ -579,7 +579,7 @@ void COpenGLRenderer::waitOnSync() {
     timeline->check(timeline->m_releasePoint, DRM_SYNCOBJ_WAIT_FLAGS_WAIT_FOR_SUBMIT);
 }
 
-void COpenGLRenderer::beginRendering(SP<IToolkitWindow> window, SP<Aquamarine::IBuffer> buf) {
+void COpenGLRenderer::beginRendering(SP<IToolkitWindow> window, SP<Abyssal::IBuffer> buf) {
     RASSERT(buf, "GL: null buffer passed to rendering");
 
     makeEGLCurrent();
@@ -588,7 +588,7 @@ void COpenGLRenderer::beginRendering(SP<IToolkitWindow> window, SP<Aquamarine::I
 
     m_currentRBO->bind();
 
-    m_projection      = Mat3x3::outputProjection(window->pixelSize(), HYPRUTILS_TRANSFORM_FLIPPED_180);
+    m_projection      = Mat3x3::outputProjection(window->pixelSize(), ABYSSUTILS_TRANSFORM_FLIPPED_180);
     m_currentViewport = window->pixelSize();
     m_scale           = window->scale();
     m_window          = window;
@@ -624,7 +624,7 @@ void COpenGLRenderer::render(bool ignoreSync) {
 
 void COpenGLRenderer::renderBreadthfirst(SP<IElement> e) {
     static const auto DEBUG_LAYOUT = Env::envEnabled("HT_DEBUG_LAYOUT");
-    CHyprColor        DEBUG_COLOR  = {Hyprgraphics::CColor::SHSL{.h = 0.0F, .s = 0.7F, .l = 0.5F}, 0.8F};
+    CAbyssColor        DEBUG_COLOR  = {Abyssgraphics::CColor::SHSL{.h = 0.0F, .s = 0.7F, .l = 0.5F}, 0.8F};
 
     e->impl->breadthfirst([this, &DEBUG_COLOR](SP<IElement> el) {
         if (el->impl->failedPositioning)
@@ -654,7 +654,7 @@ void COpenGLRenderer::renderBreadthfirst(SP<IElement> e) {
             hsl.h += 0.05F;
             if (hsl.h > 1.F)
                 hsl.h -= 1.F;
-            DEBUG_COLOR = CHyprColor{hsl, 0.8F};
+            DEBUG_COLOR = CAbyssColor{hsl, 0.8F};
         }
 
         if (el->impl->clipChildren) {
@@ -729,7 +729,7 @@ CRegion COpenGLRenderer::damageWithClip() {
 void COpenGLRenderer::renderRectangle(const SRectangleRenderData& data) {
     const auto ROUNDEDBOX    = logicalToGL(data.box);
     const auto UNTRANSFORMED = logicalToGL(data.box, false);
-    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, HYPRUTILS_TRANSFORM_FLIPPED_180, data.box.rot);
+    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, ABYSSUTILS_TRANSFORM_FLIPPED_180, data.box.rot);
     Mat3x3     glMatrix      = m_projection.copy().multiply(matrix);
 
     const auto DAMAGE = damageWithClip();
@@ -873,7 +873,7 @@ void COpenGLRenderer::renderTexture(const STextureRenderData& data) {
     const auto     SOURCE_BOX    = data.texture->fitMode() == IMAGE_FIT_MODE_CONTAIN ? containImage(data.box, tex->m_size) : data.box;
     const auto     ROUNDEDBOX    = logicalToGL(SOURCE_BOX);
     const auto     UNTRANSFORMED = logicalToGL(SOURCE_BOX, false);
-    Mat3x3         matrix        = m_projMatrix.projectBox(ROUNDEDBOX, Hyprutils::Math::HYPRUTILS_TRANSFORM_FLIPPED_180, data.box.rot);
+    Mat3x3         matrix        = m_projMatrix.projectBox(ROUNDEDBOX, Abyssutils::Math::ABYSSUTILS_TRANSFORM_FLIPPED_180, data.box.rot);
     Mat3x3         glMatrix      = m_projection.copy().multiply(matrix);
 
     const auto     DAMAGE = damageWithClip();
@@ -937,7 +937,7 @@ void COpenGLRenderer::renderTexture(const STextureRenderData& data) {
 void COpenGLRenderer::renderBorder(const SBorderRenderData& data) {
     const auto ROUNDEDBOX    = logicalToGL(data.box);
     const auto UNTRANSFORMED = logicalToGL(data.box, false);
-    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, HYPRUTILS_TRANSFORM_FLIPPED_180, data.box.rot);
+    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, ABYSSUTILS_TRANSFORM_FLIPPED_180, data.box.rot);
     Mat3x3     glMatrix      = m_projection.copy().multiply(matrix);
 
     const auto DAMAGE = damageWithClip();
@@ -997,9 +997,9 @@ void COpenGLRenderer::renderPolygon(const SPolygonRenderData& data) {
 
     Vector2D FB_SIZE = ROUNDEDBOX.size() * 2.F;
 
-    Mat3x3   matrix = m_projMatrix.projectBox(CBox{{}, FB_SIZE}, HYPRUTILS_TRANSFORM_NORMAL, 0);
+    Mat3x3   matrix = m_projMatrix.projectBox(CBox{{}, FB_SIZE}, ABYSSUTILS_TRANSFORM_NORMAL, 0);
 
-    auto     proj     = Mat3x3::outputProjection(FB_SIZE, HYPRUTILS_TRANSFORM_NORMAL);
+    auto     proj     = Mat3x3::outputProjection(FB_SIZE, ABYSSUTILS_TRANSFORM_NORMAL);
     Mat3x3   glMatrix = proj.copy().multiply(matrix);
 
     m_polyRenderFb->alloc(FB_SIZE.x, FB_SIZE.y);
@@ -1099,7 +1099,7 @@ void COpenGLRenderer::renderLine(const SLineRenderData& data) {
     });
 }
 
-SP<CSyncTimeline> COpenGLRenderer::exportSync(SP<Aquamarine::IBuffer> buf) {
+SP<CSyncTimeline> COpenGLRenderer::exportSync(SP<Abyssal::IBuffer> buf) {
     if (!buf)
         return nullptr;
 

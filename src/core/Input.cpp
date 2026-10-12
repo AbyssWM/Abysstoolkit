@@ -1,6 +1,6 @@
 #include "Input.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 Input::eMouseButton Input::buttonFromWayland(uint32_t wl) {
     switch (wl) {

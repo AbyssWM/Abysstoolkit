@@ -1,6 +1,6 @@
 #include "Combobox.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -9,8 +9,8 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CDropdownHandleElement> CDropdownHandleElement::create(const SDropdownHandleData& data) {
     auto p        = SP<CDropdownHandleElement>(new CDropdownHandleElement(data));
@@ -30,24 +30,24 @@ void CDropdownHandleElement::paint() {
     });
 }
 
-void CDropdownHandleElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CDropdownHandleElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
 }
 
-Hyprutils::Math::Vector2D CDropdownHandleElement::size() {
+Abyssutils::Math::Vector2D CDropdownHandleElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CDropdownHandleElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CDropdownHandleElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CDropdownHandleElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CDropdownHandleElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CDropdownHandleElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CDropdownHandleElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }

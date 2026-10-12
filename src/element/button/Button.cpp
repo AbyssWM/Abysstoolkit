@@ -1,6 +1,6 @@
 #include "Button.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -9,8 +9,8 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CButtonElement> CButtonElement::create(const SButtonData& data) {
     auto p          = SP<CButtonElement>(new CButtonElement(data));
@@ -25,7 +25,7 @@ CButtonElement::CButtonElement(const SButtonData& data) : IElement(), m_impl(mak
     m_impl->background = CRectangleBuilder::begin()
                              ->color([nobg = m_impl->data.noBg] {
                                  if (nobg)
-                                     return CHyprColor{g_palette->m_colors.base.asRGB(), 0.F};
+                                     return CAbyssColor{g_palette->m_colors.base.asRGB(), 0.F};
                                  return g_palette->m_colors.base;
                              })
                              ->rounding(g_palette->m_vars.smallRounding)
@@ -75,7 +75,7 @@ CButtonElement::CButtonElement(const SButtonData& data) : IElement(), m_impl(mak
             ->rebuild() //
             ->color([nobg = m_impl->data.noBg] {
                 if (nobg)
-                    return CHyprColor{g_palette->m_colors.base.asRGB(), 0.F};
+                    return CAbyssColor{g_palette->m_colors.base.asRGB(), 0.F};
                 return g_palette->m_colors.base;
             })
             ->borderColor([] { return g_palette->m_colors.alternateBase; })
@@ -102,7 +102,7 @@ void CButtonElement::paint() {
     ;
 }
 
-void CButtonElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CButtonElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -130,13 +130,13 @@ void CButtonElement::replaceData(const SButtonData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-Hyprutils::Math::Vector2D CButtonElement::size() {
+Abyssutils::Math::Vector2D CButtonElement::size() {
     return impl->position.size();
 }
 
 constexpr double        BUTTON_PAD = 5;
 
-std::optional<Vector2D> CButtonElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CButtonElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
 
     if (s.x != -1 && s.y != -1)
@@ -152,7 +152,7 @@ std::optional<Vector2D> CButtonElement::preferredSize(const Hyprutils::Math::Vec
     return s;
 }
 
-std::optional<Vector2D> CButtonElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CButtonElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
@@ -167,7 +167,7 @@ std::optional<Vector2D> CButtonElement::minimumSize(const Hyprutils::Math::Vecto
     return s;
 }
 
-std::optional<Vector2D> CButtonElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CButtonElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

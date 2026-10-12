@@ -1,13 +1,13 @@
 #pragma once
 
-#include <hyprtoolkit/system/Icons.hpp>
+#include <abysstoolkit/system/Icons.hpp>
 
 #include <optional>
 #include <filesystem>
 #include <vector>
 #include <unordered_map>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CSystemIconDescription : public ISystemIconDescription {
       public:
         // invalid icon
@@ -37,7 +37,7 @@ namespace Hyprtoolkit {
             Lookup an icon. If the icon is found, will return associated data.
             This object can be used to create an ImageElement
         */
-        virtual Hyprutils::Memory::CSharedPointer<ISystemIconDescription> lookupIcon(const std::string& iconName);
+        virtual Abyssutils::Memory::CSharedPointer<ISystemIconDescription> lookupIcon(const std::string& iconName);
 
         /*
             A cache is kept: loopkup paths can grow large, this is to avoid tons of disk I/O

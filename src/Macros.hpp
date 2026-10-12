@@ -8,7 +8,7 @@
 
 #define TRACE(expr)                                                                                                                                                                \
     {                                                                                                                                                                              \
-        if (Hyprtoolkit::Env::isTrace()) {                                                                                                                                         \
+        if (Abysstoolkit::Env::isTrace()) {                                                                                                                                         \
             expr;                                                                                                                                                                  \
         }                                                                                                                                                                          \
     }
@@ -25,7 +25,7 @@
 
 #define ASSERT(expr) RASSERT(expr, "?")
 
-#ifndef HYPRTOOLKIT_DEBUG
+#ifndef ABYSSTOOLKIT_DEBUG
 
 #define UNREACHABLE() std::unreachable();
 

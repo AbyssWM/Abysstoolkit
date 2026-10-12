@@ -1,20 +1,20 @@
 #pragma once
 
-#include <hyprtoolkit/palette/Color.hpp>
-#include <hyprtoolkit/types/ImageTypes.hpp>
-#include <hyprutils/math/Box.hpp>
-#include <hyprgraphics/color/Color.hpp>
-#include <hyprgraphics/resource/resources/AsyncResource.hpp>
-#include <aquamarine/buffer/Buffer.hpp>
+#include <abysstoolkit/palette/Color.hpp>
+#include <abysstoolkit/types/ImageTypes.hpp>
+#include <abyssutils/math/Box.hpp>
+#include <abyssgraphics/color/Color.hpp>
+#include <abyssgraphics/resource/resources/AsyncResource.hpp>
+#include <abyssal/buffer/Buffer.hpp>
 
 #include "../helpers/Memory.hpp"
 
 #include "Polygon.hpp"
 
-using namespace Hyprutils::Math;
-using namespace Hyprgraphics;
+using namespace Abyssutils::Math;
+using namespace Abyssgraphics;
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class IToolkitWindow;
     class IRendererTexture;
     class CSyncTimeline;
@@ -26,12 +26,12 @@ namespace Hyprtoolkit {
 
         struct SRectangleRenderData {
             CBox       box;
-            CHyprColor color;
+            CAbyssColor color;
             int        rounding = 0;
         };
 
         struct STextureData {
-            ASP<Hyprgraphics::IAsyncResource> resource;
+            ASP<Abyssgraphics::IAsyncResource> resource;
             eImageFitMode                     fitMode = IMAGE_FIT_MODE_STRETCH;
         };
 
@@ -44,25 +44,25 @@ namespace Hyprtoolkit {
 
         struct SBorderRenderData {
             CBox       box;
-            CHyprColor color    = {1, 1, 1, 1};
+            CAbyssColor color    = {1, 1, 1, 1};
             int        rounding = 0;
             int        thick    = 0;
         };
 
         struct SPolygonRenderData {
             CBox       box;
-            CHyprColor color = {1, 1, 1, 1};
+            CAbyssColor color = {1, 1, 1, 1};
             CPolygon   poly;
         };
 
         struct SLineRenderData {
             CBox                        box;
             const std::vector<Vector2D> points;
-            CHyprColor                  color = {1, 1, 1, 1};
+            CAbyssColor                  color = {1, 1, 1, 1};
             int                         thick = 2;
         };
 
-        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Aquamarine::IBuffer> buf) = 0;
+        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Abyssal::IBuffer> buf) = 0;
         virtual void                 render(bool ignoreSync = false)                                        = 0;
         virtual void                 endRendering()                                                         = 0;
         virtual void                 renderRectangle(const SRectangleRenderData& data)                      = 0;
@@ -73,7 +73,7 @@ namespace Hyprtoolkit {
         virtual void                 renderLine(const SLineRenderData& data)                                = 0;
         virtual void                 signalRenderPoint(SP<CSyncTimeline> timeline)                          = 0;
 
-        virtual SP<CSyncTimeline>    exportSync(SP<Aquamarine::IBuffer> buf) = 0;
+        virtual SP<CSyncTimeline>    exportSync(SP<Abyssal::IBuffer> buf) = 0;
 
         virtual bool                 explicitSyncSupported() = 0;
 

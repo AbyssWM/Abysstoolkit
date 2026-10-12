@@ -2,12 +2,12 @@
 #include "OpenGL.hpp"
 #include "../../core/InternalBackend.hpp"
 
-#include <hyprutils/signal/Listener.hpp>
-#include <hyprutils/signal/Signal.hpp>
+#include <abyssutils/signal/Listener.hpp>
+#include <abyssutils/signal/Signal.hpp>
 
 #include <dlfcn.h>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 CRenderbuffer::~CRenderbuffer() {
     g_openGL->makeEGLCurrent();
@@ -19,7 +19,7 @@ CRenderbuffer::~CRenderbuffer() {
     g_openGL->m_proc.eglDestroyImageKHR(g_openGL->m_eglDisplay, m_image);
 }
 
-CRenderbuffer::CRenderbuffer(SP<Aquamarine::IBuffer> buffer, uint32_t format) : m_hlBuffer(buffer), m_drmFormat(format) {
+CRenderbuffer::CRenderbuffer(SP<Abyssal::IBuffer> buffer, uint32_t format) : m_hlBuffer(buffer), m_drmFormat(format) {
     auto dma = buffer->dmabuf();
 
     m_image = g_openGL->createEGLImage(dma);

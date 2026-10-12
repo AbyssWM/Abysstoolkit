@@ -1,8 +1,8 @@
 #include "Text.hpp"
 
 #include <cmath>
-#include <hyprtoolkit/palette/Palette.hpp>
-#include <hyprgraphics/color/Color.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
+#include <abyssgraphics/color/Color.hpp>
 #include <pango-1.0/pango/pangocairo.h>
 
 #include "../../window/ToolkitWindow.hpp"
@@ -17,8 +17,8 @@
 #include "../../system/DesktopMethods.hpp"
 #include "Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CTextElement> CTextElement::create(const STextData& data) {
     auto p          = SP<CTextElement>(new CTextElement(data));
@@ -117,7 +117,7 @@ void CTextElement::paint() {
     });
 }
 
-void CTextElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CTextElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     const auto DESIRED = m_impl->preferred;
@@ -151,19 +151,19 @@ void CTextElement::recheckColor() {
     m_impl->needsTexRefresh = true;
 }
 
-Hyprutils::Math::Vector2D CTextElement::size() {
+Abyssutils::Math::Vector2D CTextElement::size() {
     return m_impl->unscale(m_impl->size);
 }
 
-std::optional<Vector2D> CTextElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return std::nullopt;
 }
 
-std::optional<Vector2D> CTextElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->preferred;
 }
 
-std::optional<Vector2D> CTextElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return Vector2D{0, 0};
 }
 
@@ -179,7 +179,7 @@ bool CTextElement::positioningDependsOnChild() {
     return m_impl->data.size.hasAuto();
 }
 
-std::tuple<UP<Hyprgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Vector2D> STextImpl::prepPangoLayout() {
+std::tuple<UP<Abyssgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Vector2D> STextImpl::prepPangoLayout() {
     auto                  CAIROSURFACE = makeUnique<CCairoSurface>(cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 1, 1 /* dummy value */));
     auto                  CAIRO        = cairo_create(CAIROSURFACE->cairo());
 
@@ -249,7 +249,7 @@ std::tuple<UP<Hyprgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Vector2D> ST
     return std::make_tuple<>(std::move(CAIROSURFACE), CAIRO, layout, Vector2D{logical.width, logical.height});
 }
 
-Hyprutils::Math::Vector2D STextImpl::getTextSizePreferred() {
+Abyssutils::Math::Vector2D STextImpl::getTextSizePreferred() {
     auto [CAIROSURFACE, CAIRO, LAYOUT, LAYOUTSIZE] = prepPangoLayout();
 
     g_object_unref(LAYOUT);
@@ -310,7 +310,7 @@ float STextImpl::getCursorPos(size_t offset) {
     return box.x;
 }
 
-float STextImpl::getCursorPos(const Hyprutils::Math::Vector2D& click) {
+float STextImpl::getCursorPos(const Abyssutils::Math::Vector2D& click) {
     return getCursorPos(vecToOffset(click).value_or(parsedText.length()));
 }
 
@@ -356,8 +356,8 @@ void STextImpl::renderTex() {
         .fontSize  = sc<size_t>(std::round(lastFontSizeUnscaled * lastScale)),
         .color     = CColor{CColor::SSRGB{.r = col.r, .g = col.g, .b = col.b}},
         .align     = data.align == HT_FONT_ALIGN_LEFT ?
-                Hyprgraphics::CTextResource::TEXT_ALIGN_LEFT :
-                (data.align == HT_FONT_ALIGN_CENTER ? Hyprgraphics::CTextResource::TEXT_ALIGN_CENTER : Hyprgraphics::CTextResource::TEXT_ALIGN_RIGHT),
+                Abyssgraphics::CTextResource::TEXT_ALIGN_LEFT :
+                (data.align == HT_FONT_ALIGN_CENTER ? Abyssgraphics::CTextResource::TEXT_ALIGN_CENTER : Abyssgraphics::CTextResource::TEXT_ALIGN_RIGHT),
         .maxSize   = maxSize,
         .ellipsize = !data.noEllipsize && maxSize.has_value() && maxSize->y >= 0,
         .wrap      = maxSize.has_value() && maxSize->x >= 0,

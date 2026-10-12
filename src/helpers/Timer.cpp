@@ -1,7 +1,7 @@
-#include <hyprtoolkit/core/Timer.hpp>
+#include <abysstoolkit/core/Timer.hpp>
 #include "Memory.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 CTimer::CTimer(std::chrono::steady_clock::duration timeout, std::function<void(ASP<CTimer> self, void* data)> cb_, void* data_, bool force) :
     m_cb(cb_), m_data(data_), m_allowForceUpdate(force) {

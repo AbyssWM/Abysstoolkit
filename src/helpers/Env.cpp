@@ -3,10 +3,10 @@
 #include <cstdlib>
 #include <string_view>
 
-using namespace Hyprtoolkit;
-using namespace Hyprtoolkit::Env;
+using namespace Abysstoolkit;
+using namespace Abysstoolkit::Env;
 
-bool Hyprtoolkit::Env::envEnabled(const std::string& env) {
+bool Abysstoolkit::Env::envEnabled(const std::string& env) {
     auto ret = getenv(env.c_str());
     if (!ret)
         return false;
@@ -16,7 +16,7 @@ bool Hyprtoolkit::Env::envEnabled(const std::string& env) {
     return !sv.empty() && sv != "0";
 }
 
-bool Hyprtoolkit::Env::isTrace() {
+bool Abysstoolkit::Env::isTrace() {
     static bool TRACE = envEnabled("HT_TRACE");
     return TRACE;
 }

@@ -1,11 +1,11 @@
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "ConfigManager.hpp"
 
 #include "../helpers/Memory.hpp"
 #include "../core/InternalBackend.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CPalette> CPalette::palette() {
     auto x        = g_config->getPalette();

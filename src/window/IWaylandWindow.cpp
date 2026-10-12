@@ -1,7 +1,7 @@
 #include "IWaylandWindow.hpp"
 #include "WaylandPopup.hpp"
 
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/element/Null.hpp>
 
 #include "../element/Element.hpp"
 #include "../core/platforms/WaylandPlatform.hpp"
@@ -12,10 +12,10 @@
 
 #include "../Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
-CWaylandBuffer::CWaylandBuffer(SP<Aquamarine::IBuffer> buffer) : m_buffer(buffer) {
+CWaylandBuffer::CWaylandBuffer(SP<Abyssal::IBuffer> buffer) : m_buffer(buffer) {
     auto params = makeShared<CCZwpLinuxBufferParamsV1>(g_waylandPlatform->m_waylandState.dmabuf->sendCreateParams());
 
     if (!params) {
@@ -71,9 +71,9 @@ void IWaylandWindow::resizeSwapchain(const Vector2D& pixelSize) {
     m_damageRing.setSize(pixelSize);
 
     if (!m_waylandState.swapchain)
-        m_waylandState.swapchain = Aquamarine::CSwapchain::create(g_waylandPlatform->m_allocator, g_backend->m_aqBackend->getImplementations().at(0));
+        m_waylandState.swapchain = Abyssal::CSwapchain::create(g_waylandPlatform->m_allocator, g_backend->m_aqBackend->getImplementations().at(0));
 
-    m_waylandState.swapchain->reconfigure(Aquamarine::SSwapchainOptions{
+    m_waylandState.swapchain->reconfigure(Abyssal::SSwapchainOptions{
         .length = 2,
         .size   = pixelSize,
         .format = g_waylandPlatform->m_dmabufFormats.at(0).drmFormat,
@@ -217,7 +217,7 @@ void IWaylandWindow::onCallback() {
         render();
 }
 
-Hyprutils::Math::Vector2D IWaylandWindow::pixelSize() {
+Abyssutils::Math::Vector2D IWaylandWindow::pixelSize() {
     return m_waylandState.size;
 }
 
@@ -253,7 +253,7 @@ void IWaylandWindow::mouseButton(const Input::eMouseButton button, bool state) {
     m_ignoreNextButtonEvent = true;
 }
 
-void IWaylandWindow::mouseMove(const Hyprutils::Math::Vector2D& local) {
+void IWaylandWindow::mouseMove(const Abyssutils::Math::Vector2D& local) {
     if (!m_popups.empty())
         return;
 
@@ -267,7 +267,7 @@ void IWaylandWindow::mouseAxis(const Input::eAxisAxis axis, float delta) {
     IToolkitWindow::mouseAxis(axis, delta);
 }
 
-void IWaylandWindow::setIMTo(const Hyprutils::Math::CBox& box, const std::string& str, size_t cursor) {
+void IWaylandWindow::setIMTo(const Abyssutils::Math::CBox& box, const std::string& str, size_t cursor) {
     if (!g_waylandPlatform->m_waylandState.imState.enabled) {
         g_waylandPlatform->m_waylandState.textInput->sendEnable();
         g_waylandPlatform->m_waylandState.imState.enabled = true;

@@ -9,7 +9,7 @@
 #include "../../helpers/Format.hpp"
 #include "../../Macros.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 CFramebuffer::CFramebuffer() {
     ;

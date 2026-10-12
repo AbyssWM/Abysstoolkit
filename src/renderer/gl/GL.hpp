@@ -2,7 +2,7 @@
 
 #include <GLES3/gl32.h>
 
-#ifndef HYPRTOOLKIT_DEBUG
+#ifndef ABYSSTOOLKIT_DEBUG
 
 #define GLCALL(__CALL__) __CALL__;
 

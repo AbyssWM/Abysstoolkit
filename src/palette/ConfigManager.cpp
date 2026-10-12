@@ -1,6 +1,6 @@
 #include "ConfigManager.hpp"
 
-#include <hyprutils/path/Path.hpp>
+#include <abyssutils/path/Path.hpp>
 
 #include "../core/InternalBackend.hpp"
 
@@ -10,15 +10,15 @@
 #include <cstring>
 #include <linux/limits.h>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
-static Hyprlang::CParseResult handleSource(const char* c, const char* v) {
+static Abyssparse::CParseResult handleSource(const char* c, const char* v) {
     const std::string      VALUE   = v;
     const std::string      COMMAND = c;
 
     const auto             RESULT = g_config->handleSource(COMMAND, VALUE);
 
-    Hyprlang::CParseResult result;
+    Abyssparse::CParseResult result;
     if (RESULT.has_value())
         result.setError(RESULT.value().c_str());
     return result;
@@ -45,33 +45,33 @@ CConfigManager::CConfigManager() : m_inotifyFd(inotify_init()) {
     // Read file from default location
     // or from an explicit location given by user
 
-    const auto CFGPATH = Hyprutils::Path::findConfig("hyprtoolkit").first.value_or("");
+    const auto CFGPATH = Abyssutils::Path::findConfig("abysstoolkit").first.value_or("");
     m_configPath       = CFGPATH;
 
     if (CFGPATH.empty())
-        g_logger->log(HT_LOG_DEBUG, "CConfigManager: no hyprtoolkit.conf found, using defaults (expected at $XDG_CONFIG_HOME/hypr/hyprtoolkit.conf or ~/.config/hypr/hyprtoolkit.conf)");
+        g_logger->log(HT_LOG_DEBUG, "CConfigManager: no abysstoolkit.conf found, using defaults (expected at $XDG_CONFIG_HOME/abyss/abysstoolkit.conf or ~/.config/abyss/abysstoolkit.conf)");
 
-    m_config = makeUnique<Hyprlang::CConfig>(CFGPATH.c_str(), Hyprlang::SConfigOptions{.allowMissingConfig = true});
+    m_config = makeUnique<Abyssparse::CConfig>(CFGPATH.c_str(), Abyssparse::SConfigOptions{.allowMissingConfig = true});
 
-    m_config->addConfigValue("background", Hyprlang::INT{0xFF181818});
-    m_config->addConfigValue("base", Hyprlang::INT{0xFF202020});
-    m_config->addConfigValue("text", Hyprlang::INT{0xFFDADADA});
-    m_config->addConfigValue("alternate_base", Hyprlang::INT{0xFF272727});
-    m_config->addConfigValue("bright_text", Hyprlang::INT{0xFFFFDEDE});
-    m_config->addConfigValue("link_text", Hyprlang::INT{0xFF4EECF8});
-    m_config->addConfigValue("accent", Hyprlang::INT{0xFF00FFCC});
-    m_config->addConfigValue("accent_secondary", Hyprlang::INT{0xFF0099F0});
-    m_config->addConfigValue("rounding_large", Hyprlang::INT{10});
-    m_config->addConfigValue("rounding_small", Hyprlang::INT{5});
+    m_config->addConfigValue("background", Abyssparse::INT{0xFF181818});
+    m_config->addConfigValue("base", Abyssparse::INT{0xFF202020});
+    m_config->addConfigValue("text", Abyssparse::INT{0xFFDADADA});
+    m_config->addConfigValue("alternate_base", Abyssparse::INT{0xFF272727});
+    m_config->addConfigValue("bright_text", Abyssparse::INT{0xFFFFDEDE});
+    m_config->addConfigValue("link_text", Abyssparse::INT{0xFF4EECF8});
+    m_config->addConfigValue("accent", Abyssparse::INT{0xFF00FFCC});
+    m_config->addConfigValue("accent_secondary", Abyssparse::INT{0xFF0099F0});
+    m_config->addConfigValue("rounding_large", Abyssparse::INT{10});
+    m_config->addConfigValue("rounding_small", Abyssparse::INT{5});
 
-    m_config->addConfigValue("h1_size", Hyprlang::INT{19});
-    m_config->addConfigValue("h2_size", Hyprlang::INT{15});
-    m_config->addConfigValue("h3_size", Hyprlang::INT{13});
-    m_config->addConfigValue("font_size", Hyprlang::INT{11});
-    m_config->addConfigValue("small_font_size", Hyprlang::INT{10});
-    m_config->addConfigValue("icon_theme", Hyprlang::STRING{""});
-    m_config->addConfigValue("font_family", Hyprlang::STRING{"Sans Serif"});
-    m_config->addConfigValue("font_family_monospace", Hyprlang::STRING{"monospace"});
+    m_config->addConfigValue("h1_size", Abyssparse::INT{19});
+    m_config->addConfigValue("h2_size", Abyssparse::INT{15});
+    m_config->addConfigValue("h3_size", Abyssparse::INT{13});
+    m_config->addConfigValue("font_size", Abyssparse::INT{11});
+    m_config->addConfigValue("small_font_size", Abyssparse::INT{10});
+    m_config->addConfigValue("icon_theme", Abyssparse::STRING{""});
+    m_config->addConfigValue("font_family", Abyssparse::STRING{"Sans Serif"});
+    m_config->addConfigValue("font_family_monospace", Abyssparse::STRING{"monospace"});
 
     m_config->registerHandler(&::handleSource, "source", {.allowFlags = false});
 
@@ -100,25 +100,25 @@ void CConfigManager::parse() {
 SP<CPalette> CConfigManager::getPalette() {
     auto p = CPalette::emptyPalette();
 
-    auto BACKGROUND      = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "background");
-    auto BASE            = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "base");
-    auto TEXT            = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "text");
-    auto ALTERNATEBASE   = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "alternate_base");
-    auto BRIGHTTEXT      = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "bright_text");
-    auto LINK            = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "link_text");
-    auto ACCENT          = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "accent");
-    auto ACCENTSECONDARY = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "accent_secondary");
-    auto ROUNDINGLARGE   = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "rounding_large");
-    auto ROUNDINGSMALL   = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "rounding_small");
+    auto BACKGROUND      = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "background");
+    auto BASE            = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "base");
+    auto TEXT            = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "text");
+    auto ALTERNATEBASE   = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "alternate_base");
+    auto BRIGHTTEXT      = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "bright_text");
+    auto LINK            = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "link_text");
+    auto ACCENT          = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "accent");
+    auto ACCENTSECONDARY = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "accent_secondary");
+    auto ROUNDINGLARGE   = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "rounding_large");
+    auto ROUNDINGSMALL   = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "rounding_small");
 
-    auto H1SIZE         = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "h1_size");
-    auto H2SIZE         = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "h2_size");
-    auto H3SIZE         = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "h3_size");
-    auto FONTSIZE       = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "font_size");
-    auto SMALLFONTSIZE  = Hyprlang::CSimpleConfigValue<Hyprlang::INT>(m_config.get(), "small_font_size");
-    auto ICONTHEME      = Hyprlang::CSimpleConfigValue<Hyprlang::STRING>(m_config.get(), "icon_theme");
-    auto FONTFAMILY     = Hyprlang::CSimpleConfigValue<Hyprlang::STRING>(m_config.get(), "font_family");
-    auto FONTFAMILYMONO = Hyprlang::CSimpleConfigValue<Hyprlang::STRING>(m_config.get(), "font_family_monospace");
+    auto H1SIZE         = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "h1_size");
+    auto H2SIZE         = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "h2_size");
+    auto H3SIZE         = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "h3_size");
+    auto FONTSIZE       = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "font_size");
+    auto SMALLFONTSIZE  = Abyssparse::CSimpleConfigValue<Abyssparse::INT>(m_config.get(), "small_font_size");
+    auto ICONTHEME      = Abyssparse::CSimpleConfigValue<Abyssparse::STRING>(m_config.get(), "icon_theme");
+    auto FONTFAMILY     = Abyssparse::CSimpleConfigValue<Abyssparse::STRING>(m_config.get(), "font_family");
+    auto FONTFAMILYMONO = Abyssparse::CSimpleConfigValue<Abyssparse::STRING>(m_config.get(), "font_family_monospace");
 
     p->m_colors.background      = *BACKGROUND;
     p->m_colors.base            = *BASE;

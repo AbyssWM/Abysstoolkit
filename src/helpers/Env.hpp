@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Hyprtoolkit::Env {
+namespace Abysstoolkit::Env {
     bool envEnabled(const std::string& env);
     bool isTrace();
 }

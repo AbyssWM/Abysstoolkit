@@ -1,7 +1,7 @@
 #pragma once
 
-#include <hyprtoolkit/window/Window.hpp>
-#include <hyprtoolkit/types/PointerShape.hpp>
+#include <abysstoolkit/window/Window.hpp>
+#include <abysstoolkit/types/PointerShape.hpp>
 
 #include "../helpers/DamageRing.hpp"
 #include "../helpers/Memory.hpp"
@@ -9,7 +9,7 @@
 
 #include "Window.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CRectangleElement;
     class CColumnLayoutElement;
@@ -17,7 +17,7 @@ namespace Hyprtoolkit {
     class CTimer;
 
     struct SToolkitFocusLock {
-        SToolkitFocusLock(SP<IElement> e, const Hyprutils::Math::Vector2D& coord);
+        SToolkitFocusLock(SP<IElement> e, const Abyssutils::Math::Vector2D& coord);
         ~SToolkitFocusLock();
 
         WP<IElement> m_el;
@@ -32,19 +32,19 @@ namespace Hyprtoolkit {
             Schedules a frame event as well.
             Takes logical coordinates (unscaled)
         */
-        virtual void                      damage(Hyprutils::Math::CRegion&& rg);
+        virtual void                      damage(Abyssutils::Math::CRegion&& rg);
         virtual void                      scheduleFrame();
         virtual void                      damageEntire();
 
-        virtual Hyprutils::Math::Vector2D cursorPos();
+        virtual Abyssutils::Math::Vector2D cursorPos();
         virtual void                      onPreRender();
         virtual void                      render() = 0;
         virtual void                      scheduleReposition(WP<IElement> e);
 
         virtual SP<IWindow>               openPopup(const SWindowCreationData& data) = 0;
 
-        virtual void                      mouseEnter(const Hyprutils::Math::Vector2D& local);
-        virtual void                      mouseMove(const Hyprutils::Math::Vector2D& local);
+        virtual void                      mouseEnter(const Abyssutils::Math::Vector2D& local);
+        virtual void                      mouseMove(const Abyssutils::Math::Vector2D& local);
         virtual void                      mouseButton(const Input::eMouseButton button, bool state);
         virtual void                      mouseAxis(const Input::eAxisAxis axis, float delta);
         virtual void                      mouseLeave();
@@ -53,13 +53,13 @@ namespace Hyprtoolkit {
         virtual void                      unfocusKeyboard();
         virtual void                      setKeyboardFocus(SP<IElement>);
 
-        virtual void                      updateFocus(const Hyprutils::Math::Vector2D& coords);
+        virtual void                      updateFocus(const Abyssutils::Math::Vector2D& coords);
         virtual void                      setCursor(ePointerShape shape) = 0;
 
-        virtual void                      setIMTo(const Hyprutils::Math::CBox& box, const std::string& str, size_t cursor);
+        virtual void                      setIMTo(const Abyssutils::Math::CBox& box, const std::string& str, size_t cursor);
         virtual void                      resetIM();
 
-        virtual void                      openTooltip(const std::string& s, const Hyprutils::Math::Vector2D& pos);
+        virtual void                      openTooltip(const std::string& s, const Abyssutils::Math::Vector2D& pos);
         virtual void                      closeTooltip();
 
         void                              initElementIfNeeded(SP<IElement>);
@@ -68,7 +68,7 @@ namespace Hyprtoolkit {
         CDamageRing                        m_damageRing;
         bool                               m_needsFrame = true;
         WP<IToolkitWindow>                 m_self;
-        Hyprutils::Math::Vector2D          m_mousePos;
+        Abyssutils::Math::Vector2D          m_mousePos;
         bool                               m_mouseIsDown = false;
 
         std::string                        m_currentInput       = "";

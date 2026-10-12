@@ -1,11 +1,11 @@
 #include "DesktopMethods.hpp"
 
-#include <hyprutils/os/Process.hpp>
+#include <abyssutils/os/Process.hpp>
 
-using namespace Hyprtoolkit;
-using namespace Hyprtoolkit::DesktopMethods;
+using namespace Abysstoolkit;
+using namespace Abysstoolkit::DesktopMethods;
 
-using namespace Hyprutils::OS;
+using namespace Abyssutils::OS;
 
 std::expected<void, std::string> DesktopMethods::openLink(const std::string_view& sv) {
     CProcess proc("xdg-open", {std::string{sv}});

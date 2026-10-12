@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace Hyprtoolkit::UTF8 {
+namespace Abysstoolkit::UTF8 {
     size_t      codepointLen(const char* utf8Char, size_t max);
     size_t      codepointLenBefore(const std::string& s, size_t offset);
     size_t      length(const std::string&);

@@ -1,21 +1,21 @@
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/window/Window.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/RowLayout.hpp>
-#include <hyprtoolkit/element/ColumnLayout.hpp>
-#include <hyprtoolkit/element/Text.hpp>
-#include <hyprtoolkit/element/Image.hpp>
-#include <hyprtoolkit/element/Button.hpp>
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/window/Window.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/RowLayout.hpp>
+#include <abysstoolkit/element/ColumnLayout.hpp>
+#include <abysstoolkit/element/Text.hpp>
+#include <abysstoolkit/element/Image.hpp>
+#include <abysstoolkit/element/Button.hpp>
+#include <abysstoolkit/element/Null.hpp>
 
-#include <hyprutils/memory/SharedPtr.hpp>
-#include <hyprutils/memory/UniquePtr.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/UniquePtr.hpp>
 
 #include <print>
 
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
-using namespace Hyprtoolkit;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
+using namespace Abysstoolkit;
 
 #define SP CSharedPointer
 #define WP CWeakPointer
@@ -27,7 +27,7 @@ int                 main(int argc, char** argv, char** envp) {
     backend = IBackend::create();
 
     //
-    auto window = CWindowBuilder::begin()->preferredSize({480, 180})->minSize({480, 180})->maxSize({480, 180})->appTitle("Dialog")->appClass("hyprtoolkit-dialog")->commence();
+    auto window = CWindowBuilder::begin()->preferredSize({480, 180})->minSize({480, 180})->maxSize({480, 180})->appTitle("Dialog")->appClass("abysstoolkit-dialog")->commence();
 
     window->m_rootElement->addChild(CRectangleBuilder::begin()->color([] { return backend->getPalette()->m_colors.background; })->commence());
 
@@ -40,13 +40,13 @@ int                 main(int argc, char** argv, char** envp) {
 
     layout->addChild(layoutInner);
     layoutInner->setGrow(true);
-    layoutInner->setPositionMode(Hyprtoolkit::IElement::HT_POSITION_ABSOLUTE);
-    layoutInner->setPositionFlag(Hyprtoolkit::IElement::HT_POSITION_FLAG_HCENTER, true);
+    layoutInner->setPositionMode(Abysstoolkit::IElement::HT_POSITION_ABSOLUTE);
+    layoutInner->setPositionFlag(Abysstoolkit::IElement::HT_POSITION_FLAG_HCENTER, true);
 
     auto title = CTextBuilder::begin()->text("Hello World")->fontSize({CFontSize::HT_FONT_H2})->color([] { return backend->getPalette()->m_colors.text; })->commence();
 
     auto hr = CRectangleBuilder::begin() //
-                  ->color([] { return CHyprColor{backend->getPalette()->m_colors.text.darken(0.65)}; })
+                  ->color([] { return CAbyssColor{backend->getPalette()->m_colors.text.darken(0.65)}; })
                   ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_ABSOLUTE, {0.5F, 9.F}})
                   ->commence();
 
@@ -54,10 +54,10 @@ int                 main(int argc, char** argv, char** envp) {
 
     auto content = CTextBuilder::begin()
                        ->text("This is an example dialog. This first line is long on purpose, so that we overflow. Amogus sussus biggus sussus.\n\nWoo!")
-                       ->align(Hyprtoolkit::HT_FONT_ALIGN_CENTER)
+                       ->align(Abysstoolkit::HT_FONT_ALIGN_CENTER)
                        ->color([] { return backend->getPalette()->m_colors.text; })
                        ->commence();
-    content->setPositionFlag(Hyprtoolkit::IElement::HT_POSITION_FLAG_HCENTER, true);
+    content->setPositionFlag(Abysstoolkit::IElement::HT_POSITION_FLAG_HCENTER, true);
 
     auto button1 = CButtonBuilder::begin()
                        ->label("Exit")

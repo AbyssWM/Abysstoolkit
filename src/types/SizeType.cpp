@@ -1,13 +1,13 @@
-#include <hyprtoolkit/types/SizeType.hpp>
+#include <abysstoolkit/types/SizeType.hpp>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
-CDynamicSize::CDynamicSize(eSizingType typeX, eSizingType typeY, const Hyprutils::Math::Vector2D& size) : m_typeX(typeX), m_typeY(typeY), m_value(size) {
+CDynamicSize::CDynamicSize(eSizingType typeX, eSizingType typeY, const Abyssutils::Math::Vector2D& size) : m_typeX(typeX), m_typeY(typeY), m_value(size) {
     ;
 }
 
-Hyprutils::Math::Vector2D CDynamicSize::calculate(Hyprutils::Math::Vector2D elSize) const {
-    Hyprutils::Math::Vector2D size;
+Abyssutils::Math::Vector2D CDynamicSize::calculate(Abyssutils::Math::Vector2D elSize) const {
+    Abyssutils::Math::Vector2D size;
     switch (m_typeX) {
         case HT_SIZE_ABSOLUTE: size.x = m_value.x; break;
         case HT_SIZE_PERCENT: size.x = m_value.x * elSize.x; break;

@@ -2,26 +2,26 @@
 
 #include "OpenGL.hpp"
 #include "../../helpers/Memory.hpp"
-#include <hyprutils/os/FileDescriptor.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CEGLSync {
       public:
         static UP<CEGLSync> create();
 
         ~CEGLSync();
 
-        Hyprutils::OS::CFileDescriptor&  fd();
-        Hyprutils::OS::CFileDescriptor&& takeFd();
+        Abyssutils::OS::CFileDescriptor&  fd();
+        Abyssutils::OS::CFileDescriptor&& takeFd();
         bool                             isValid();
 
       private:
         CEGLSync() = default;
 
-        Hyprutils::OS::CFileDescriptor m_fd;
+        Abyssutils::OS::CFileDescriptor m_fd;
         EGLSyncKHR                     m_sync  = EGL_NO_SYNC_KHR;
         bool                           m_valid = false;
 
-        friend class CHyprOpenGLImpl;
+        friend class CAbyssOpenGLImpl;
     };
 }

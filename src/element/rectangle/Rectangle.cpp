@@ -6,7 +6,7 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CRectangleElement> CRectangleElement::create(const SRectangleData& data) {
     auto p          = SP<CRectangleElement>(new CRectangleElement(data));
@@ -52,7 +52,7 @@ void CRectangleElement::paint() {
     }
 }
 
-void CRectangleElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CRectangleElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -79,22 +79,22 @@ void CRectangleElement::recheckColor() {
     *m_impl->borderColor = m_impl->data.borderColor();
 }
 
-Hyprutils::Math::Vector2D CRectangleElement::size() {
+Abyssutils::Math::Vector2D CRectangleElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CRectangleElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CRectangleElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 
-std::optional<Vector2D> CRectangleElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CRectangleElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
     return Vector2D{0, 0};
 }
 
-std::optional<Vector2D> CRectangleElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CRectangleElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

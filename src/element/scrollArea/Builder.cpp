@@ -1,6 +1,6 @@
 #include "ScrollArea.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CScrollAreaBuilder> CScrollAreaBuilder::begin() {
     SP<CScrollAreaBuilder> p = SP<CScrollAreaBuilder>(new CScrollAreaBuilder());

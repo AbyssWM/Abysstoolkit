@@ -3,10 +3,10 @@
 #include "../element/Element.hpp"
 #include "../window/ToolkitWindow.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
-void CPositioner::position(SP<IElement> element, const CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CPositioner::position(SP<IElement> element, const CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
 
     initElementIfNeeded(element);
 
@@ -109,5 +109,5 @@ void CPositioner::initElementIfNeeded(SP<IElement> el) {
     if (el->impl->positionerData)
         return;
 
-    el->impl->positionerData = makeUnique<Hyprtoolkit::SPositionerData>();
+    el->impl->positionerData = makeUnique<Abysstoolkit::SPositionerData>();
 }

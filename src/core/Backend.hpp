@@ -1,14 +1,14 @@
 #pragma once
 
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprutils/os/FileDescriptor.hpp>
-#include <hyprutils/cli/Logger.hpp>
-#include <hyprgraphics/resource/AsyncResourceGatherer.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
+#include <abyssutils/cli/Logger.hpp>
+#include <abyssgraphics/resource/AsyncResourceGatherer.hpp>
 
 #include "../helpers/Env.hpp"
 #include "../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CPalette;
     class CConfigManager;
@@ -39,7 +39,7 @@ namespace Hyprtoolkit {
 
         // schedule function to when fd is readable (WL_EVENT_READABLE / POLLIN),
         // takes ownership of fd
-        void        doOnReadable(Hyprutils::OS::CFileDescriptor fd, std::function<void()>&& fn);
+        void        doOnReadable(Abyssutils::OS::CFileDescriptor fd, std::function<void()>&& fn);
 
         SP<IWindow> openWindow(const SWindowCreationData& data);
 
@@ -47,13 +47,13 @@ namespace Hyprtoolkit {
 
         std::vector<pollfd>                                     m_pollfds;
 
-        Hyprutils::Memory::CSharedPointer<Aquamarine::CBackend> m_aqBackend;
+        Abyssutils::Memory::CSharedPointer<Abyssal::CBackend> m_aqBackend;
 
         bool                                                    m_terminate         = false;
         bool                                                    m_needsConfigReload = false;
 
         struct SFDListener {
-            Hyprutils::OS::CFileDescriptor fdOwned;
+            Abyssutils::OS::CFileDescriptor fdOwned;
             int                            fd = 0;
             std::function<void()>          callback;
             bool                           needsDispatch = false;
@@ -87,7 +87,7 @@ namespace Hyprtoolkit {
             int64_t                  eventLoopThreadID = -1;
         } m_sLoopState;
 
-        std::vector<Hyprutils::Memory::CAtomicSharedPointer<CTimer>>                m_timers;
-        std::vector<Hyprutils::Memory::CAtomicSharedPointer<std::function<void()>>> m_idles;
+        std::vector<Abyssutils::Memory::CAtomicSharedPointer<CTimer>>                m_timers;
+        std::vector<Abyssutils::Memory::CAtomicSharedPointer<std::function<void()>>> m_idles;
     };
 }

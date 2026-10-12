@@ -1,13 +1,13 @@
 #pragma once
 
-#include <hyprtoolkit/element/Textbox.hpp>
-#include <hyprutils/signal/Listener.hpp>
+#include <abysstoolkit/element/Textbox.hpp>
+#include <abyssutils/signal/Listener.hpp>
 
 #include "../../helpers/Memory.hpp"
 
-using namespace Hyprutils::Signal;
+using namespace Abyssutils::Signal;
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CRectangleElement;
     class CNullElement;
@@ -16,7 +16,7 @@ namespace Hyprtoolkit {
     struct STextboxData {
         std::string                                                                                 text;
         std::string                                                                                 placeholder;
-        std::function<void(Hyprutils::Memory::CSharedPointer<CTextboxElement>, const std::string&)> onTextEdited;
+        std::function<void(Abyssutils::Memory::CSharedPointer<CTextboxElement>, const std::string&)> onTextEdited;
         bool                                                                                        multiline = true;
         bool                                                                                        password  = false;
         CDynamicSize                                                                                size{CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1, 1}};
@@ -38,11 +38,11 @@ namespace Hyprtoolkit {
         bool                               active = false;
 
         struct {
-            CHyprSignalListener key;
-            CHyprSignalListener enter;
-            CHyprSignalListener leave;
-            CHyprSignalListener mouseMove;
-            CHyprSignalListener mouseButton;
+            CAbyssSignalListener key;
+            CAbyssSignalListener enter;
+            CAbyssSignalListener leave;
+            CAbyssSignalListener mouseMove;
+            CAbyssSignalListener mouseButton;
         } listeners;
 
         struct {
@@ -65,6 +65,6 @@ namespace Hyprtoolkit {
         void                      updateLabel();
         void                      updateCursor();
 
-        Hyprutils::Math::Vector2D lastCursorPos;
+        Abyssutils::Math::Vector2D lastCursorPos;
     };
 }

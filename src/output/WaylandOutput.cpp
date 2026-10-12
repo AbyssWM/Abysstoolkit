@@ -2,21 +2,21 @@
 #include "../core/InternalBackend.hpp"
 #include "../helpers/Memory.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
-static Hyprutils::Math::eTransform wlTransformToHyprutils(wl_output_transform t) {
+static Abyssutils::Math::eTransform wlTransformToAbyssutils(wl_output_transform t) {
     switch (t) {
-        case WL_OUTPUT_TRANSFORM_NORMAL: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_NORMAL;
-        case WL_OUTPUT_TRANSFORM_180: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_180;
-        case WL_OUTPUT_TRANSFORM_90: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_90;
-        case WL_OUTPUT_TRANSFORM_270: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_270;
-        case WL_OUTPUT_TRANSFORM_FLIPPED: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_FLIPPED;
-        case WL_OUTPUT_TRANSFORM_FLIPPED_180: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_FLIPPED_180;
-        case WL_OUTPUT_TRANSFORM_FLIPPED_270: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_FLIPPED_270;
-        case WL_OUTPUT_TRANSFORM_FLIPPED_90: return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_FLIPPED_90;
+        case WL_OUTPUT_TRANSFORM_NORMAL: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_NORMAL;
+        case WL_OUTPUT_TRANSFORM_180: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_180;
+        case WL_OUTPUT_TRANSFORM_90: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_90;
+        case WL_OUTPUT_TRANSFORM_270: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_270;
+        case WL_OUTPUT_TRANSFORM_FLIPPED: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_FLIPPED;
+        case WL_OUTPUT_TRANSFORM_FLIPPED_180: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_FLIPPED_180;
+        case WL_OUTPUT_TRANSFORM_FLIPPED_270: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_FLIPPED_270;
+        case WL_OUTPUT_TRANSFORM_FLIPPED_90: return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_FLIPPED_90;
         default: break;
     }
-    return Hyprutils::Math::eTransform::HYPRUTILS_TRANSFORM_NORMAL;
+    return Abyssutils::Math::eTransform::ABYSSUTILS_TRANSFORM_NORMAL;
 }
 
 CWaylandOutput::CWaylandOutput(wl_proxy* wlResource, uint32_t id) : m_id(id), m_wlOutput(makeShared<CCWlOutput>(wlResource)) {
@@ -50,7 +50,7 @@ CWaylandOutput::CWaylandOutput(wl_proxy* wlResource, uint32_t id) : m_id(id), m_
 
     m_wlOutput->setGeometry(
         [this](CCWlOutput* r, int32_t x, int32_t y, int32_t physical_width, int32_t physical_height, int32_t subpixel, const char* make, const char* model, int32_t transform_) {
-            m_configuration.transform = wlTransformToHyprutils((wl_output_transform)transform_);
+            m_configuration.transform = wlTransformToAbyssutils((wl_output_transform)transform_);
 
             g_logger->log(HT_LOG_DEBUG, "wayland output {}: make {} model {}", m_id, make ? make : "", model ? model : "");
         });

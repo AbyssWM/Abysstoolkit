@@ -3,7 +3,7 @@
 #include "IWaylandWindow.hpp"
 #include <wlr-layer-shell-unstable-v1.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CWaylandLayer : public IWaylandWindow {
       public:

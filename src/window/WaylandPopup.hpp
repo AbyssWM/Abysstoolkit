@@ -2,7 +2,7 @@
 
 #include "IWaylandWindow.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CWaylandWindow;
 
@@ -14,7 +14,7 @@ namespace Hyprtoolkit {
 
         virtual void                                       close();
         virtual void                                       open();
-        virtual Hyprutils::Memory::CSharedPointer<IWindow> openPopup(const SWindowCreationData& data);
+        virtual Abyssutils::Memory::CSharedPointer<IWindow> openPopup(const SWindowCreationData& data);
 
       private:
         WP<CWaylandWindow>  m_parent;

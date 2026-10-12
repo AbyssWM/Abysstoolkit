@@ -2,10 +2,10 @@
 
 #include <cstdint>
 #include <string>
-#include <aquamarine/backend/Misc.hpp>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssal/backend/Misc.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     using DRMFormat = uint32_t;
     using SHMFormat = uint32_t;
 
@@ -18,10 +18,10 @@ namespace Hyprtoolkit {
         bool                      withAlpha        = true;
         DRMFormat                 alphaStripped    = 0; /* DRM_FORMAT_INVALID */
         uint32_t                  bytesPerBlock    = 0;
-        Hyprutils::Math::Vector2D blockSize;
+        Abyssutils::Math::Vector2D blockSize;
     };
 
-    using SDRMFormat = Aquamarine::SDRMFormat;
+    using SDRMFormat = Abyssal::SDRMFormat;
 
     namespace NFormatUtils {
         const SPixelFormat* getPixelFormatFromDRM(DRMFormat drm);

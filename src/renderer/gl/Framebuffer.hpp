@@ -2,7 +2,7 @@
 
 #include "GLTexture.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CFramebuffer {
       public:
@@ -18,7 +18,7 @@ namespace Hyprtoolkit {
         SP<CGLTexture>            getTexture();
         GLuint                    getFBID();
 
-        Hyprutils::Math::Vector2D m_size;
+        Abyssutils::Math::Vector2D m_size;
         uint32_t                  m_drmFormat = 0 /* DRM_FORMAT_INVALID */;
 
       private:

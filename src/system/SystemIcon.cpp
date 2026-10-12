@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 CSystemIconDescription::CSystemIconDescription() {
     ;

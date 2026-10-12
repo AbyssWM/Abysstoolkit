@@ -2,15 +2,15 @@
 
 #include <string_view>
 
-#include <hyprutils/signal/Signal.hpp>
+#include <abyssutils/signal/Signal.hpp>
 
 #include "../../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class IRendererTexture;
 }
 
-namespace Hyprtoolkit::Asset {
+namespace Abysstoolkit::Asset {
     enum eAssetCacheEntryStatus : uint8_t {
         CACHE_ENTRY_PENDING = 0,
         CACHE_ENTRY_DONE    = 1,
@@ -38,7 +38,7 @@ namespace Hyprtoolkit::Asset {
         }
 
         struct {
-            Hyprutils::Signal::CSignalT<> done;
+            Abyssutils::Signal::CSignalT<> done;
         } m_events;
 
       private:

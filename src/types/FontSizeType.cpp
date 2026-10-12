@@ -1,9 +1,9 @@
-#include <hyprtoolkit/types/FontTypes.hpp>
+#include <abysstoolkit/types/FontTypes.hpp>
 
 #include "../core/InternalBackend.hpp"
 #include "../Macros.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 CFontSize::CFontSize(eSizingBase base, float mult) : m_base(base), m_value(mult) {
     ;

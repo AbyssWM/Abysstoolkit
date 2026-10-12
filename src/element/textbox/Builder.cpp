@@ -1,6 +1,6 @@
 #include "Textbox.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CTextboxBuilder> CTextboxBuilder::begin() {
     SP<CTextboxBuilder> p = SP<CTextboxBuilder>(new CTextboxBuilder());

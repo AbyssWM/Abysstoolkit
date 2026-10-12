@@ -1,11 +1,11 @@
 #pragma once
 
-#include <hyprtoolkit/window/Window.hpp>
+#include <abysstoolkit/window/Window.hpp>
 
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-#include <aquamarine/allocator/Swapchain.hpp>
-#include <aquamarine/allocator/GBM.hpp>
+#include <abyssal/allocator/Swapchain.hpp>
+#include <abyssal/allocator/GBM.hpp>
 
 #include "../helpers/Memory.hpp"
 #include "ToolkitWindow.hpp"
@@ -19,12 +19,12 @@
 
 #include <chrono>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CSyncTimeline;
 
     class CWaylandBuffer {
       public:
-        CWaylandBuffer(SP<Aquamarine::IBuffer> buffer);
+        CWaylandBuffer(SP<Abyssal::IBuffer> buffer);
         ~CWaylandBuffer();
         bool              good();
 
@@ -37,22 +37,22 @@ namespace Hyprtoolkit {
             SP<CCWpLinuxDrmSyncobjTimelineV1> syncTimeline;
         } m_waylandState;
 
-        Hyprutils::Memory::CWeakPointer<Aquamarine::IBuffer> m_buffer;
+        Abyssutils::Memory::CWeakPointer<Abyssal::IBuffer> m_buffer;
     };
 
     class IWaylandWindow : public IToolkitWindow {
       public:
         virtual ~IWaylandWindow() = default;
 
-        virtual Hyprutils::Math::Vector2D pixelSize();
+        virtual Abyssutils::Math::Vector2D pixelSize();
         virtual float                     scale();
         virtual void                      render();
         virtual void                      setCursor(ePointerShape shape);
         virtual SP<IWindow>               openPopup(const SWindowCreationData& data);
-        virtual void                      mouseMove(const Hyprutils::Math::Vector2D& local);
+        virtual void                      mouseMove(const Abyssutils::Math::Vector2D& local);
         virtual void                      mouseButton(const Input::eMouseButton button, bool state);
         virtual void                      mouseAxis(const Input::eAxisAxis axis, float delta);
-        virtual void                      setIMTo(const Hyprutils::Math::CBox& box, const std::string& str, size_t cursor);
+        virtual void                      setIMTo(const Abyssutils::Math::CBox& box, const std::string& str, size_t cursor);
         virtual void                      resetIM();
         virtual void                      onPreRender();
 
@@ -61,8 +61,8 @@ namespace Hyprtoolkit {
       protected:
         virtual void onCallback();
         virtual void onScaleUpdate();
-        virtual void configure(const Hyprutils::Math::Vector2D& size, uint32_t serial);
-        virtual void resizeSwapchain(const Hyprutils::Math::Vector2D& pixelSize);
+        virtual void configure(const Abyssutils::Math::Vector2D& size, uint32_t serial);
+        virtual void resizeSwapchain(const Abyssutils::Math::Vector2D& pixelSize);
 
         void         prepareExplicit(SP<CWaylandBuffer>);
         void         submitExplicit(SP<CWaylandBuffer>);
@@ -80,17 +80,17 @@ namespace Hyprtoolkit {
             SP<CCWpLinuxDrmSyncobjSurfaceV1>        syncobjSurf;
 
             std::array<SP<CWaylandBuffer>, 2>       wlBuffers;
-            SP<Aquamarine::CSwapchain>              swapchain;
+            SP<Abyssal::CSwapchain>              swapchain;
             size_t                                  bufIdx = 0;
 
-            Hyprutils::Math::Vector2D               size;
-            Hyprutils::Math::Vector2D               logicalSize;
+            Abyssutils::Math::Vector2D               size;
+            Abyssutils::Math::Vector2D               logicalSize;
             float                                   appliedScale;
             SP<CCWpFractionalScaleV1>               fractional = nullptr;
             SP<CCWpViewport>                        viewport   = nullptr;
             uint32_t                                serial     = 0;
 
-            std::optional<Hyprutils::Math::CRegion> lastOpaqueRegion;
+            std::optional<Abyssutils::Math::CRegion> lastOpaqueRegion;
         } m_waylandState;
 
         std::chrono::steady_clock::time_point m_lastFrame = std::chrono::steady_clock::now();

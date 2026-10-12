@@ -1,6 +1,6 @@
 #include "Checkbox.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -9,8 +9,8 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CCheckmarkElement> CCheckmarkElement::create(const SCheckmarkData& data) {
     auto p        = SP<CCheckmarkElement>(new CCheckmarkElement(data));
@@ -32,24 +32,24 @@ void CCheckmarkElement::paint() {
     });
 }
 
-void CCheckmarkElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CCheckmarkElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
 }
 
-Hyprutils::Math::Vector2D CCheckmarkElement::size() {
+Abyssutils::Math::Vector2D CCheckmarkElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CCheckmarkElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckmarkElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CCheckmarkElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckmarkElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CCheckmarkElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckmarkElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_data.size.calculate(parent);
 }

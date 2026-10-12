@@ -2,7 +2,7 @@
 
 #include <helpers/Env.hpp>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 TEST(Env, enabled) {
     setenv("HT_INTERNAL_TEST1", "1", 1);

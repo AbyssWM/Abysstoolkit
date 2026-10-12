@@ -1,12 +1,12 @@
 #pragma once
 
-#include <hyprtoolkit/palette/Color.hpp>
-#include <hyprutils/animation/AnimatedVariable.hpp>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abysstoolkit/palette/Color.hpp>
+#include <abyssutils/animation/AnimatedVariable.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
 #include "../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     enum eAnimatedVarType : int8_t {
         AVARTYPE_INVALID = -1,
@@ -29,12 +29,12 @@ namespace Hyprtoolkit {
     };
 
     template <>
-    struct STypeToAnimatedVarType_t<Hyprutils::Math::Vector2D> {
+    struct STypeToAnimatedVarType_t<Abyssutils::Math::Vector2D> {
         static constexpr eAnimatedVarType value = AVARTYPE_VECTOR;
     };
 
     template <>
-    struct STypeToAnimatedVarType_t<CHyprColor> {
+    struct STypeToAnimatedVarType_t<CAbyssColor> {
         static constexpr eAnimatedVarType value = AVARTYPE_COLOR;
     };
 
@@ -55,12 +55,12 @@ namespace Hyprtoolkit {
     // This is mainly to get better errors if we put a type that's not supported
     // Otherwise template errors are ugly
     template <class T>
-    concept Animable = OneOf<T, Hyprutils::Math::Vector2D, float, CHyprColor /*, CGradientValueData*/>;
+    concept Animable = OneOf<T, Abyssutils::Math::Vector2D, float, CAbyssColor /*, CGradientValueData*/>;
 
     struct SAnimationContext {};
 
     template <Animable VarType>
-    using CAnimatedVariable = Hyprutils::Animation::CGenericAnimatedVariable<VarType, SAnimationContext>;
+    using CAnimatedVariable = Abyssutils::Animation::CGenericAnimatedVariable<VarType, SAnimationContext>;
 
     template <Animable VarType>
     using PHLANIMVAR = UP<CAnimatedVariable<VarType>>;

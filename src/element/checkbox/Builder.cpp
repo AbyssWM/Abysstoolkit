@@ -1,6 +1,6 @@
 #include "Checkbox.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CCheckboxBuilder> CCheckboxBuilder::begin() {
     SP<CCheckboxBuilder> p = SP<CCheckboxBuilder>(new CCheckboxBuilder());
@@ -9,7 +9,7 @@ SP<CCheckboxBuilder> CCheckboxBuilder::begin() {
     return p;
 }
 
-SP<CCheckboxBuilder> CCheckboxBuilder::onToggled(std::function<void(Hyprutils::Memory::CSharedPointer<CCheckboxElement>, bool)>&& f) {
+SP<CCheckboxBuilder> CCheckboxBuilder::onToggled(std::function<void(Abyssutils::Memory::CSharedPointer<CCheckboxElement>, bool)>&& f) {
     m_data->onToggled = std::move(f);
     return m_self.lock();
 }

@@ -1,6 +1,6 @@
 #include "Line.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CLineBuilder> CLineBuilder::begin() {
     SP<CLineBuilder> p = SP<CLineBuilder>(new CLineBuilder());
@@ -14,7 +14,7 @@ SP<CLineBuilder> CLineBuilder::color(colorFn&& f) {
     return m_self.lock();
 }
 
-SP<CLineBuilder> CLineBuilder::points(std::vector<Hyprutils::Math::Vector2D>&& f) {
+SP<CLineBuilder> CLineBuilder::points(std::vector<Abyssutils::Math::Vector2D>&& f) {
     m_data->points = std::move(f);
     return m_self.lock();
 }

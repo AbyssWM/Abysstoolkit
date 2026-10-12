@@ -7,18 +7,18 @@
 #include <filesystem>
 #include <fstream>
 
-#include <hyprutils/string/String.hpp>
-#include <hyprutils/string/ConstVarList.hpp>
-#include <hyprutils/string/VarList2.hpp>
-#include <hyprutils/utils/ScopeGuard.hpp>
+#include <abyssutils/string/String.hpp>
+#include <abyssutils/string/ConstVarList.hpp>
+#include <abyssutils/string/VarList2.hpp>
+#include <abyssutils/utils/ScopeGuard.hpp>
 
 extern "C" {
 #include "iniparser.h"
 }
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::String;
-using namespace Hyprutils::Utils;
+using namespace Abysstoolkit;
+using namespace Abyssutils::String;
+using namespace Abyssutils::Utils;
 
 static std::optional<std::string> readFileAsString(const std::string& path) {
     std::error_code ec;

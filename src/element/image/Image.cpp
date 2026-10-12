@@ -10,7 +10,7 @@
 
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CImageElement> CImageElement::create(const SImageData& data) {
     auto p          = SP<CImageElement>(new CImageElement(data));
@@ -142,7 +142,7 @@ void SImageImpl::postImageLoad() {
             cacheEntry->texDone(g_renderer->uploadTexture({.resource = resourceGeneric, .fitMode = data.fitMode}));
     } else {
         failed = true;
-        g_logger->log(HT_LOG_ERROR, "Image: failed loading, hyprgraphics couldn't load asset {}", lastPath);
+        g_logger->log(HT_LOG_ERROR, "Image: failed loading, abyssgraphics couldn't load asset {}", lastPath);
     }
 
     oldCacheEntry.reset();
@@ -190,17 +190,17 @@ void CImageElement::replaceData(const SImageData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-void CImageElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CImageElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
 }
 
-Hyprutils::Math::Vector2D CImageElement::size() {
+Abyssutils::Math::Vector2D CImageElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CImageElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CImageElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
@@ -221,14 +221,14 @@ std::optional<Vector2D> CImageElement::preferredSize(const Hyprutils::Math::Vect
     return Vector2D{ASPECT_RATIO * s.y, s.y};
 }
 
-std::optional<Vector2D> CImageElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CImageElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
     return Vector2D{0, 0};
 }
 
-std::optional<Vector2D> CImageElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CImageElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;

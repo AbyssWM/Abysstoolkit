@@ -1,6 +1,6 @@
 #include "Checkbox.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../core/InternalBackend.hpp"
 #include "../../layout/Positioner.hpp"
@@ -9,8 +9,8 @@
 #include "../../core/AnimationManager.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprgraphics;
+using namespace Abysstoolkit;
+using namespace Abyssgraphics;
 
 SP<CCheckboxElement> CCheckboxElement::create(const SCheckboxData& data) {
     auto p          = SP<CCheckboxElement>(new CCheckboxElement(data));
@@ -19,7 +19,7 @@ SP<CCheckboxElement> CCheckboxElement::create(const SCheckboxData& data) {
     return p;
 }
 
-std::function<CHyprColor()> SCheckboxImpl::getFgColor() {
+std::function<CAbyssColor()> SCheckboxImpl::getFgColor() {
     if (data.toggled)
         return [] { return g_palette->m_colors.accent; };
     else {
@@ -45,7 +45,7 @@ CCheckboxElement::CCheckboxElement(const SCheckboxData& data) : IElement(), m_im
     m_impl->background->setPositionMode(HT_POSITION_ABSOLUTE);
     m_impl->background->setPositionFlag(HT_POSITION_FLAG_CENTER, true);
 
-    CHyprColor col = g_palette->m_colors.accent;
+    CAbyssColor col = g_palette->m_colors.accent;
     col.a          = m_impl->data.toggled ? 1.F : 0.F;
     m_impl->foreground =
         CCheckmarkElement::create(SCheckmarkData{.size = {CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}}, .color = [col] { return col; }});
@@ -90,7 +90,7 @@ CCheckboxElement::CCheckboxElement(const SCheckboxData& data) : IElement(), m_im
             if (m_impl->data.onToggled)
                 m_impl->data.onToggled(m_impl->self.lock(), m_impl->data.toggled);
 
-            CHyprColor col               = g_palette->m_colors.accent;
+            CAbyssColor col               = g_palette->m_colors.accent;
             col.a                        = m_impl->data.toggled ? 1.F : 0.F;
             *m_impl->foreground->m_color = col;
         }
@@ -103,7 +103,7 @@ void CCheckboxElement::paint() {
     ;
 }
 
-void CCheckboxElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CCheckboxElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());
@@ -120,7 +120,7 @@ SP<CCheckboxBuilder> CCheckboxElement::rebuild() {
 void CCheckboxElement::replaceData(const SCheckboxData& data) {
     m_impl->data = data;
 
-    CHyprColor col               = g_palette->m_colors.accent;
+    CAbyssColor col               = g_palette->m_colors.accent;
     col.a                        = m_impl->data.toggled ? 1.F : 0.F;
     *m_impl->foreground->m_color = col;
 
@@ -128,19 +128,19 @@ void CCheckboxElement::replaceData(const SCheckboxData& data) {
         impl->window->scheduleReposition(impl->self);
 }
 
-Hyprutils::Math::Vector2D CCheckboxElement::size() {
+Abyssutils::Math::Vector2D CCheckboxElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CCheckboxElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 
-std::optional<Vector2D> CCheckboxElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckboxElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 
-std::optional<Vector2D> CCheckboxElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckboxElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 

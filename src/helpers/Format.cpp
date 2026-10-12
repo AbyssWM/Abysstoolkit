@@ -4,11 +4,11 @@
 #include <xf86drm.h>
 #include <drm_fourcc.h>
 #include <GLES3/gl32.h>
-#include <hyprutils/memory/Casts.hpp>
+#include <abyssutils/memory/Casts.hpp>
 #include "../Macros.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Memory;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Memory;
 
 /*
     DRM formats are LE, while OGL is BE. The two primary formats

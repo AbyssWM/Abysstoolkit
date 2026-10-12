@@ -3,14 +3,14 @@
 #include "wayland.hpp"
 
 #include <cstdint>
-#include <hyprtoolkit/core/Output.hpp>
+#include <abysstoolkit/core/Output.hpp>
 
-#include <hyprutils/math/Misc.hpp>
-#include <hyprutils/memory/SharedPtr.hpp>
-#include <hyprutils/memory/WeakPtr.hpp>
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Misc.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/WeakPtr.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CWaylandOutput : public IOutput {
       public:
         CWaylandOutput(wl_proxy* wlResource, uint32_t id);
@@ -23,12 +23,12 @@ namespace Hyprtoolkit {
 
         uint32_t                                      m_id       = 0;
         bool                                          m_focused  = false;
-        Hyprutils::Memory::CSharedPointer<CCWlOutput> m_wlOutput = nullptr;
+        Abyssutils::Memory::CSharedPointer<CCWlOutput> m_wlOutput = nullptr;
 
         struct {
             bool                        done      = false;
-            Hyprutils::Math::eTransform transform = Hyprutils::Math::HYPRUTILS_TRANSFORM_NORMAL;
-            Hyprutils::Math::Vector2D   size;
+            Abyssutils::Math::eTransform transform = Abyssutils::Math::ABYSSUTILS_TRANSFORM_NORMAL;
+            Abyssutils::Math::Vector2D   size;
             uint32_t                    fps   = 60;
             uint32_t                    scale = 1;
             std::string                 name  = "";

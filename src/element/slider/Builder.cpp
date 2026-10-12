@@ -1,6 +1,6 @@
 #include "Slider.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CSliderBuilder> CSliderBuilder::begin() {
     SP<CSliderBuilder> p = SP<CSliderBuilder>(new CSliderBuilder());
@@ -29,7 +29,7 @@ SP<CSliderBuilder> CSliderBuilder::snapInt(bool x) {
     return m_self.lock();
 }
 
-SP<CSliderBuilder> CSliderBuilder::onChanged(std::function<void(Hyprutils::Memory::CSharedPointer<CSliderElement>, float)>&& x) {
+SP<CSliderBuilder> CSliderBuilder::onChanged(std::function<void(Abyssutils::Memory::CSharedPointer<CSliderElement>, float)>&& x) {
     m_data->onChanged = std::move(x);
     return m_self.lock();
 }

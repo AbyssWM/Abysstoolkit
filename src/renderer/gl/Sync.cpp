@@ -1,8 +1,8 @@
 #include "Sync.hpp"
 #include "../../core/InternalBackend.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::OS;
+using namespace Abysstoolkit;
+using namespace Abyssutils::OS;
 
 UP<CEGLSync> CEGLSync::create() {
     EGLSyncKHR sync = g_openGL->m_proc.eglCreateSyncKHR(g_openGL->m_eglDisplay, EGL_SYNC_NATIVE_FENCE_ANDROID, nullptr);

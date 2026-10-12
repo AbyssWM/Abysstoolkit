@@ -1,14 +1,14 @@
 #pragma once
-#include <hyprlang.hpp>
+#include <abyssparse.hpp>
 #include <string>
 
 #include "../helpers/Memory.hpp"
 
 #include <sys/inotify.h>
 
-#include <hyprutils/os/FileDescriptor.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     class CPalette;
 
@@ -22,8 +22,8 @@ namespace Hyprtoolkit {
 
         SP<CPalette>                   getPalette();
 
-        UP<Hyprlang::CConfig>          m_config;
-        Hyprutils::OS::CFileDescriptor m_inotifyFd;
+        UP<Abyssparse::CConfig>          m_config;
+        Abyssutils::OS::CFileDescriptor m_inotifyFd;
         std::vector<int>               m_watches;
         std::string                    m_configPath;
         std::string                    m_configCurrentPath;

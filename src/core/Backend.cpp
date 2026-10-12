@@ -1,7 +1,7 @@
 #include <algorithm>
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/core/Timer.hpp>
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/core/Timer.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "InternalBackend.hpp"
 #include "AnimationManager.hpp"
@@ -32,8 +32,8 @@
 #include <sys/lwp.h>
 #endif
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Memory;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Memory;
 
 #define SP CSharedPointer
 #define WP CWeakPointer
@@ -42,19 +42,19 @@ CBackend::CBackend() {
     pipe(m_sLoopState.exitfd);
     pipe(m_sLoopState.wakeupfd);
 
-    Aquamarine::SBackendOptions options{};
-    g_logger->m_aqLoggerConnection = makeShared<Hyprutils::CLI::CLoggerConnection>(g_logger->m_logger);
-    g_logger->m_aqLoggerConnection->setLogLevel(Hyprutils::CLI::LOG_WARN); // don't print debug logs, unless AQ_TRACE is set, then aq will set it
-    g_logger->m_aqLoggerConnection->setName("aquamarine");
+    Abyssal::SBackendOptions options{};
+    g_logger->m_aqLoggerConnection = makeShared<Abyssutils::CLI::CLoggerConnection>(g_logger->m_logger);
+    g_logger->m_aqLoggerConnection->setLogLevel(Abyssutils::CLI::LOG_WARN); // don't print debug logs, unless ABYSSAL_TRACE is set, then aq will set it
+    g_logger->m_aqLoggerConnection->setName("abyssal");
     options.logConnection = g_logger->m_aqLoggerConnection;
 
-    std::vector<Aquamarine::SBackendImplementationOptions> implementations;
-    Aquamarine::SBackendImplementationOptions              option;
-    option.backendType        = Aquamarine::eBackendType::AQ_BACKEND_NULL;
-    option.backendRequestMode = Aquamarine::eBackendRequestMode::AQ_BACKEND_REQUEST_MANDATORY;
+    std::vector<Abyssal::SBackendImplementationOptions> implementations;
+    Abyssal::SBackendImplementationOptions              option;
+    option.backendType        = Abyssal::eBackendType::ABYSSAL_BACKEND_NULL;
+    option.backendRequestMode = Abyssal::eBackendRequestMode::ABYSSAL_BACKEND_REQUEST_MANDATORY;
     implementations.emplace_back(option);
 
-    m_aqBackend             = Aquamarine::CBackend::create(implementations, options);
+    m_aqBackend             = Abyssal::CBackend::create(implementations, options);
     g_asyncResourceGatherer = makeShared<CAsyncResourceGatherer>();
     g_animationManager      = makeShared<CHTAnimationManager>();
 }
@@ -295,7 +295,7 @@ void CBackend::removeFd(int fd) {
     rebuildPollfds();
 }
 
-void CBackend::doOnReadable(Hyprutils::OS::CFileDescriptor fd, std::function<void()>&& fn) {
+void CBackend::doOnReadable(Abyssutils::OS::CFileDescriptor fd, std::function<void()>&& fn) {
     int fdInt = fd.get();
     m_sLoopState.userFds.emplace_back(SFDListener{
         .fdOwned      = std::move(fd),

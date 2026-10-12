@@ -1,7 +1,7 @@
 #include "AssetCache.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprtoolkit::Asset;
+using namespace Abysstoolkit;
+using namespace Abysstoolkit::Asset;
 
 SP<CAssetCache> Asset::assetCache() {
     static auto cache = makeShared<CAssetCache>();

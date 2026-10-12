@@ -1,20 +1,20 @@
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/window/Window.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/RowLayout.hpp>
-#include <hyprtoolkit/element/ColumnLayout.hpp>
-#include <hyprtoolkit/element/Text.hpp>
-#include <hyprtoolkit/element/Image.hpp>
-#include <hyprtoolkit/element/Button.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/window/Window.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/RowLayout.hpp>
+#include <abysstoolkit/element/ColumnLayout.hpp>
+#include <abysstoolkit/element/Text.hpp>
+#include <abysstoolkit/element/Image.hpp>
+#include <abysstoolkit/element/Button.hpp>
 
-#include <hyprutils/memory/SharedPtr.hpp>
-#include <hyprutils/memory/UniquePtr.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/UniquePtr.hpp>
 
 #include <print>
 
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
-using namespace Hyprtoolkit;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
+using namespace Abysstoolkit;
 
 #define SP CSharedPointer
 #define WP CWeakPointer
@@ -26,8 +26,8 @@ static size_t       buttonClicks = 1;
 static void         addTimer(SP<CRectangleElement> rect) {
     backend->addTimer(
         std::chrono::seconds(1),
-        [rect](Hyprutils::Memory::CAtomicSharedPointer<CTimer> timer, void* data) {
-            rect->rebuild()->color([] { return CHyprColor{rand() % 1000 / 1000.F, rand() % 1000 / 1000.F, rand() % 1000 / 1000.F, 1.F}; })->commence();
+        [rect](Abyssutils::Memory::CAtomicSharedPointer<CTimer> timer, void* data) {
+            rect->rebuild()->color([] { return CAbyssColor{rand() % 1000 / 1000.F, rand() % 1000 / 1000.F, rand() % 1000 / 1000.F, 1.F}; })->commence();
 
             addTimer(rect);
         },
@@ -38,22 +38,22 @@ int main(int argc, char** argv, char** envp) {
     backend = IBackend::create();
 
     //
-    auto window = CWindowBuilder::begin()->preferredSize({640, 480})->appTitle("Hello World!")->appClass("hyprtoolkit")->commence();
+    auto window = CWindowBuilder::begin()->preferredSize({640, 480})->appTitle("Hello World!")->appClass("abysstoolkit")->commence();
 
-    window->m_rootElement->addChild(CRectangleBuilder::begin()->color([] { return CHyprColor{0.1F, 0.1F, 0.1F}; })->commence());
+    window->m_rootElement->addChild(CRectangleBuilder::begin()->color([] { return CAbyssColor{0.1F, 0.1F, 0.1F}; })->commence());
 
     auto layout = CRowLayoutBuilder::begin()->commence();
 
     window->m_rootElement->addChild(layout);
 
     auto rect3 = CRectangleBuilder::begin() //
-                     ->color([] { return CHyprColor{0.2F, 0.4F, 0.4F}; })
+                     ->color([] { return CAbyssColor{0.2F, 0.4F, 0.4F}; })
                      ->rounding(10)
                      ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {150, 150}})
                      ->commence();
 
     auto rect4 = CRectangleBuilder::begin() //
-                     ->color([] { return CHyprColor{0.4F, 0.2F, 0.4F}; })
+                     ->color([] { return CAbyssColor{0.4F, 0.2F, 0.4F}; })
                      ->rounding(10)
                      ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {50, 50}})
                      ->commence();
@@ -65,7 +65,7 @@ int main(int argc, char** argv, char** envp) {
                      ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {447, 447}})
                      ->commence();
 
-    auto text = CTextBuilder::begin()->text("world is a fuck")->color([] { return CHyprColor{0.4F, 0.4F, 0.4F}; })->commence();
+    auto text = CTextBuilder::begin()->text("world is a fuck")->color([] { return CAbyssColor{0.4F, 0.4F, 0.4F}; })->commence();
 
     auto button = CButtonBuilder::begin()
                       ->label("Click me bitch")
