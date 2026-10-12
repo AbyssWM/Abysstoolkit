@@ -37,6 +37,8 @@ Abysstoolkit is a fork of [hyprtoolkit](https://github.com/hyprwm/hyprtoolkit). 
 | [Xdg-desktop-portal-abyss](https://github.com/AbyssWM/Xdg-desktop-portal-abyss) | [xdg-desktop-portal-hyprland](https://github.com/hyprwm/xdg-desktop-portal-hyprland) |
 | **Abysstoolkit** | [hyprtoolkit](https://github.com/hyprwm/hyprtoolkit) |
 | [Abyss-guiutils](https://github.com/AbyssWM/Abyss-guiutils) | [hyprland-guiutils](https://github.com/hyprwm/hyprland-guiutils) |
+| [AbyssDusk](https://github.com/AbyssWM/AbyssDusk) | [hyprsunset](https://github.com/hyprwm/hyprsunset) |
+| [AbyssPicker](https://github.com/AbyssWM/AbyssPicker) | [hyprpicker](https://github.com/hyprwm/hyprpicker) |
 
 ## Credits
 
