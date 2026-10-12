@@ -14,6 +14,17 @@
 
 extern "C" {
 #include "iniparser.h"
+
+// GCC 14 (libstdc++ 14) cannot std::format a std::vector
+static std::string joinDirs(const std::vector<std::string>& v) {
+    std::string out;
+    for (const auto& e : v) {
+        if (!out.empty())
+            out += ", ";
+        out += e;
+    }
+    return out;
+}
 }
 
 using namespace Abysstoolkit;
@@ -99,7 +110,7 @@ static std::optional<std::vector<std::string>> findAnyTheme() {
             // try to find it
             auto themeDir = getThemeDir(iconTheme);
             if (themeDir && !themeDir->empty()) {
-                g_logger->log(HT_LOG_TRACE, "CSystemIconFactory: Found {} as default fallback", themeDir.value());
+                g_logger->log(HT_LOG_TRACE, "CSystemIconFactory: Found {} as default fallback", joinDirs(themeDir.value()));
                 return themeDir;
             }
 
@@ -214,7 +225,7 @@ void CSystemIconFactory::parseTheme(const std::string& themeDir) {
 
             auto inheritTheme = getThemeDir(trim(std::string{inheritName}));
             if (inheritTheme) {
-                g_logger->log(HT_LOG_TRACE, "CSystemIconFactory: parsing inherited theme {}", *inheritTheme);
+                g_logger->log(HT_LOG_TRACE, "CSystemIconFactory: parsing inherited theme {}", joinDirs(*inheritTheme));
                 parseThemes(*inheritTheme);
             } else
                 g_logger->log(HT_LOG_WARNING, "CSystemIconFactory: inherited theme {} not found", std::string{inheritName});
