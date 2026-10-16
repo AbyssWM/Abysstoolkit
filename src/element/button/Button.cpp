@@ -199,7 +199,7 @@ Abyssutils::Math::Vector2D CButtonElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CButtonElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CButtonElement::preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow) {
     auto s = m_impl->data.size.calculate(parent);
 
     if (s.x != -1 && s.y != -1)

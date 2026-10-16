@@ -167,7 +167,7 @@ Abyssutils::Math::Vector2D CCheckboxElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CCheckboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CCheckboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 

@@ -54,6 +54,8 @@ namespace Abysstoolkit {
 
         Abyssutils::Memory::CSharedPointer<CTextBuilder> rebuild();
         virtual Abyssutils::Math::Vector2D               size();
+        void                                            setText(std::string text);
+        void                                            animateColor(const SAnimation& animation);
 
         HT_HIDDEN : CTextElement(const STextData& data);
         static Abyssutils::Memory::CSharedPointer<CTextElement> create(const STextData& data);
@@ -62,7 +64,7 @@ namespace Abysstoolkit {
 
         virtual void                                           paint();
         virtual void                                           reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize = {-1, -1});
-        virtual std::optional<Abyssutils::Math::Vector2D>       preferredSize(const Abyssutils::Math::Vector2D& parent);
+        virtual std::optional<Abyssutils::Math::Vector2D>       preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow = true);
         virtual std::optional<Abyssutils::Math::Vector2D>       minimumSize(const Abyssutils::Math::Vector2D& parent);
         virtual std::optional<Abyssutils::Math::Vector2D>       maximumSize(const Abyssutils::Math::Vector2D& parent);
         virtual bool                                           positioningDependsOnChild();

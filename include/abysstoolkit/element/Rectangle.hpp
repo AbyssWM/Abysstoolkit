@@ -3,6 +3,7 @@
 #include "Element.hpp"
 #include "../types/SizeType.hpp"
 #include "../palette/Color.hpp"
+#include "../palette/Gradient.hpp"
 
 #include <abyssutils/memory/UniquePtr.hpp>
 
@@ -19,6 +20,7 @@ namespace Abysstoolkit {
         static Abyssutils::Memory::CSharedPointer<CRectangleBuilder> begin();
         Abyssutils::Memory::CSharedPointer<CRectangleBuilder>        color(colorFn&&);
         Abyssutils::Memory::CSharedPointer<CRectangleBuilder>        borderColor(colorFn&&);
+        Abyssutils::Memory::CSharedPointer<CRectangleBuilder>        borderGradient(gradientFn&&);
         Abyssutils::Memory::CSharedPointer<CRectangleBuilder>        rounding(int);
         Abyssutils::Memory::CSharedPointer<CRectangleBuilder>        borderThickness(int);
         Abyssutils::Memory::CSharedPointer<CRectangleBuilder>        size(CDynamicSize&&);
@@ -41,6 +43,8 @@ namespace Abysstoolkit {
 
         Abyssutils::Memory::CSharedPointer<CRectangleBuilder> rebuild();
         virtual Abyssutils::Math::Vector2D                    size();
+        void                                                 animateColor(const SAnimation& animation);
+        void                                                 animateBorderColor(const SAnimation& animation);
 
       private:
         static Abyssutils::Memory::CSharedPointer<CRectangleElement> create(const SRectangleData& data);

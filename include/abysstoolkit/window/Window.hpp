@@ -19,6 +19,18 @@ namespace Abysstoolkit {
         HT_WINDOW_LOCK_SURFACE = 3,
     };
 
+    enum eResizeEdge : uint32_t {
+        HT_RESIZE_EDGE_NONE         = 0,
+        HT_RESIZE_EDGE_TOP          = 1,
+        HT_RESIZE_EDGE_BOTTOM       = 2,
+        HT_RESIZE_EDGE_LEFT         = 4,
+        HT_RESIZE_EDGE_TOP_LEFT     = 5,
+        HT_RESIZE_EDGE_BOTTOM_LEFT  = 6,
+        HT_RESIZE_EDGE_RIGHT        = 8,
+        HT_RESIZE_EDGE_TOP_RIGHT    = 9,
+        HT_RESIZE_EDGE_BOTTOM_RIGHT = 10,
+    };
+
     class CWindowBuilder {
       public:
         ~CWindowBuilder() = default;

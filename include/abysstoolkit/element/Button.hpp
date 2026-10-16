@@ -23,6 +23,11 @@ namespace Abysstoolkit {
         Abyssutils::Memory::CSharedPointer<CButtonBuilder>        label(std::string&&);
         Abyssutils::Memory::CSharedPointer<CButtonBuilder>        noBorder(bool);
         Abyssutils::Memory::CSharedPointer<CButtonBuilder>        noBg(bool);
+        Abyssutils::Memory::CSharedPointer<CButtonBuilder>        accent(bool);
+        // ellipsize the label with "…" when it doesn't fit. requires a constrained
+        // button width; an auto-width button simply grows to fit instead.
+        Abyssutils::Memory::CSharedPointer<CButtonBuilder>        ellipsize(bool);
+        Abyssutils::Memory::CSharedPointer<CButtonBuilder>        enabled(bool);
         Abyssutils::Memory::CSharedPointer<CButtonBuilder>        alignText(eFontAlignment);
         Abyssutils::Memory::CSharedPointer<CButtonBuilder>        fontFamily(std::string&&);
         Abyssutils::Memory::CSharedPointer<CButtonBuilder>        fontSize(CFontSize&&);
@@ -48,6 +53,8 @@ namespace Abysstoolkit {
 
         Abyssutils::Memory::CSharedPointer<CButtonBuilder> rebuild();
         virtual Abyssutils::Math::Vector2D                 size();
+        void                                              setLabel(std::string label);
+        void                                              setEnabled(bool enabled);
 
       private:
         CButtonElement(const SButtonData& data);
@@ -57,7 +64,7 @@ namespace Abysstoolkit {
 
         virtual void                                             paint();
         virtual void                                             reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize = {-1, -1});
-        virtual std::optional<Abyssutils::Math::Vector2D>         preferredSize(const Abyssutils::Math::Vector2D& parent);
+        virtual std::optional<Abyssutils::Math::Vector2D>         preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow = true);
         virtual std::optional<Abyssutils::Math::Vector2D>         minimumSize(const Abyssutils::Math::Vector2D& parent);
         virtual std::optional<Abyssutils::Math::Vector2D>         maximumSize(const Abyssutils::Math::Vector2D& parent);
         virtual bool                                             acceptsMouseInput();

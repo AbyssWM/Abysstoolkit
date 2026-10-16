@@ -324,7 +324,7 @@ void CScrollAreaElement::setScroll(const Abyssutils::Math::Vector2D& x) {
         impl->window->scheduleReposition(impl->self);
 }
 
-std::optional<Vector2D> CScrollAreaElement::preferredSize(const Vector2D& parent) {
+std::optional<Vector2D> CScrollAreaElement::preferredSize(const Vector2D& parent, bool grow) {
     return impl->getPreferredSizeGeneric(m_impl->data.size, parent);
 }
 

@@ -210,7 +210,7 @@ std::optional<Vector2D> CTextElement::maximumSize(const Abyssutils::Math::Vector
     return std::nullopt;
 }
 
-std::optional<Vector2D> CTextElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextElement::preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
