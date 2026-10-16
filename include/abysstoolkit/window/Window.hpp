@@ -5,6 +5,7 @@
 #include <abyssutils/math/Vector2D.hpp>
 
 #include "../core/Input.hpp"
+#include "../core/CoreMacros.hpp"
 
 namespace Abysstoolkit {
     class IElement;

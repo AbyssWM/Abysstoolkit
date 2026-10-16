@@ -154,6 +154,15 @@ protocolnew("unstable/keyboard-shortcuts-inhibit" "keyboard-shortcuts-inhibit-un
 if(BUILD_TESTING)
   enable_testing()
 
+  find_package(Python3 COMPONENTS Interpreter QUIET)
+  if(Python3_Interpreter_FOUND)
+    add_test(NAME config_preprocess
+             COMMAND ${Python3_EXECUTABLE} -B
+                     ${CMAKE_CURRENT_SOURCE_DIR}/tests/config/test_preprocess.py)
+    set_tests_properties(config_preprocess PROPERTIES
+                         ENVIRONMENT "ABYSS_TEST_WORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/config-tests")
+  endif()
+
   # test apps
   add_custom_target(tests)
 
@@ -221,3 +230,7 @@ install(TARGETS abysstoolkit)
 install(DIRECTORY "include/abysstoolkit" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 install(FILES ${CMAKE_BINARY_DIR}/abysstoolkit.pc
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+install(PROGRAMS tools/abyss-preprocess/abyss-preprocess
+        DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES cmake/AbyssConfig.cmake
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/abysstoolkit/cmake)
