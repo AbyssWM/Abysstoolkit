@@ -1,19 +1,21 @@
-#include <abysstoolkit/core/Backend.hpp>
-#include <abysstoolkit/window/Window.hpp>
-#include <abysstoolkit/system/Icons.hpp>
-#include <abysstoolkit/element/Rectangle.hpp>
-#include <abysstoolkit/element/RowLayout.hpp>
-#include <abysstoolkit/element/ColumnLayout.hpp>
-#include <abysstoolkit/element/Text.hpp>
-#include <abysstoolkit/element/Image.hpp>
-#include <abysstoolkit/element/Button.hpp>
-#include <abysstoolkit/element/Null.hpp>
-#include <abysstoolkit/element/Checkbox.hpp>
-#include <abysstoolkit/element/Spinbox.hpp>
-#include <abysstoolkit/element/Slider.hpp>
-#include <abysstoolkit/element/ScrollArea.hpp>
-#include <abysstoolkit/element/Combobox.hpp>
-#include <abysstoolkit/element/Textbox.hpp>
+#include <hyprtoolkit/core/Backend.hpp>
+#include <hyprtoolkit/window/Window.hpp>
+#include <hyprtoolkit/system/Icons.hpp>
+#include <hyprtoolkit/element/Rectangle.hpp>
+#include <hyprtoolkit/element/RowLayout.hpp>
+#include <hyprtoolkit/element/ColumnLayout.hpp>
+#include <hyprtoolkit/element/Text.hpp>
+#include <hyprtoolkit/element/Image.hpp>
+#include <hyprtoolkit/element/Button.hpp>
+#include <hyprtoolkit/element/Null.hpp>
+#include <hyprtoolkit/element/Checkbox.hpp>
+#include <hyprtoolkit/element/RadioGroup.hpp>
+#include <hyprtoolkit/element/Spinbox.hpp>
+#include <hyprtoolkit/element/ProgressBar.hpp>
+#include <hyprtoolkit/element/Slider.hpp>
+#include <hyprtoolkit/element/ScrollArea.hpp>
+#include <hyprtoolkit/element/Combobox.hpp>
+#include <hyprtoolkit/element/Textbox.hpp>
 
 #include <abyssutils/memory/SharedPtr.hpp>
 #include <abyssutils/memory/UniquePtr.hpp>
@@ -128,6 +130,7 @@ int main(int argc, char** argv, char** envp) {
                  ->preferredSize({480, 700})
                  ->minSize({480, 480})
                  ->maxSize({1280, 720})
+                 ->resizable(true)
                  ->appTitle("Controls")
                  ->appClass("abysstoolkit-controls")
                  ->commence();
@@ -136,7 +139,7 @@ int main(int argc, char** argv, char** envp) {
 
     window->m_rootElement->addChild(bg);
 
-    auto scroll = CScrollAreaBuilder::begin()->scrollY(true)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}})->commence();
+    auto scroll = CScrollAreaBuilder::begin()->scrollY(true)->showScrollbar(true)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}})->commence();
 
     mainLayout = CColumnLayoutBuilder::begin()->gap(3)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_AUTO, {0.7F, 1.F}})->commence();
 
@@ -188,6 +191,23 @@ int main(int argc, char** argv, char** envp) {
     auto checkbox  = stretchLayout("checkbox 1", CCheckboxBuilder::begin()->commence());
     auto checkbox2 = stretchLayout("checkbox 2", CCheckboxBuilder::begin()->commence());
 
+    auto radio1 = CCheckboxBuilder::begin()->style(HT_CHECKBOX_STYLE_RADIO)->toggled(true)->commence();
+    auto radio2 = CCheckboxBuilder::begin()->style(HT_CHECKBOX_STYLE_RADIO)->commence();
+    auto radio3 = CCheckboxBuilder::begin()->style(HT_CHECKBOX_STYLE_RADIO)->commence();
+
+    auto radioGroup = CRadioGroup::create();
+    radioGroup->add(radio1);
+    radioGroup->add(radio2);
+    radioGroup->add(radio3);
+
+    auto radioRow = CRowLayoutBuilder::begin()->gap(8)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_AUTO, {1, 1}})->commence();
+    radioRow->addChild(radio1);
+    radioRow->addChild(CTextBuilder::begin()->text("first")->color([] { return backend->getPalette()->m_colors.text; })->commence());
+    radioRow->addChild(radio2);
+    radioRow->addChild(CTextBuilder::begin()->text("second")->color([] { return backend->getPalette()->m_colors.text; })->commence());
+    radioRow->addChild(radio3);
+    radioRow->addChild(CTextBuilder::begin()->text("third")->color([] { return backend->getPalette()->m_colors.text; })->commence());
+
     auto spinbox = CSpinboxBuilder::begin()
                        ->label("Spinbox")
                        ->items({"Hello", "World", "Amongus"})
@@ -199,6 +219,9 @@ int main(int argc, char** argv, char** envp) {
 
     auto slider2 = stretchLayout(
         "Big Slider", CSliderBuilder::begin()->max(10000)->val(2500)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_ABSOLUTE, {0.5F, SLIDER_HEIGHT}})->commence());
+
+    auto progress = stretchLayout(
+        "Progress", CProgressBarBuilder::begin()->value(0.42F)->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_ABSOLUTE, {0.5F, 14.F}})->commence());
 
     auto combo = stretchLayout(
         "Combo",
@@ -239,9 +262,11 @@ int main(int argc, char** argv, char** envp) {
     mainLayout->addChild(button4);
     mainLayout->addChild(checkbox);
     mainLayout->addChild(checkbox2);
+    mainLayout->addChild(radioRow);
     mainLayout->addChild(spinbox);
     mainLayout->addChild(slider);
     mainLayout->addChild(slider2);
+    mainLayout->addChild(progress);
     mainLayout->addChild(combo);
     mainLayout->addChild(textboxCont);
     mainLayout->addChild(text);

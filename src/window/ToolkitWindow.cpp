@@ -54,6 +54,7 @@ void IToolkitWindow::damage(Abyssutils::Math::CRegion&& rg) {
 }
 
 void IToolkitWindow::damageEntire() {
+    m_opaqueRegionDirty = true;
     m_damageRing.damageEntire();
 
     scheduleFrame();
@@ -218,7 +219,7 @@ void IToolkitWindow::mouseEnter(const Abyssutils::Math::Vector2D& local) {
         m_mainHoverElement->m_el->impl->m_externalEvents.mouseMove.emit(local - m_mainHoverElement->m_el->impl->position.pos());
 
     for (const auto& e : m_hoveredElements) {
-        if (!e->m_el)
+        if (!e->m_el || (m_mainHoverElement && e->m_el == m_mainHoverElement->m_el))
             continue;
         e->m_el->impl->m_externalEvents.mouseMove.emit(local - e->m_el->impl->position.pos());
     }
@@ -237,7 +238,7 @@ void IToolkitWindow::mouseMove(const Abyssutils::Math::Vector2D& local) {
         m_mainHoverElement->m_el->impl->m_externalEvents.mouseMove.emit(local - m_mainHoverElement->m_el->impl->position.pos());
 
     for (const auto& e : m_hoveredElements) {
-        if (!e->m_el)
+        if (!e->m_el || (m_mainHoverElement && e->m_el == m_mainHoverElement->m_el))
             continue;
         e->m_el->impl->m_externalEvents.mouseMove.emit(local - e->m_el->impl->position.pos());
     }
@@ -264,7 +265,7 @@ void IToolkitWindow::mouseButton(const Input::eMouseButton button, bool state) {
         m_mainHoverElement->m_el->impl->m_externalEvents.mouseButton.emit(button, state);
 
     for (const auto& e : m_hoveredElements) {
-        if (!e->m_el)
+        if (!e->m_el || (m_mainHoverElement && e->m_el == m_mainHoverElement->m_el))
             continue;
         e->m_el->impl->m_externalEvents.mouseButton.emit(button, state);
     }
@@ -276,7 +277,7 @@ void IToolkitWindow::mouseAxis(const Input::eAxisAxis axis, float delta) {
         m_mainHoverElement->m_el->impl->m_externalEvents.mouseAxis.emit(axis, delta);
 
     for (const auto& e : m_hoveredElements) {
-        if (!e->m_el)
+        if (!e->m_el || (m_mainHoverElement && e->m_el == m_mainHoverElement->m_el))
             continue;
         e->m_el->impl->m_externalEvents.mouseAxis.emit(axis, delta);
     }
@@ -305,6 +306,9 @@ void IToolkitWindow::unfocusKeyboard() {
 }
 
 void IToolkitWindow::setKeyboardFocus(SP<IElement> e) {
+    if (m_keyboardFocus == e)
+        return;
+
     unfocusKeyboard();
 
     if (!e->acceptsKeyboardInput())
@@ -334,12 +338,12 @@ void IToolkitWindow::openTooltip(const std::string& s, const Abyssutils::Math::V
 
     m_tooltip.text = CTextBuilder::begin()->color([] { return g_palette->m_colors.text; })->clampSize({MAX_TOOLTIP_WIDTH, -1.F})->text(std::string{s})->commence();
     m_tooltip.bg   = CRectangleBuilder::begin()
-                       ->color([] { return g_palette->m_colors.base; })
-                       ->borderThickness(1)
-                       ->borderColor([] { return g_palette->m_colors.base.brighten(0.2F); })
-                       ->rounding(g_palette->m_vars.smallRounding)
-                       ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1, 1}})
-                       ->commence();
+                         ->color([] { return g_palette->m_colors.base; })
+                         ->borderThickness(1)
+                         ->borderColor([] { return g_palette->m_colors.base.brighten(0.2F); })
+                         ->rounding(g_palette->m_vars.smallRounding)
+                         ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1, 1}})
+                         ->commence();
     m_tooltip.bg->setReceivesMouse(true);
     m_tooltip.bg->setMouseLeave([self = m_self, this]() {
         if (!self)
@@ -353,7 +357,7 @@ void IToolkitWindow::openTooltip(const std::string& s, const Abyssutils::Math::V
 
     m_tooltip.bg->addChild(m_tooltip.text);
 
-    const auto EXPECTED_TEXT_SIZE = m_tooltip.text->m_impl->getTextSizePreferred();
+    const auto EXPECTED_TEXT_SIZE = m_tooltip.text->preferredSize({0, 0}).value();
 
     m_tooltip.tooltipPopup = reinterpretPointerCast<IToolkitWindow>(CWindowBuilder::begin()
                                                                         ->type(eWindowType::HT_WINDOW_POPUP)

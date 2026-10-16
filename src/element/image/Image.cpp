@@ -3,6 +3,7 @@
 #include "../../layout/Positioner.hpp"
 #include "../../renderer/Renderer.hpp"
 #include "../../core/InternalBackend.hpp"
+#include "../../core/BackendContext.hpp"
 #include "../../window/ToolkitWindow.hpp"
 #include "../../system/Icons.hpp"
 #include "../../resource/assetCache/AssetCache.hpp"
@@ -41,7 +42,7 @@ void CImageElement::paint() {
     if (impl->window)
         m_impl->lastScale = impl->window->scale();
 
-    if (m_impl->data.icon && m_impl->preferredSvgSize() != m_impl->size && !m_impl->waitingForTex) {
+    if (m_impl->scalable() && m_impl->preferredSvgSize() != m_impl->size && !m_impl->waitingForTex) {
         renderTex();
         assetToUse = m_impl->oldCacheEntry;
     }
@@ -52,17 +53,17 @@ void CImageElement::paint() {
     g_renderer->renderTexture({
         .box      = impl->position,
         .texture  = assetToUse->tex(),
-        .a        = 1.F,
-        .rounding = 0,
+        .a        = m_impl->data.a,
+        .rounding = m_impl->data.rounding,
     });
 }
 
 void CImageElement::renderTex() {
-    if (m_impl->waitingForTex)
-        return;
-
-    m_impl->resource.reset();
-    m_impl->oldCacheEntry = m_impl->cacheEntry;
+    const uint64_t GENERATION = ++m_impl->requestGeneration;
+    m_impl->listeners.cacheEntryDone.reset();
+    m_impl->failed = false;
+    if (m_impl->cacheEntry && m_impl->cacheEntry->tex())
+        m_impl->oldCacheEntry = m_impl->cacheEntry;
     m_impl->cacheEntry.reset();
 
     const auto CACHE_STR = m_impl->getCacheString();
@@ -75,7 +76,13 @@ void CImageElement::renderTex() {
         if (ASSET->status() == Asset::CACHE_ENTRY_DONE)
             m_impl->postImageScheduleRecalc();
         else {
-            m_impl->listeners.cacheEntryDone = ASSET->m_events.done.listen([this] {
+            m_impl->waitingForTex            = true;
+            m_impl->listeners.cacheEntryDone = ASSET->m_events.done.listen([this, self = impl->self, generation = GENERATION, entry = WP<Asset::CAssetCacheEntry>{ASSET}] {
+                if (!self || generation != m_impl->requestGeneration)
+                    return;
+
+                const auto ENTRY = entry.lock();
+                m_impl->failed   = !ENTRY || ENTRY->status() == Asset::CACHE_ENTRY_FAILED;
                 m_impl->postImageScheduleRecalc();
                 m_impl->listeners.cacheEntryDone.reset();
             });
@@ -83,72 +90,97 @@ void CImageElement::renderTex() {
         return;
     }
 
+    const auto REQUEST  = makeShared<SImageLoadRequest>();
+    REQUEST->generation = GENERATION;
+    REQUEST->fitMode    = m_impl->data.fitMode;
+    REQUEST->cacheEntry = makeShared<Asset::CAssetCacheEntry>(CACHE_STR);
+    m_impl->cacheEntry  = REQUEST->cacheEntry;
+
     if (!m_impl->data.data.empty()) {
-        const auto SIZE  = m_impl->preferredSvgSize();
-        m_impl->resource = makeAtomicShared<CImageResource>(m_impl->data.data, SIZE);
-        m_impl->lastData = m_impl->data.data.data();
+        const auto SIZE   = m_impl->preferredSvgSize();
+        REQUEST->resource = makeAtomicShared<CImageResource>(m_impl->data.data, SIZE);
+        m_impl->lastData  = m_impl->data.data.data();
     } else if (!m_impl->data.icon) {
-        m_impl->resource = makeAtomicShared<CImageResource>(m_impl->data.path);
-        m_impl->lastPath = m_impl->data.path;
+        REQUEST->resource = makeAtomicShared<CImageResource>(m_impl->data.path);
+        REQUEST->path     = m_impl->data.path;
+        m_impl->lastPath  = m_impl->data.path;
     } else {
-        m_impl->lastPath = reinterpretPointerCast<CSystemIconDescription>(m_impl->data.icon)->m_bestPath;
-        const auto SIZE  = m_impl->preferredSvgSize();
-        m_impl->resource = makeAtomicShared<CImageResource>(m_impl->lastPath, SIZE);
+        REQUEST->path     = reinterpretPointerCast<CSystemIconDescription>(m_impl->data.icon)->m_bestPath;
+        m_impl->lastPath  = REQUEST->path;
+        const auto SIZE   = m_impl->preferredSvgSize();
+        REQUEST->resource = makeAtomicShared<CImageResource>(REQUEST->path, SIZE);
 
         if (SIZE.x == 0 || SIZE.y == 0)
             return;
     }
 
-    m_impl->cacheEntry = makeShared<Asset::CAssetCacheEntry>(CACHE_STR);
-    Asset::assetCache()->cache(m_impl->cacheEntry);
+    Asset::assetCache()->cache(REQUEST->cacheEntry);
+    m_impl->requests.emplace_back(REQUEST);
 
     m_impl->waitingForTex = true;
 
-    ASP<IAsyncResource> resourceGeneric(m_impl->resource);
-
-    g_asyncResourceGatherer->enqueue(resourceGeneric);
+    ASP<IAsyncResource> resourceGeneric(REQUEST->resource);
 
     if (!m_impl->data.sync) {
-        m_impl->resource->m_events.finished.listenStatic([this, self = impl->self] {
-            if (!self)
-                return;
-
-            g_backend->addIdle([this, self = self]() {
-                if (!self)
+        // attach listener before enqueueing to avoid missing the finished event
+        REQUEST->resource->m_events.finished.listenStatic(
+            [this, self = impl->self, lifetime = WP<SBackendLifetime>{g_backendServices->lifetime}, request = WP<SImageLoadRequest>{REQUEST}] {
+                if (!self || !lifetime || !request)
                     return;
 
-                m_impl->postImageLoad();
+                g_backend->addIdle([this, self = self, lifetime, request] {
+                    if (!self || !lifetime)
+                        return;
+
+                    const auto REQUEST = request.lock();
+                    if (REQUEST)
+                        m_impl->postImageLoad(REQUEST);
+                });
             });
-        });
+
+        g_asyncResourceGatherer->enqueue(resourceGeneric);
     } else {
+        g_asyncResourceGatherer->enqueue(resourceGeneric);
         g_asyncResourceGatherer->await(resourceGeneric);
-        m_impl->postImageLoad();
+        m_impl->postImageLoad(REQUEST);
     }
 }
 
-void SImageImpl::postImageLoad() {
-    if (!resource || !cacheEntry)
+void SImageImpl::postImageLoad(const SP<SImageLoadRequest>& request) {
+    if (!request || !request->resource || !request->cacheEntry)
         return;
 
-    if (resource->m_asset.cairoSurface) {
-        ASP<IAsyncResource> resourceGeneric(resource);
-        size = resource->m_asset.pixelSize;
+    bool loaded = false;
+    if (request->resource->m_asset.cairoSurface) {
+        ASP<IAsyncResource> resourceGeneric(request->resource);
+        const auto          imageSize = request->resource->m_asset.pixelSize;
 
-        const auto MAX_SIZE = g_renderer->getMaxTextureSize();
-        if (size.x > MAX_SIZE || size.y > MAX_SIZE) {
-            failed = true;
-            g_logger->log(HT_LOG_ERROR, "Image: failed loading, image dimensions {}x{} exceed max texture size {}", (int)size.x, (int)size.y, MAX_SIZE);
-        } else
-            cacheEntry->texDone(g_renderer->uploadTexture({.resource = resourceGeneric, .fitMode = data.fitMode}));
+        const auto          MAX_SIZE = g_renderer->getMaxTextureSize();
+        if (imageSize.x > MAX_SIZE || imageSize.y > MAX_SIZE) {
+            request->cacheEntry->fail();
+            g_logger->log(HT_LOG_ERROR, "Image: failed loading, image dimensions {}x{} exceed max texture size {}", (int)imageSize.x, (int)imageSize.y, MAX_SIZE);
+        } else {
+            request->cacheEntry->texDone(g_renderer->uploadTexture({.resource = resourceGeneric, .fitMode = request->fitMode}));
+            loaded = true;
+        }
     } else {
-        failed = true;
-        g_logger->log(HT_LOG_ERROR, "Image: failed loading, abyssgraphics couldn't load asset {}", lastPath);
+        request->cacheEntry->fail();
+        g_logger->log(HT_LOG_ERROR, "Image: failed loading, hyprgraphics couldn't load asset {}", request->path);
     }
 
-    oldCacheEntry.reset();
-    resource.reset();
+    const bool CURRENT = request->generation == requestGeneration;
+    if (CURRENT) {
+        cacheEntry = request->cacheEntry;
+        failed     = !loaded;
+        if (loaded)
+            size = request->resource->m_asset.pixelSize;
+        oldCacheEntry.reset();
+    }
 
-    postImageScheduleRecalc();
+    std::erase(requests, request);
+
+    if (CURRENT)
+        postImageScheduleRecalc();
 }
 
 void SImageImpl::postImageScheduleRecalc() {
@@ -168,9 +200,15 @@ std::string SImageImpl::getCacheString() {
         return std::format("data-{:x}", rc<uintptr_t>(data.data.data()));
 
     if (!data.icon)
-        return data.path.ends_with(".svg") ? std::format("{}-{}x{}", data.path, preferredSvgSize().x, preferredSvgSize().y) : data.path;
+        return data.path.ends_with(".svg") ? std::format("{}-{}x{}-{}", data.path, preferredSvgSize().x, preferredSvgSize().y, sc<int>(data.fitMode)) :
+                                             std::format("{}-{}", data.path, sc<int>(data.fitMode));
     else
-        return std::format("icon-{}-{}x{}", reinterpretPointerCast<CSystemIconDescription>(data.icon)->m_bestPath, preferredSvgSize().x, preferredSvgSize().y);
+        return std::format("icon-{}-{}x{}-{}", reinterpretPointerCast<CSystemIconDescription>(data.icon)->m_bestPath, preferredSvgSize().x, preferredSvgSize().y,
+                           sc<int>(data.fitMode));
+}
+
+bool SImageImpl::scalable() const {
+    return data.icon ? data.icon->scalable() : data.path.ends_with(".svg");
 }
 
 SP<CImageBuilder> CImageElement::rebuild() {

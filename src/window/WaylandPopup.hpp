@@ -9,7 +9,7 @@ namespace Abysstoolkit {
     // TODO: de-dup this shit
     class CWaylandPopup : public IWaylandWindow {
       public:
-        CWaylandPopup(const SWindowCreationData& data, SP<CWaylandWindow> parent);
+        CWaylandPopup(const SWindowCreationData& data, SP<IWaylandWindow> parent);
         virtual ~CWaylandPopup();
 
         virtual void                                       close();
@@ -17,7 +17,7 @@ namespace Abysstoolkit {
         virtual Abyssutils::Memory::CSharedPointer<IWindow> openPopup(const SWindowCreationData& data);
 
       private:
-        WP<CWaylandWindow>  m_parent;
+        WP<IWaylandWindow>  m_parent;
         SWindowCreationData m_creationData;
 
         struct {

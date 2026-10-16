@@ -10,6 +10,7 @@
 #include "../../renderer/Renderer.hpp"
 #include "../../window/ToolkitWindow.hpp"
 #include "../../core/InternalBackend.hpp"
+#include "../../core/BackendContext.hpp"
 #include "../Element.hpp"
 #include "../text/Text.hpp"
 #include "../../helpers/UTF8.hpp"
@@ -73,23 +74,53 @@ void CTextboxElement::init() {
     if (!m_impl->data.multiline)
         m_impl->text->setPositionFlag(HT_POSITION_FLAG_VCENTER, true);
 
-    m_impl->listeners.mouseMove = impl->m_externalEvents.mouseMove.listen([this](Vector2D pos) { m_impl->lastCursorPos = pos; });
+    m_impl->listeners.mouseMove = impl->m_externalEvents.mouseMove.listen([this](Vector2D pos) {
+        m_impl->lastCursorPos = pos;
+        if (!m_impl->eyeBg)
+            return;
+        const bool IN_EYE = pos.x >= impl->position.w - STextboxImpl::EYE_W;
+        if (IN_EYE == m_impl->eyeHover)
+            return;
+        m_impl->eyeHover = IN_EYE;
+        m_impl->eyeText
+            ->rebuild() //
+            ->color([hover = IN_EYE] { return hover ? g_palette->m_colors.text : g_palette->m_colors.text.darken(0.4F); })
+            ->commence();
+    });
+
+    m_impl->listeners.mouseLeave = impl->m_externalEvents.mouseLeave.listen([this] {
+        if (!m_impl->eyeBg || !m_impl->eyeHover)
+            return;
+        m_impl->eyeHover = false;
+        m_impl->eyeText
+            ->rebuild() //
+            ->color([] { return g_palette->m_colors.text.darken(0.4F); })
+            ->commence();
+    });
 
     m_impl->listeners.mouseButton = impl->m_externalEvents.mouseButton.listen([this](Input::eMouseButton button, bool down) {
-        if (down)
+        if (!down)
+            return;
+        if (m_impl->eyeBg && m_impl->lastCursorPos.x >= impl->position.w - STextboxImpl::EYE_W) {
+            m_impl->data.password = !m_impl->data.password;
+            m_impl->updateLabel();
+            m_impl->updateEyeSymbol();
+        } else {
             m_impl->focusCursorAtClickedChar();
+        }
     });
 
     m_impl->listeners.enter = impl->m_externalEvents.keyboardEnter.listen([this] {
         m_impl->bgInnerCont->addChild(m_impl->cursorCont);
-        impl->window->setIMTo(impl->position, m_impl->data.text, m_impl->inputState.cursor);
+        if (impl->window)
+            impl->window->setIMTo(impl->position, m_impl->data.text, m_impl->inputState.cursor);
         m_impl->bg->rebuild()->borderColor([] { return g_palette->m_colors.alternateBase.brighten(0.5F); })->commence();
-        m_impl->focusCursorAtClickedChar();
     });
 
     m_impl->listeners.leave = impl->m_externalEvents.keyboardLeave.listen([this] {
         m_impl->bgInnerCont->removeChild(m_impl->cursorCont);
-        impl->window->resetIM();
+        if (impl->window)
+            impl->window->resetIM();
         m_impl->bg->rebuild()->borderColor([] { return g_palette->m_colors.alternateBase; })->commence();
     });
 
@@ -100,7 +131,7 @@ void CTextboxElement::init() {
 
             if (m_impl->hasSelect()) {
                 m_impl->removeSelectedText();
-                m_impl->updateLabel();
+                m_impl->updateLabel(true);
                 return;
             }
 
@@ -113,7 +144,7 @@ void CTextboxElement::init() {
             m_impl->inputState.selectEnd = m_impl->inputState.cursor;
             m_impl->inputState.cursor    = m_impl->inputState.selectBegin;
             m_impl->removeSelectedText();
-            m_impl->updateLabel();
+            m_impl->updateLabel(true);
             return;
         }
 
@@ -123,7 +154,7 @@ void CTextboxElement::init() {
 
             if (m_impl->hasSelect()) {
                 m_impl->removeSelectedText();
-                m_impl->updateLabel();
+                m_impl->updateLabel(true);
                 return;
             }
 
@@ -136,7 +167,7 @@ void CTextboxElement::init() {
                 m_impl->inputState.selectEnd = m_impl->moveCharForwards();
             m_impl->inputState.cursor = m_impl->inputState.selectBegin;
             m_impl->removeSelectedText();
-            m_impl->updateLabel();
+            m_impl->updateLabel(true);
             return;
         }
 
@@ -214,7 +245,7 @@ void CTextboxElement::init() {
                 return;
 
             const auto oldCursorPos = m_impl->inputState.cursor;
-            const auto CHARBOX      = m_impl->text->m_impl->getCharBox(m_impl->inputState.cursor);
+            const auto CHARBOX      = m_impl->text->m_impl->getCharBox(m_impl->srcToDisplay(m_impl->inputState.cursor));
             const auto SCALE        = m_impl->self->impl->window ? m_impl->self->impl->window->scale() : 1.F;
 
             // move up by one line height, using the left edge of the character box
@@ -223,7 +254,7 @@ void CTextboxElement::init() {
 
             auto newOffset = m_impl->text->m_impl->vecToOffset(targetPos);
             if (newOffset.has_value())
-                m_impl->inputState.cursor = std::min(newOffset.value(), m_impl->data.text.length());
+                m_impl->inputState.cursor = std::min(m_impl->displayToSrc(*newOffset), m_impl->data.text.length());
 
             if (ev.modMask & Input::HT_MODIFIER_SHIFT) {
                 if (!m_impl->hasSelect()) {
@@ -254,7 +285,7 @@ void CTextboxElement::init() {
                 return;
 
             const auto oldCursorPos = m_impl->inputState.cursor;
-            const auto CHARBOX      = m_impl->text->m_impl->getCharBox(m_impl->inputState.cursor);
+            const auto CHARBOX      = m_impl->text->m_impl->getCharBox(m_impl->srcToDisplay(m_impl->inputState.cursor));
             const auto SCALE        = m_impl->self->impl->window ? m_impl->self->impl->window->scale() : 1.F;
 
             // move down by one line height, using the left edge of the character box
@@ -263,7 +294,7 @@ void CTextboxElement::init() {
 
             auto newOffset = m_impl->text->m_impl->vecToOffset(targetPos);
             if (newOffset.has_value())
-                m_impl->inputState.cursor = std::min(newOffset.value(), m_impl->data.text.length());
+                m_impl->inputState.cursor = std::min(m_impl->displayToSrc(*newOffset), m_impl->data.text.length());
 
             if (ev.modMask & Input::HT_MODIFIER_SHIFT) {
                 if (!m_impl->hasSelect()) {
@@ -321,6 +352,46 @@ void CTextboxElement::init() {
             return;
         }
 
+        if ((ev.xkbKeysym == XKB_KEY_C || ev.xkbKeysym == XKB_KEY_c) && (ev.modMask & Input::HT_MODIFIER_CTRL)) {
+            if (m_impl->hasSelect() && g_backendServices && g_backendServices->clipboard) {
+                const auto begin = std::min(m_impl->inputState.selectBegin, m_impl->inputState.selectEnd);
+                const auto end   = std::max(m_impl->inputState.selectBegin, m_impl->inputState.selectEnd);
+                g_backendServices->clipboard->setText(m_impl->data.text.substr(begin, end - begin));
+            }
+            return;
+        }
+
+        if ((ev.xkbKeysym == XKB_KEY_X || ev.xkbKeysym == XKB_KEY_x) && (ev.modMask & Input::HT_MODIFIER_CTRL)) {
+            if (m_impl->hasSelect() && g_backendServices && g_backendServices->clipboard) {
+                const auto begin = std::min(m_impl->inputState.selectBegin, m_impl->inputState.selectEnd);
+                const auto end   = std::max(m_impl->inputState.selectBegin, m_impl->inputState.selectEnd);
+                g_backendServices->clipboard->setText(m_impl->data.text.substr(begin, end - begin));
+                m_impl->removeSelectedText();
+                m_impl->updateLabel(true);
+            }
+            return;
+        }
+
+        if ((ev.xkbKeysym == XKB_KEY_V || ev.xkbKeysym == XKB_KEY_v) && (ev.modMask & Input::HT_MODIFIER_CTRL)) {
+            if (!g_backendServices || !g_backendServices->clipboard)
+                return;
+            const auto pasted = g_backendServices->clipboard->getText();
+            if (pasted.empty())
+                return;
+
+            std::string text = pasted;
+            if (!m_impl->data.multiline) {
+                if (auto nl = text.find('\n'); nl != std::string::npos)
+                    text.resize(nl);
+            }
+
+            m_impl->removeSelectedText();
+            m_impl->data.text = m_impl->data.text.insert(m_impl->inputState.cursor, text);
+            m_impl->inputState.cursor += text.length();
+            m_impl->updateLabel(true);
+            return;
+        }
+
         if (ev.utf8.empty())
             return;
 
@@ -331,7 +402,7 @@ void CTextboxElement::init() {
 
         m_impl->data.text = m_impl->data.text.insert(m_impl->inputState.cursor, ev.utf8);
         m_impl->inputState.cursor += ev.utf8.length();
-        m_impl->updateLabel();
+        m_impl->updateLabel(true);
     });
 
     m_impl->placeholder->setMargin(1);
@@ -343,6 +414,8 @@ void CTextboxElement::init() {
 
     m_impl->cursorCont->addChild(m_impl->cursor);
     m_impl->bg->impl->clipChildren = true;
+
+    m_impl->updateEyeIcon();
 
     m_impl->updateLabel();
 
@@ -357,11 +430,74 @@ size_t CTextboxElement::cursorPos() const {
     return m_impl->inputState.cursor;
 }
 
+void CTextboxElement::setText(std::string text) {
+    if (text == m_impl->data.text)
+        return;
+
+    m_impl->data.text         = std::move(text);
+    m_impl->inputState.cursor = std::min(m_impl->inputState.cursor, m_impl->data.text.length());
+    m_impl->clearSelect();
+    m_impl->updateLabel();
+
+    if (impl->window)
+        impl->window->scheduleReposition(impl->self);
+}
+
+void CTextboxElement::setPassword(bool password) {
+    if (password == m_impl->data.password)
+        return;
+
+    m_impl->data.password = password;
+    m_impl->updateLabel();
+    m_impl->updateEyeSymbol();
+
+    if (impl->window)
+        impl->window->scheduleReposition(impl->self);
+}
+
+void STextboxImpl::updateEyeSymbol() {
+    if (!eyeText)
+        return;
+    eyeText->rebuild()->text(std::string{data.password ? "" : ""})->commence();
+}
+
+void STextboxImpl::updateEyeIcon() {
+    if (!data.eyeIcon) {
+        if (eyeBg)
+            bg->removeChild(eyeBg);
+        eyeText.reset();
+        eyeBg.reset();
+        eyeHover = false;
+        return;
+    }
+
+    if (eyeBg)
+        return;
+
+    eyeBg   = CRectangleBuilder::begin()
+                  ->color([] { return CHyprColor{0.F, 0.F, 0.F, 0.F}; })
+                  ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_PERCENT, {EYE_W, 1.F}})
+                  ->commence();
+    eyeText = CTextBuilder::begin()
+                  ->text(std::string{data.password ? "" : ""})
+                  ->color([] { return g_palette->m_colors.text.darken(0.4F); })
+                  ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}})
+                  ->commence();
+    eyeText->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
+    eyeText->setPositionFlag(IElement::HT_POSITION_FLAG_HCENTER, true);
+    eyeText->setPositionFlag(IElement::HT_POSITION_FLAG_VCENTER, true);
+    eyeBg->addChild(eyeText);
+    eyeBg->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
+    eyeBg->setPositionFlag(IElement::HT_POSITION_FLAG_RIGHT, true);
+    eyeBg->setPositionFlag(IElement::HT_POSITION_FLAG_VCENTER, true);
+    bg->addChild(eyeBg);
+}
+
 std::tuple<ssize_t, ssize_t> CTextboxElement::selection() const {
     return {m_impl->inputState.selectBegin, m_impl->inputState.selectEnd};
 }
 
-void STextboxImpl::updateLabel() {
+void STextboxImpl::updateLabel(bool textEdited) {
     if (data.text.empty()) {
         bgInnerCont->removeChild(text);
         bgInnerCont->addChild(placeholder);
@@ -371,28 +507,24 @@ void STextboxImpl::updateLabel() {
     }
 
     if (!data.password) {
-
-        auto fullLabel = inputState.imText.empty() ? //
-            data.text :                              //
-            data.text.insert(inputState.cursor, "<u>" + inputState.imText + "</u>");
+        auto fullLabel = data.text;
+        if (!inputState.imText.empty())
+            fullLabel.insert(inputState.cursor, "<u>" + inputState.imText + "</u>");
 
         text->rebuild()->text(std::move(fullLabel))->commence();
     } else {
-        std::string pwdText = "";
-        for (size_t i = 0; i < data.text.size(); ++i) {
-            pwdText += '*';
-        }
+        std::string pwdText(UTF8::length(data.text), '*');
 
-        auto fullLabel = inputState.imText.empty() ? //
-            pwdText :                                //
-            pwdText.insert(inputState.cursor, "<u>" + inputState.imText + "</u>");
+        auto        fullLabel = inputState.imText.empty() ? //
+            pwdText :                                       //
+            pwdText.insert(srcToDisplay(inputState.cursor), "<u>" + inputState.imText + "</u>");
 
         text->rebuild()->text(std::move(fullLabel))->commence();
     }
 
     updateCursor();
 
-    if (data.onTextEdited)
+    if (textEdited && data.onTextEdited)
         data.onTextEdited(self.lock(), data.text);
 }
 
@@ -405,13 +537,21 @@ void CTextboxElement::imApplyText() {
     m_impl->data.text = m_impl->data.text.insert(m_impl->inputState.cursor, m_impl->inputState.imText);
     m_impl->inputState.cursor += m_impl->inputState.imText.length();
     m_impl->inputState.imText.clear();
-    m_impl->updateLabel();
+    m_impl->updateLabel(true);
+}
+
+size_t STextboxImpl::srcToDisplay(size_t srcByte) const {
+    return data.password ? UTF8::offsetToUTF8Len(data.text, srcByte) : srcByte;
+}
+
+size_t STextboxImpl::displayToSrc(size_t displayByte) const {
+    return data.password ? UTF8::utf8ToOffset(data.text, displayByte) : displayByte;
 }
 
 void STextboxImpl::updateCursor() {
     inputState.cursor = std::clamp(inputState.cursor, (size_t)0, data.text.length());
 
-    const auto  CHARBOX = text->m_impl->getCharBox(inputState.cursor);
+    const auto  CHARBOX = text->m_impl->getCharBox(srcToDisplay(inputState.cursor));
     const float XPOS    = CHARBOX.x;
 
     if (data.multiline) {
@@ -434,7 +574,10 @@ void CTextboxElement::focus(bool focus) {
     if (!impl->window)
         return;
 
-    impl->window->setKeyboardFocus(impl->self.lock());
+    if (focus)
+        impl->window->setKeyboardFocus(impl->self.lock());
+    else if (impl->window->m_keyboardFocus == impl->self)
+        impl->window->unfocusKeyboard();
 }
 
 void CTextboxElement::paint() {
@@ -459,8 +602,8 @@ void STextboxImpl::updateSelect() {
     }
 
     // get character boxes for selection start and end
-    auto beginBox = text->m_impl->getCharBox(inputState.selectBegin);
-    auto endBox   = text->m_impl->getCharBox(inputState.selectEnd);
+    auto beginBox = text->m_impl->getCharBox(srcToDisplay(inputState.selectBegin));
+    auto endBox   = text->m_impl->getCharBox(srcToDisplay(inputState.selectEnd));
 
     // check if selection spans multiple lines
     const float LINE_THRESHOLD = 1.F; // tolerance for Y position comparison
@@ -470,16 +613,22 @@ void STextboxImpl::updateSelect() {
         float width = endBox.x - beginBox.x;
 
         auto  selectBg = CRectangleBuilder::begin()
-                            ->color([] {
+                             ->color([] {
                                 auto x = g_palette->m_colors.accent.darken(0.4F);
                                 x.a    = 0.5F;
                                 return x;
-                            })
-                            ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {width, beginBox.h}})
-                            ->commence();
+                             })
+                             ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {width, beginBox.h}})
+                             ->commence();
 
         selectBg->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
-        selectBg->setAbsolutePosition(Vector2D{beginBox.x, beginBox.y});
+        if (!data.multiline) {
+            // single-line text is vertically centered (CTextElement::paint applies the VCENTER offset),
+            // but getCharBox y is relative to the layout top, so center the highlight to land on the glyphs.
+            selectBg->setPositionFlag(IElement::HT_POSITION_FLAG_VCENTER, true);
+            selectBg->setAbsolutePosition(Vector2D{beginBox.x, 0.F});
+        } else
+            selectBg->setAbsolutePosition(Vector2D{beginBox.x, beginBox.y});
 
         selectBgCont->addChild(selectBg);
         selectBgs.push_back(selectBg);
@@ -495,7 +644,7 @@ void STextboxImpl::updateSelect() {
 
             // scan forward on this line until we hit a line break or end of selection
             for (size_t i = currentOffset + 1; i <= (size_t)inputState.selectEnd; i++) {
-                auto nextBox = text->m_impl->getCharBox(i);
+                auto nextBox = text->m_impl->getCharBox(srcToDisplay(i));
 
                 // check if we moved to a new line
                 if (std::abs(nextBox.y - lineStartBox.y) > LINE_THRESHOLD)
@@ -530,7 +679,7 @@ void STextboxImpl::updateSelect() {
 
             currentOffset = lineEndOffset + 1;
             if (currentOffset < (size_t)inputState.selectEnd)
-                lineStartBox = text->m_impl->getCharBox(currentOffset);
+                lineStartBox = text->m_impl->getCharBox(srcToDisplay(currentOffset));
         }
     }
 
@@ -550,8 +699,9 @@ void STextboxImpl::removeSelectedText() {
 }
 
 void STextboxImpl::focusCursorAtClickedChar() {
-    const float SCALE = self->impl->window ? self->impl->window->scale() : 1.F;
-    inputState.cursor = text->m_impl->vecToOffset((lastCursorPos - (text->impl->position.pos() - self->impl->position.pos())) * SCALE).value_or(data.text.size());
+    const float SCALE     = self->impl->window ? self->impl->window->scale() : 1.F;
+    const auto  DISPLAYED = text->m_impl->vecToOffset((lastCursorPos - (text->impl->position.pos() - self->impl->position.pos())) * SCALE);
+    inputState.cursor     = DISPLAYED.has_value() ? displayToSrc(*DISPLAYED) : data.text.size();
     updateCursor();
     clearSelect();
 }
@@ -607,6 +757,11 @@ size_t STextboxImpl::moveCharForwards() const {
 void CTextboxElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
+    if (!m_impl->firstAttachedPass && impl->window) {
+        m_impl->firstAttachedPass = true;
+        m_impl->updateLabel();
+    }
+
     g_positioner->positionChildren(impl->self.lock());
 }
 
@@ -619,12 +774,30 @@ SP<CTextboxBuilder> CTextboxElement::rebuild() {
 }
 
 void CTextboxElement::replaceData(const STextboxData& data) {
-    const bool TEXTS_DIFFER = data.text != m_impl->data.text;
+    const bool MULTILINE_CHANGED   = data.multiline != m_impl->data.multiline;
+    const bool PLACEHOLDER_CHANGED = data.placeholder != m_impl->data.placeholder;
+    const bool TEXT_CHANGED        = data.text != m_impl->data.text;
 
     m_impl->data = data;
 
-    if (TEXTS_DIFFER)
-        m_impl->updateLabel();
+    if (TEXT_CHANGED) {
+        m_impl->inputState.cursor = std::min(m_impl->inputState.cursor, m_impl->data.text.length());
+        m_impl->inputState.imText.clear();
+        m_impl->clearSelect();
+    }
+
+    if (MULTILINE_CHANGED) {
+        m_impl->cursorCont->setPositionFlag(HT_POSITION_FLAG_VCENTER, !data.multiline);
+        m_impl->placeholder->setPositionFlag(HT_POSITION_FLAG_VCENTER, !data.multiline);
+        m_impl->text->setPositionFlag(HT_POSITION_FLAG_VCENTER, !data.multiline);
+    }
+
+    if (PLACEHOLDER_CHANGED)
+        m_impl->placeholder->rebuild()->text(std::string{data.placeholder})->commence();
+
+    m_impl->updateEyeIcon();
+    m_impl->updateLabel();
+    m_impl->updateEyeSymbol();
 
     if (impl->window)
         impl->window->scheduleReposition(impl->self);
@@ -658,6 +831,14 @@ bool CTextboxElement::acceptsMouseInput() {
 
 ePointerShape CTextboxElement::pointerShape() {
     return HT_POINTER_TEXT;
+}
+
+std::function<ePointerShape()> CTextboxElement::pointerShapeFn() {
+    return [this] {
+        if (m_impl->eyeBg && m_impl->lastCursorPos.x >= impl->position.w - STextboxImpl::EYE_W)
+            return HT_POINTER_POINTER;
+        return HT_POINTER_TEXT;
+    };
 }
 
 bool CTextboxElement::acceptsKeyboardInput() {

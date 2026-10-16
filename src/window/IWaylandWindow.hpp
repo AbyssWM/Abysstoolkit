@@ -16,6 +16,7 @@
 #include <viewporter.hpp>
 #include <text-input-unstable-v3.hpp>
 #include <linux-drm-syncobj-v1.hpp>
+#include <keyboard-shortcuts-inhibit-unstable-v1.hpp>
 
 #include <chrono>
 
@@ -74,6 +75,7 @@ namespace Abysstoolkit {
 
         struct {
             SP<CCWlSurface>                         surface;
+            SP<CCZwpKeyboardShortcutsInhibitorV1>   shortcutsInhibitor;
             SP<CCXdgSurface>                        xdgSurface;
             SP<CCXdgToplevel>                       xdgToplevel;
             SP<CCWlCallback>                        frameCallback;
@@ -83,12 +85,12 @@ namespace Abysstoolkit {
             SP<Abyssal::CSwapchain>              swapchain;
             size_t                                  bufIdx = 0;
 
-            Abyssutils::Math::Vector2D               size;
-            Abyssutils::Math::Vector2D               logicalSize;
-            float                                   appliedScale;
-            SP<CCWpFractionalScaleV1>               fractional = nullptr;
-            SP<CCWpViewport>                        viewport   = nullptr;
-            uint32_t                                serial     = 0;
+            Hyprutils::Math::Vector2D               size;
+            Hyprutils::Math::Vector2D               logicalSize;
+            float                                   appliedScale = 1.F;
+            SP<CCWpFractionalScaleV1>               fractional   = nullptr;
+            SP<CCWpViewport>                        viewport     = nullptr;
+            uint32_t                                serial       = 0;
 
             std::optional<Abyssutils::Math::CRegion> lastOpaqueRegion;
         } m_waylandState;

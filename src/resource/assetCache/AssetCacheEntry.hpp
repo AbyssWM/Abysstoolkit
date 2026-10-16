@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string_view>
 
 #include <abyssutils/signal/Signal.hpp>
@@ -13,7 +14,8 @@ namespace Abysstoolkit {
 namespace Abysstoolkit::Asset {
     enum eAssetCacheEntryStatus : uint8_t {
         CACHE_ENTRY_PENDING = 0,
-        CACHE_ENTRY_DONE    = 1,
+        CACHE_ENTRY_DONE,
+        CACHE_ENTRY_FAILED,
     };
 
     class CAssetCacheEntry {
@@ -29,9 +31,11 @@ namespace Abysstoolkit::Asset {
         std::string_view       source() const;
         SP<IRendererTexture>   tex() const;
         eAssetCacheEntryStatus status() const;
+        uint64_t               generation() const;
 
         // if created without a tex, this will mark asset as done
         void texDone(SP<IRendererTexture> tex);
+        void fail();
 
         bool operator==(const CAssetCacheEntry& e) const {
             return m_tex == e.m_tex;
@@ -44,6 +48,7 @@ namespace Abysstoolkit::Asset {
       private:
         const std::string      m_source;
         SP<IRendererTexture>   m_tex;
-        eAssetCacheEntryStatus m_status = CACHE_ENTRY_PENDING;
+        eAssetCacheEntryStatus m_status     = CACHE_ENTRY_PENDING;
+        uint64_t               m_generation = 0;
     };
 };

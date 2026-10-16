@@ -1,7 +1,9 @@
 #include "WaylandPlatform.hpp"
 
 #include <algorithm>
-#include <abyssutils/memory/Casts.hpp>
+#include <array>
+#include <ranges>
+#include <hyprutils/memory/Casts.hpp>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
 #include "../InternalBackend.hpp"
@@ -110,6 +112,13 @@ bool CWaylandPlatform::attempt() {
             TRACE(g_logger->log(HT_LOG_TRACE, "  > binding to global: {} (version {}) with id {}", name, 1, id));
             m_waylandState.sessionLock = makeShared<CCExtSessionLockManagerV1>(
                 (wl_proxy*)wl_registry_bind((wl_registry*)m_waylandState.registry->resource(), id, &ext_session_lock_manager_v1_interface, 1));
+        } else if (NAME == wl_data_device_manager_interface.name) {
+            TRACE(g_logger->log(HT_LOG_TRACE, "  > binding to global: {} (version {}) with id {}", name, 3, id));
+            m_waylandState.dataDeviceManager =
+                makeShared<CCWlDataDeviceManager>((wl_proxy*)wl_registry_bind((wl_registry*)m_waylandState.registry->resource(), id, &wl_data_device_manager_interface, 3));
+        } else if (NAME == zwp_keyboard_shortcuts_inhibit_manager_v1_interface.name) {
+            m_waylandState.shortcutsInhibitMgr = makeShared<CCZwpKeyboardShortcutsInhibitManagerV1>(
+                (wl_proxy*)wl_registry_bind((wl_registry*)m_waylandState.registry->resource(), id, &zwp_keyboard_shortcuts_inhibit_manager_v1_interface, 1));
         }
     });
     m_waylandState.registry->setGlobalRemove([this](CCWlRegistry* r, uint32_t id) {
@@ -134,6 +143,9 @@ bool CWaylandPlatform::attempt() {
 
     if (m_waylandState.textInputManager)
         initIM();
+
+    if (m_waylandState.dataDeviceManager)
+        initClipboard();
 
     dispatchEvents();
 
@@ -165,21 +177,15 @@ CWaylandPlatform::~CWaylandPlatform() {
 }
 
 bool CWaylandPlatform::dispatchEvents() {
-    wl_display_flush(m_waylandState.display);
-
-    if (wl_display_prepare_read(m_waylandState.display) == 0) {
-        wl_display_read_events(m_waylandState.display);
-        wl_display_dispatch_pending(m_waylandState.display);
-    } else
-        wl_display_dispatch(m_waylandState.display);
-
     int ret = 0;
     do {
         ret = wl_display_dispatch_pending(m_waylandState.display);
-        wl_display_flush(m_waylandState.display);
     } while (ret > 0);
 
-    return true;
+    if (ret < 0)
+        return false;
+
+    return wl_display_flush(m_waylandState.display) >= 0 || errno == EAGAIN;
 }
 
 SP<IWaylandWindow> CWaylandPlatform::windowForSurf(wl_proxy* proxy) {
@@ -350,8 +356,17 @@ void CWaylandPlatform::initSeat() {
                 m_waylandState.seatState.repeatDelay = delay;
             });
 
-        } else if (!HAS_KEYBOARD && m_waylandState.keyboard)
+            // keyboard focus follows what the compositor focuses, not where the pointer is. without
+            // this a freshly opened dialog (e.g. a polkit prompt) gets no keys until the pointer
+            // enters it, so a programmatically focused field could not be typed into.
+            m_waylandState.keyboard->setEnter([this](CCWlKeyboard* r, uint32_t serial, wl_proxy* surf, wl_array* keys) { onKeyboardEnter(surf, keys); });
+
+            m_waylandState.keyboard->setLeave([this](CCWlKeyboard* r, uint32_t serial, wl_proxy* surf) { onKeyboardLeave(); });
+
+        } else if (!HAS_KEYBOARD && m_waylandState.keyboard) {
+            onKeyboardLeave();
             m_waylandState.keyboard.reset();
+        }
 
         if (HAS_POINTER && !m_waylandState.pointer) {
             m_waylandState.pointer = makeShared<CCWlPointer>(m_waylandState.seat->sendGetPointer());
@@ -367,12 +382,8 @@ void CWaylandPlatform::initSeat() {
                 w->mouseEnter(local);
                 m_currentWindow   = w;
                 m_lastEnterSerial = serial;
-                m_currentMods     = 0;
 
                 setCursor(HT_POINTER_ARROW);
-
-                m_waylandState.seatState.pressedKeys.clear();
-                stopRepeatTimer();
             });
 
             m_waylandState.pointer->setLeave([this](CCWlPointer* r, uint32_t serial, wl_proxy* surf) {
@@ -383,10 +394,6 @@ void CWaylandPlatform::initSeat() {
 
                 w->mouseLeave();
                 m_currentWindow.reset();
-                m_currentMods = 0;
-
-                m_waylandState.seatState.pressedKeys.clear();
-                stopRepeatTimer();
             });
 
             m_waylandState.pointer->setMotion([this](CCWlPointer* r, uint32_t time, wl_fixed_t x, wl_fixed_t y) {
@@ -401,6 +408,9 @@ void CWaylandPlatform::initSeat() {
             m_waylandState.pointer->setButton([this](CCWlPointer* r, uint32_t serial, uint32_t time, uint32_t button, wl_pointer_button_state state) {
                 if (!m_currentWindow)
                     return;
+
+                if (state == WL_POINTER_BUTTON_STATE_PRESSED)
+                    m_lastPointerButtonPressSerial = serial;
 
                 m_currentWindow->mouseButton(Input::buttonFromWayland(button), state == WL_POINTER_BUTTON_STATE_PRESSED);
             });
@@ -423,6 +433,93 @@ void CWaylandPlatform::initSeat() {
 
 void CWaylandPlatform::initShell() {
     m_waylandState.xdg->setPing([](CCXdgWmBase* r, uint32_t serial) { r->sendPong(serial); });
+}
+
+void CWaylandPlatform::initClipboard() {
+    if (!m_waylandState.dataDeviceManager || !m_waylandState.seat)
+        return;
+
+    m_waylandState.dataDevice = makeShared<CCWlDataDevice>(m_waylandState.dataDeviceManager->sendGetDataDevice(m_waylandState.seat.get()));
+
+    m_waylandState.dataDevice->setDataOffer([this](CCWlDataDevice*, wl_proxy* offer) {
+        auto wrapped = makeShared<CCWlDataOffer>(offer);
+        wrapped->setOffer([](CCWlDataOffer*, const char*) {});
+        m_waylandState.pendingOffers.push_back(wrapped);
+    });
+
+    m_waylandState.dataDevice->setSelection([this](CCWlDataDevice*, wl_proxy* offer) {
+        auto& pending = m_waylandState.pendingOffers;
+        if (!offer) {
+            m_waylandState.currentOffer.reset();
+            pending.clear();
+            return;
+        }
+        const auto IT               = std::ranges::find_if(pending, [offer](const auto& po) { return po && po->resource() == offer; });
+        m_waylandState.currentOffer = IT != pending.end() ? *IT : nullptr;
+        pending.clear();
+    });
+}
+
+void CWaylandPlatform::setClipboard(const std::string& text) {
+    if (!m_waylandState.dataDeviceManager || !m_waylandState.dataDevice)
+        return;
+
+    m_waylandState.currentSourceText = text;
+
+    m_waylandState.currentSource = makeShared<CCWlDataSource>(m_waylandState.dataDeviceManager->sendCreateDataSource());
+
+    m_waylandState.currentSource->sendOffer("text/plain");
+    m_waylandState.currentSource->sendOffer("text/plain;charset=utf-8");
+    m_waylandState.currentSource->sendOffer("UTF8_STRING");
+
+    m_waylandState.currentSource->setSend([this](CCWlDataSource*, const char* /*mime*/, int32_t fd) {
+        const auto& s    = m_waylandState.currentSourceText;
+        size_t      sent = 0;
+        while (sent < s.size()) {
+            ssize_t n = write(fd, s.data() + sent, s.size() - sent);
+            if (n <= 0) {
+                if (errno == EINTR)
+                    continue;
+                break;
+            }
+            sent += (size_t)n;
+        }
+        close(fd);
+    });
+
+    m_waylandState.currentSource->setCancelled([this](CCWlDataSource*) {
+        m_waylandState.currentSource.reset();
+        m_waylandState.currentSourceText.clear();
+    });
+
+    m_waylandState.dataDevice->sendSetSelection(m_waylandState.currentSource.get(), m_lastEnterSerial);
+    wl_display_flush(m_waylandState.display);
+}
+
+std::string CWaylandPlatform::readClipboard() {
+    auto& offer = m_waylandState.currentOffer;
+    if (!offer)
+        return {};
+
+    int fds[2];
+    if (pipe2(fds, O_CLOEXEC) != 0)
+        return {};
+
+    offer->sendReceive("text/plain;charset=utf-8", fds[1]);
+    close(fds[1]);
+    wl_display_roundtrip(m_waylandState.display);
+
+    std::string            out;
+    std::array<char, 4096> buf{};
+    for (;;) {
+        const ssize_t N = read(fds[0], buf.data(), buf.size());
+        if (N > 0)
+            out.append(buf.data(), (size_t)N);
+        else if (N == 0 || errno != EINTR)
+            break;
+    }
+    close(fds[0]);
+    return out;
 }
 
 bool CWaylandPlatform::initDmabuf() {
@@ -522,9 +619,9 @@ bool CWaylandPlatform::initDmabuf() {
         g_logger->log(HT_LOG_DEBUG, "zwp_linux_dmabuf_v1: opened node {} with fd {}", m_drmState.nodeName, m_drmState.fd);
     }
 
-    m_allocator = Abyssal::CGBMAllocator::create(m_drmState.fd, g_backend->m_aqBackend);
+    m_allocator = Aquamarine::CGBMAllocator::create(m_drmState.fd, g_waylandBackend->m_aqBackend);
 
-    auto nullBackend = reinterpretPointerCast<Abyssal::CNullBackend>(g_backend->m_aqBackend->getImplementations().at(0));
+    auto nullBackend = reinterpretPointerCast<Aquamarine::CNullBackend>(g_waylandBackend->m_aqBackend->getImplementations().at(0));
 
     nullBackend->setFormats(m_dmabufFormats);
 
@@ -541,6 +638,10 @@ void CWaylandPlatform::setCursor(ePointerShape shape) {
         case HT_POINTER_ARROW: break;
         case HT_POINTER_POINTER: wlShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_POINTER; break;
         case HT_POINTER_TEXT: wlShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_TEXT; break;
+        case HT_POINTER_RESIZE_NS: wlShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NS_RESIZE; break;
+        case HT_POINTER_RESIZE_EW: wlShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_EW_RESIZE; break;
+        case HT_POINTER_RESIZE_NESW: wlShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NESW_RESIZE; break;
+        case HT_POINTER_RESIZE_NWSE: wlShape = WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NWSE_RESIZE; break;
         default: break;
     }
 
@@ -564,7 +665,7 @@ void CWaylandPlatform::onKey(uint32_t keycode, bool state) {
     else
         std::erase(m_waylandState.seatState.pressedKeys, keycode);
 
-    if (!m_currentWindow)
+    if (!m_keyboardWindow)
         return;
 
     Input::SKeyboardKeyEvent e;
@@ -577,7 +678,7 @@ void CWaylandPlatform::onKey(uint32_t keycode, bool state) {
         if (SYM == XKB_KEY_Left || SYM == XKB_KEY_Right || SYM == XKB_KEY_Up || SYM == XKB_KEY_Down) {
             // skip compose
             e.xkbKeysym = SYM;
-            m_currentWindow->keyboardKey(e);
+            m_keyboardWindow->keyboardKey(e);
             m_waylandState.seatState.repeatKeyEvent = e;
             startRepeatTimer();
             return;
@@ -598,7 +699,7 @@ void CWaylandPlatform::onKey(uint32_t keycode, bool state) {
         if (len > 1) {
             e.xkbKeysym = SYM;
             e.utf8      = std::string{buf, sc<size_t>(len - 1)};
-            m_currentWindow->keyboardKey(e);
+            m_keyboardWindow->keyboardKey(e);
             m_waylandState.seatState.repeatKeyEvent = e;
         }
 
@@ -610,15 +711,46 @@ void CWaylandPlatform::onKey(uint32_t keycode, bool state) {
         xkb_compose_state_reset(m_waylandState.seatState.xkbComposeState);
 
     m_waylandState.seatState.repeatKeyEvent = e;
-    m_currentWindow->keyboardKey(e);
+    m_keyboardWindow->keyboardKey(e);
     stopRepeatTimer();
 }
 
-void CWaylandPlatform::onRepeatTimerFire() {
-    if (!m_currentWindow)
+void CWaylandPlatform::onKeyboardEnter(wl_proxy* surf, wl_array* keys) {
+    resetKeyboardState();
+    m_keyboardWindow = windowForSurf(surf);
+
+    if (!keys || !keys->data)
         return;
 
-    m_currentWindow->keyboardKey(m_waylandState.seatState.repeatKeyEvent);
+    const auto KEY_COUNT = keys->size / sizeof(uint32_t);
+    const auto KEYS      = sc<const uint32_t*>(keys->data);
+    m_waylandState.seatState.pressedKeys.assign(KEYS, KEYS + KEY_COUNT);
+}
+
+void CWaylandPlatform::onKeyboardLeave() {
+    m_keyboardWindow.reset();
+    resetKeyboardState();
+}
+
+void CWaylandPlatform::resetKeyboardState() {
+    stopRepeatTimer();
+
+    m_waylandState.seatState.pressedKeys.clear();
+    m_waylandState.seatState.repeatKeyEvent = {.down = false};
+    m_waylandState.seatState.currentLayer   = 0;
+    m_currentMods                           = 0;
+
+    if (m_waylandState.seatState.xkbState)
+        xkb_state_update_mask(m_waylandState.seatState.xkbState, 0, 0, 0, 0, 0, 0);
+    if (m_waylandState.seatState.xkbComposeState)
+        xkb_compose_state_reset(m_waylandState.seatState.xkbComposeState);
+}
+
+void CWaylandPlatform::onRepeatTimerFire() {
+    if (!m_keyboardWindow)
+        return;
+
+    m_keyboardWindow->keyboardKey(m_waylandState.seatState.repeatKeyEvent);
 
     // add a repeat timer
     m_waylandState.seatState.repeatTimer =

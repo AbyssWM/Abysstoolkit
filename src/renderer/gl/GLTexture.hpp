@@ -10,7 +10,8 @@
 #include "../RendererTexture.hpp"
 #include "../../helpers/Memory.hpp"
 
-namespace Abysstoolkit {
+namespace Hyprtoolkit {
+    struct SBackendLifetime;
     enum eGLTextureType : uint8_t {
         TEXTURE_INVALID,  // Invalid
         TEXTURE_RGBA,     // 4 channels
@@ -22,7 +23,7 @@ namespace Abysstoolkit {
 
     class CGLTexture : public IRendererTexture {
       public:
-        CGLTexture() = default;
+        CGLTexture();
         virtual ~CGLTexture();
 
         virtual size_t                    id();
@@ -44,9 +45,12 @@ namespace Abysstoolkit {
         eImageFitMode                     m_fitMode   = IMAGE_FIT_MODE_STRETCH;
         Abyssutils::Math::Vector2D         m_size      = {};
 
-        ASP<Abyssgraphics::IAsyncResource> m_resource;
+        ASP<Hyprgraphics::IAsyncResource> m_resource;
+        WP<SBackendLifetime>              m_lifetime;
 
         void                              upload();
+        void                              uploadOnContext(WP<CGLTexture> self);
+        void                              releaseFromRenderer();
         void                              allocate();
         void                              bind();
     };

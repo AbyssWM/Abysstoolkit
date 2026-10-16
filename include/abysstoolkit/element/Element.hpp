@@ -13,6 +13,7 @@
 #include "../types/PointerShape.hpp"
 #include "../palette/Color.hpp"
 #include "../core/Input.hpp"
+#include "../core/Animation.hpp"
 #include "../core/CoreMacros.hpp"
 
 namespace Abysstoolkit {
@@ -64,6 +65,11 @@ namespace Abysstoolkit {
         virtual void setMouseMove(std::function<void(const Abyssutils::Math::Vector2D&)>&& fn);
         virtual void setMouseButton(std::function<void(Input::eMouseButton, bool)>&& fn);
         virtual void setMouseAxis(std::function<void(Input::eAxisAxis, float)>&& fn);
+        virtual void setReceivesTouch(bool x);
+        virtual void setTouchDown(std::function<void(const Input::STouchEvent&)>&& fn);
+        virtual void setTouchMotion(std::function<void(const Input::STouchEvent&)>&& fn);
+        virtual void setTouchUp(std::function<void(const Input::STouchEvent&)>&& fn);
+        virtual void setTouchCancel(std::function<void(const Input::STouchEvent&)>&& fn);
 
         virtual void setTooltip(std::string&&);
 
@@ -71,6 +77,12 @@ namespace Abysstoolkit {
 
         virtual void setGrow(bool grow);
         virtual void setGrow(bool growH, bool growV);
+
+        // Installs a persistent policy. Future property/layout changes are animated.
+        // Geometry is presentation-only; layout and input immediately use final coordinates.
+        void animateOpacity(const SAnimation& animation);
+        void animateGeometry(const SAnimation& animation);
+        void setOpacity(float opacity);
 
         // forces a reposition right now, useful for pre-calculating expected sizes
         virtual void forceReposition();
@@ -85,6 +97,7 @@ namespace Abysstoolkit {
 
         virtual bool                                     acceptsMouseInput();
         virtual bool                                     acceptsKeyboardInput();
+        virtual bool                                     acceptsTouchInput();
         virtual ePointerShape                            pointerShape();
         virtual std::function<ePointerShape()>           pointerShapeFn();
         virtual bool                                     alwaysGetMouseInput();

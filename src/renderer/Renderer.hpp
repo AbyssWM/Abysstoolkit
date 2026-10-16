@@ -1,11 +1,12 @@
 #pragma once
 
-#include <abysstoolkit/palette/Color.hpp>
-#include <abysstoolkit/types/ImageTypes.hpp>
-#include <abyssutils/math/Box.hpp>
-#include <abyssgraphics/color/Color.hpp>
-#include <abyssgraphics/resource/resources/AsyncResource.hpp>
-#include <abyssal/buffer/Buffer.hpp>
+#include <hyprtoolkit/palette/Color.hpp>
+#include <hyprtoolkit/palette/Gradient.hpp>
+#include <hyprtoolkit/types/ImageTypes.hpp>
+#include <hyprutils/math/Box.hpp>
+#include <hyprgraphics/color/Color.hpp>
+#include <hyprgraphics/resource/resources/AsyncResource.hpp>
+#include <aquamarine/buffer/Buffer.hpp>
 
 #include "../helpers/Memory.hpp"
 
@@ -36,17 +37,19 @@ namespace Abysstoolkit {
         };
 
         struct STextureRenderData {
-            CBox                 box;
-            SP<IRendererTexture> texture;
-            float                a        = 1.F;
-            int                  rounding = 0;
+            CBox                      box;
+            SP<IRendererTexture>      texture;
+            float                     a        = 1.F;
+            int                       rounding = 0;
+            std::optional<CHyprColor> tint;
+            bool                      tintGrayscaleOnly = false;
         };
 
         struct SBorderRenderData {
-            CBox       box;
-            CAbyssColor color    = {1, 1, 1, 1};
-            int        rounding = 0;
-            int        thick    = 0;
+            CBox               box;
+            CGradientValueData gradient;
+            int                rounding = 0;
+            int                thick    = 0;
         };
 
         struct SPolygonRenderData {
@@ -62,7 +65,8 @@ namespace Abysstoolkit {
             int                         thick = 2;
         };
 
-        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Abyssal::IBuffer> buf) = 0;
+        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Aquamarine::IBuffer> buf) = 0;
+        virtual void                 beginRenderingExternal(SP<IToolkitWindow> window, uint32_t bufferAge)  = 0;
         virtual void                 render(bool ignoreSync = false)                                        = 0;
         virtual void                 endRendering()                                                         = 0;
         virtual void                 renderRectangle(const SRectangleRenderData& data)                      = 0;

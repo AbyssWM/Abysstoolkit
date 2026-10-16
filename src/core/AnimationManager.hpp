@@ -1,7 +1,10 @@
 #pragma once
 
-#include <abyssutils/animation/AnimationManager.hpp>
-#include <abyssutils/animation/AnimatedVariable.hpp>
+#include <hyprutils/animation/AnimationManager.hpp>
+#include <hyprutils/animation/AnimatedVariable.hpp>
+#include <hyprtoolkit/core/Animation.hpp>
+
+#include <vector>
 
 #include "AnimatedVariable.hpp"
 
@@ -16,6 +19,8 @@ namespace Abysstoolkit {
 
         using SAnimationPropertyConfig = Abyssutils::Animation::SAnimationPropertyConfig;
 
+        SP<SAnimationPropertyConfig> configFor(const SAnimation& animation);
+
         template <Animable VarType>
         void createAnimation(const VarType& v, PHLANIMVAR<VarType>& pav, SP<SAnimationPropertyConfig> pConfig) {
             constexpr const eAnimatedVarType EAVTYPE = typeToeAnimatedVarType<VarType>;
@@ -25,7 +30,11 @@ namespace Abysstoolkit {
             pav->setConfig(pConfig);
         }
 
-        Abyssutils::Animation::CAnimationConfigTree m_animationTree;
+        Hyprutils::Animation::CAnimationConfigTree m_animationTree;
+
+      private:
+        std::vector<std::pair<SAnimation, SP<SAnimationPropertyConfig>>> m_dynamicConfigs;
+        size_t                                                           m_nextCurveID = 0;
     };
 
     inline SP<CHTAnimationManager> g_animationManager;

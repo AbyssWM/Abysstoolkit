@@ -12,6 +12,31 @@
 using namespace Abysstoolkit;
 using namespace Abyssgraphics;
 
+static SP<IElement> createForeground(SCheckboxImpl* impl) {
+    auto fgColor = [impl] {
+        auto c = g_palette->m_colors.accent;
+        c.a    = impl->data.toggled ? 1.F : 0.F;
+        return c;
+    };
+
+    SP<IElement> foreground;
+    if (impl->data.style == HT_CHECKBOX_STYLE_RADIO)
+        foreground = CRectangleBuilder::begin()
+                         ->color(fgColor)
+                         ->rounding(4)
+                         ->size(CDynamicSize{CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {4.F / 7.F, 4.F / 7.F}})
+                         ->commence();
+    else
+        foreground = CCheckmarkElement::create(SCheckmarkData{
+            .size  = {CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}},
+            .color = fgColor,
+        });
+
+    foreground->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
+    foreground->setPositionFlag(IElement::HT_POSITION_FLAG_CENTER, true);
+    return foreground;
+}
+
 SP<CCheckboxElement> CCheckboxElement::create(const SCheckboxData& data) {
     auto p          = SP<CCheckboxElement>(new CCheckboxElement(data));
     p->impl->self   = p;
@@ -19,24 +44,15 @@ SP<CCheckboxElement> CCheckboxElement::create(const SCheckboxData& data) {
     return p;
 }
 
-std::function<CAbyssColor()> SCheckboxImpl::getFgColor() {
-    if (data.toggled)
-        return [] { return g_palette->m_colors.accent; };
-    else {
-        return [] {
-            auto c = g_palette->m_colors.accent;
-            c.a    = 0.F;
-            return c;
-        };
-    }
-}
-
 CCheckboxElement::CCheckboxElement(const SCheckboxData& data) : IElement(), m_impl(makeUnique<SCheckboxImpl>()) {
     m_impl->data = data;
 
+    const bool RADIO    = data.style == HT_CHECKBOX_STYLE_RADIO;
+    const int  ROUNDING = RADIO ? 7 : g_palette->m_vars.smallRounding;
+
     m_impl->background = CRectangleBuilder::begin()
                              ->color([] { return g_palette->m_colors.base; })
-                             ->rounding(g_palette->m_vars.smallRounding)
+                             ->rounding(ROUNDING)
                              ->borderColor([] { return g_palette->m_colors.alternateBase; })
                              ->borderThickness(1)
                              ->size(CDynamicSize{CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {14.F, 14.F}})
@@ -45,13 +61,7 @@ CCheckboxElement::CCheckboxElement(const SCheckboxData& data) : IElement(), m_im
     m_impl->background->setPositionMode(HT_POSITION_ABSOLUTE);
     m_impl->background->setPositionFlag(HT_POSITION_FLAG_CENTER, true);
 
-    CAbyssColor col = g_palette->m_colors.accent;
-    col.a          = m_impl->data.toggled ? 1.F : 0.F;
-    m_impl->foreground =
-        CCheckmarkElement::create(SCheckmarkData{.size = {CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}}, .color = [col] { return col; }});
-
-    m_impl->foreground->setPositionMode(HT_POSITION_ABSOLUTE);
-    m_impl->foreground->setPositionFlag(HT_POSITION_FLAG_CENTER, true);
+    m_impl->foreground = createForeground(m_impl.get());
 
     m_impl->background->addChild(m_impl->foreground);
 
@@ -85,14 +95,18 @@ CCheckboxElement::CCheckboxElement(const SCheckboxData& data) : IElement(), m_im
             return;
 
         if (button == Input::MOUSE_BUTTON_LEFT) {
+            // a radio is turned off by selecting another, never by clicking itself
+            if (m_impl->data.style == HT_CHECKBOX_STYLE_RADIO && m_impl->data.toggled)
+                return;
+
             m_impl->data.toggled = !m_impl->data.toggled;
 
             if (m_impl->data.onToggled)
                 m_impl->data.onToggled(m_impl->self.lock(), m_impl->data.toggled);
+            if (m_impl->onToggledInternal)
+                m_impl->onToggledInternal(m_impl->self.lock(), m_impl->data.toggled);
 
-            CAbyssColor col               = g_palette->m_colors.accent;
-            col.a                        = m_impl->data.toggled ? 1.F : 0.F;
-            *m_impl->foreground->m_color = col;
+            m_impl->foreground->recheckColor();
         }
     });
 
@@ -118,11 +132,32 @@ SP<CCheckboxBuilder> CCheckboxElement::rebuild() {
 }
 
 void CCheckboxElement::replaceData(const SCheckboxData& data) {
-    m_impl->data = data;
+    const bool STYLE_CHANGED = m_impl->data.style != data.style;
+    m_impl->data             = data;
 
-    CAbyssColor col               = g_palette->m_colors.accent;
-    col.a                        = m_impl->data.toggled ? 1.F : 0.F;
-    *m_impl->foreground->m_color = col;
+    if (STYLE_CHANGED) {
+        m_impl->background->removeChild(m_impl->foreground);
+        m_impl->background->rebuild()->rounding(data.style == HT_CHECKBOX_STYLE_RADIO ? 7 : g_palette->m_vars.smallRounding)->commence();
+        m_impl->foreground = createForeground(m_impl.get());
+        m_impl->background->addChild(m_impl->foreground);
+    } else
+        m_impl->foreground->recheckColor();
+
+    if (impl->window)
+        impl->window->scheduleReposition(impl->self);
+}
+
+bool CCheckboxElement::state() {
+    return m_impl->data.toggled;
+}
+
+void CCheckboxElement::setState(bool state) {
+    if (m_impl->data.toggled == state)
+        return;
+
+    m_impl->data.toggled = state;
+
+    m_impl->foreground->recheckColor();
 
     if (impl->window)
         impl->window->scheduleReposition(impl->self);

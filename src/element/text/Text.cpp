@@ -1,15 +1,18 @@
 #include "Text.hpp"
 
 #include <cmath>
-#include <abysstoolkit/palette/Palette.hpp>
-#include <abyssgraphics/color/Color.hpp>
-#include <pango-1.0/pango/pangocairo.h>
+#include <glib-object.h>
+#include <hyprtoolkit/palette/Palette.hpp>
+#include <hyprgraphics/color/Color.hpp>
+#include <pango/pango.h>
 
 #include "../../window/ToolkitWindow.hpp"
 #include "../../layout/Positioner.hpp"
 #include "../../renderer/Renderer.hpp"
 #include "../../core/InternalBackend.hpp"
+#include "../../core/BackendContext.hpp"
 #include "../../core/Logger.hpp"
+#include "../../core/AnimationManager.hpp"
 #include "../../helpers/Memory.hpp"
 
 #include "../Element.hpp"
@@ -21,17 +24,28 @@ using namespace Abysstoolkit;
 using namespace Abyssgraphics;
 
 SP<CTextElement> CTextElement::create(const STextData& data) {
-    auto p          = SP<CTextElement>(new CTextElement(data));
-    p->impl->self   = p;
-    p->m_impl->self = p;
+    auto p                          = SP<CTextElement>(new CTextElement(data));
+    p->impl->self                   = p;
+    p->m_impl->self                 = p;
+    p->m_impl->colorAnimationConfig = g_animationManager->m_animationTree.getConfig("fast");
+    g_animationManager->createAnimation(data.color(), p->m_impl->color, p->m_impl->colorAnimationConfig);
+    p->m_impl->color->setCallbackOnBegin(
+        [self = WP<CTextElement>{p}](auto) {
+            if (self)
+                self->impl->damageEntire();
+        },
+        false);
+    p->m_impl->color->setUpdateCallback([self = WP<CTextElement>{p}](auto) {
+        if (self)
+            self->impl->damageEntire();
+    });
     return p;
 }
 
 CTextElement::CTextElement(const STextData& data) : IElement(), m_impl(makeUnique<STextImpl>()) {
     m_impl->data = data;
+    m_impl->setPangoData();
     m_impl->parseText();
-    m_impl->lastFontSizeUnscaled = m_impl->data.fontSize.ptSize();
-    m_impl->preferred            = m_impl->getTextSizePreferred();
 
     impl->m_externalEvents.mouseMove.listenStatic([this](const Vector2D& pos) {
         m_impl->lastCursorPos = pos;
@@ -48,17 +62,50 @@ CTextElement::CTextElement(const STextData& data) : IElement(), m_impl(makeUniqu
 
 CTextElement::~CTextElement() = default;
 
+void CTextElement::setText(std::string text) {
+    if (text == m_impl->data.text)
+        return;
+
+    m_impl->data.text = std::move(text);
+    m_impl->parseText();
+    m_impl->scheduleTexRefresh();
+
+    if (impl->window)
+        impl->window->scheduleReposition(impl->self);
+}
+
 void CTextElement::replaceData(const STextData& data) {
-    const bool TEXT_DIFFERENT = data.text != m_impl->data.text;
+    const bool TEXT_DIFFERENT      = data.text != m_impl->data.text;
+    const auto COLOR               = data.color();
+    const bool COLOR_DIFFERENT     = COLOR != m_impl->color->goal();
+    const bool ALIGN_DIFFERENT     = data.align != m_impl->data.align;
+    const bool ELLIPSIZE_DIFFERENT = data.noEllipsize != m_impl->data.noEllipsize;
+    const bool FONT_DIFFERENT      = data.fontFamily != m_impl->data.fontFamily || data.fontSize.ptSize() != m_impl->data.fontSize.ptSize();
+    const bool CLAMP_DIFFERENT     = data.clampSize != m_impl->data.clampSize;
 
     m_impl->data = data;
 
-    if (m_impl->lastFontSizeUnscaled != m_impl->data.fontSize.ptSize() || TEXT_DIFFERENT) {
+    if (ALIGN_DIFFERENT)
+        m_impl->setPangoAlign();
+    if (ELLIPSIZE_DIFFERENT)
+        m_impl->setPangoEllipsize();
+    if (FONT_DIFFERENT)
+        m_impl->setPangoFont();
+    if (TEXT_DIFFERENT)
         m_impl->parseText();
-        m_impl->lastFontSizeUnscaled = m_impl->data.fontSize.ptSize();
-        m_impl->preferred            = m_impl->getTextSizePreferred();
-        m_impl->scheduleTexRefresh();
+
+    if (m_impl->colorAnimationEnabled) {
+        if (m_impl->color->isBeingAnimated() && (m_impl->color->getConfig() != m_impl->colorAnimationConfig || (m_impl->color->isSpringCurve() && m_impl->color->goal() != COLOR)))
+            m_impl->color->setValueAndWarp(m_impl->color->value());
+        m_impl->color->setConfig(m_impl->colorAnimationConfig);
+        *m_impl->color = COLOR;
+    } else {
+        m_impl->color->setValueAndWarp(COLOR);
+        m_impl->needsTexRefresh = m_impl->needsTexRefresh || COLOR_DIFFERENT;
     }
+
+    if (ALIGN_DIFFERENT || ELLIPSIZE_DIFFERENT || FONT_DIFFERENT || TEXT_DIFFERENT || CLAMP_DIFFERENT)
+        m_impl->scheduleTexRefresh();
 
     if (impl->window)
         impl->window->scheduleReposition(impl->self);
@@ -70,6 +117,15 @@ SP<CTextBuilder> CTextElement::rebuild() {
     p->m_data    = makeUnique<STextData>(m_impl->data);
     p->m_element = m_impl->self;
     return p;
+}
+
+void CTextElement::animateColor(const SAnimation& animation) {
+    m_impl->colorAnimationEnabled = !std::holds_alternative<SNoAnimation>(animation);
+    m_impl->colorAnimationConfig  = g_animationManager->configFor(animation);
+    m_impl->needsTexRefresh       = true;
+    if (!m_impl->colorAnimationEnabled)
+        m_impl->color->setValueAndWarp(m_impl->color->goal());
+    impl->damageEntire();
 }
 
 void CTextElement::paint() {
@@ -84,9 +140,8 @@ void CTextElement::paint() {
         return;
     }
 
-    if ((impl->window && impl->window->scale() != m_impl->lastScale) || m_impl->needsTexRefresh) {
-        m_impl->lastScale = impl->window ? impl->window->scale() : 1.F;
-        m_impl->preferred = m_impl->getTextSizePreferred();
+    m_impl->updateScale();
+    if (m_impl->needsTexRefresh) {
         if (!m_impl->resource)
             m_impl->renderTex();
         textureToUse = m_impl->oldTex;
@@ -109,46 +164,42 @@ void CTextElement::paint() {
     renderBox.w = texSizeLogical.x;
     renderBox.h = texSizeLogical.y;
 
+    const auto COLOR = m_impl->color->value();
     g_renderer->renderTexture({
-        .box      = renderBox,
-        .texture  = textureToUse,
-        .a        = m_impl->data.a,
-        .rounding = 0,
+        .box               = renderBox,
+        .texture           = textureToUse,
+        .a                 = sc<float>(m_impl->data.a * (m_impl->renderColorAtPaint ? COLOR.a : 1.F)),
+        .rounding          = 0,
+        .tint              = m_impl->renderColorAtPaint ? std::optional<CHyprColor>{COLOR.stripA()} : std::nullopt,
+        .tintGrayscaleOnly = m_impl->renderColorAtPaint,
     });
 }
 
-void CTextElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
+void CTextElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+    auto initial_position = impl->position;
+
     IElement::reposition(box);
 
-    const auto DESIRED = m_impl->preferred;
-    if (DESIRED.x > 0 && DESIRED.y > 0 && !m_impl->data.noEllipsize) {
-        const auto PREV     = m_impl->lastMaxSize;
-        m_impl->lastMaxSize = {-1, -1};
-        const auto SIZE     = box.size();
-        if (maxSize.x > 0)
-            m_impl->lastMaxSize.x = maxSize.x;
-        if (maxSize.y > 0)
-            m_impl->lastMaxSize.y = maxSize.y;
-        if (SIZE.x + 1 < DESIRED.x)
-            m_impl->lastMaxSize.x = SIZE.x;
-        if (SIZE.y + 1 < DESIRED.y)
-            m_impl->lastMaxSize.y = SIZE.y;
-
-        if (PREV != m_impl->lastMaxSize) {
-            m_impl->needsTexRefresh = true;
-            const auto LAST_PREF    = m_impl->preferred;
-            m_impl->lastScale       = impl->window ? impl->window->scale() : 1.F;
-            m_impl->preferred       = m_impl->getTextSizePreferred();
-            if (impl->window && (std::abs(LAST_PREF.x - m_impl->preferred.x) > 2 || std::abs(LAST_PREF.y - m_impl->preferred.y) > 2))
-                impl->window->scheduleReposition(impl->self.lock());
-        }
-    }
+    if (initial_position != impl->position)
+        m_impl->needsTexRefresh = true;
 
     g_positioner->positionChildren(impl->self.lock());
+
+    pango_layout_set_width(m_impl->pangoData.layout, sc<int>(impl->position.size().x * PANGO_SCALE * m_impl->lastScale));
+    pango_layout_set_height(m_impl->pangoData.layout, sc<int>(impl->position.size().y * PANGO_SCALE * m_impl->lastScale));
 }
 
 void CTextElement::recheckColor() {
-    m_impl->needsTexRefresh = true;
+    const auto COLOR = m_impl->data.color();
+    if (m_impl->colorAnimationEnabled) {
+        if (m_impl->color->isBeingAnimated() && (m_impl->color->getConfig() != m_impl->colorAnimationConfig || (m_impl->color->isSpringCurve() && m_impl->color->goal() != COLOR)))
+            m_impl->color->setValueAndWarp(m_impl->color->value());
+        m_impl->color->setConfig(m_impl->colorAnimationConfig);
+        *m_impl->color = COLOR;
+    } else {
+        m_impl->color->setValueAndWarp(COLOR);
+        m_impl->needsTexRefresh = true;
+    }
 }
 
 Abyssutils::Math::Vector2D CTextElement::size() {
@@ -159,8 +210,42 @@ std::optional<Vector2D> CTextElement::maximumSize(const Abyssutils::Math::Vector
     return std::nullopt;
 }
 
-std::optional<Vector2D> CTextElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
-    return m_impl->preferred;
+std::optional<Vector2D> CTextElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+    auto s = m_impl->data.size.calculate(parent);
+    if (s.x != -1 && s.y != -1)
+        return s;
+
+    auto maxSize = parent - Vector2D{impl->margin * 2, impl->margin * 2};
+    if (s.x != -1)
+        maxSize.x = s.x;
+    if (s.y != -1)
+        maxSize.y = s.y;
+    maxSize = m_impl->applyClampSize(maxSize);
+
+    m_impl->updateScale();
+    auto LAYOUT = m_impl->pangoData.layout;
+    if (maxSize.x != 0)
+        pango_layout_set_width(LAYOUT, sc<int>(maxSize.x * PANGO_SCALE * m_impl->lastScale));
+    else
+        pango_layout_set_width(LAYOUT, -1);
+    if (maxSize.y != 0)
+        pango_layout_set_height(LAYOUT, sc<int>(maxSize.y * PANGO_SCALE * m_impl->lastScale));
+    else
+        pango_layout_set_height(LAYOUT, -1);
+
+    PangoRectangle ink, logical;
+    pango_layout_get_pixel_extents(LAYOUT, &ink, &logical);
+
+    auto result = Vector2D{std::ceil(logical.width / m_impl->lastScale), std::ceil(logical.height / m_impl->lastScale)} + Vector2D(impl->margin * 2, impl->margin * 2);
+    if (s.x == -1)
+        s.x = result.x;
+    if (s.y == -1)
+        s.y = result.y;
+
+    pango_layout_set_width(m_impl->pangoData.layout, sc<int>(impl->position.size().x * PANGO_SCALE * m_impl->lastScale));
+    pango_layout_set_height(m_impl->pangoData.layout, sc<int>(impl->position.size().y * PANGO_SCALE * m_impl->lastScale));
+
+    return s;
 }
 
 std::optional<Vector2D> CTextElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
@@ -179,32 +264,82 @@ bool CTextElement::positioningDependsOnChild() {
     return m_impl->data.size.hasAuto();
 }
 
-std::tuple<UP<Abyssgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Vector2D> STextImpl::prepPangoLayout() {
-    auto                  CAIROSURFACE = makeUnique<CCairoSurface>(cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 1, 1 /* dummy value */));
-    auto                  CAIRO        = cairo_create(CAIROSURFACE->cairo());
+SPangoData::SPangoData() : layout(nullptr), context(nullptr) {}
 
-    PangoLayout*          layout = pango_cairo_create_layout(CAIRO);
+SPangoData::SPangoData(PangoLayout* layout, PangoContext* context) : layout(layout), context(context) {}
 
+SPangoData::SPangoData(SPangoData&& other) noexcept : layout(other.layout), context(other.context) {
+    ref();
+}
+
+SPangoData& SPangoData::operator=(SPangoData&& other) noexcept {
+    if (this != &other) {
+        unref();
+
+        layout  = other.layout;
+        context = other.context;
+
+        ref();
+    }
+
+    return *this;
+}
+
+SPangoData::~SPangoData() {
+    unref();
+}
+
+void SPangoData::unref() const {
+    if (layout)
+        g_object_unref(layout);
+    if (context)
+        g_object_unref(context);
+}
+
+void SPangoData::ref() const {
+    if (layout)
+        g_object_ref(layout);
+    if (context)
+        g_object_ref(context);
+}
+
+void STextImpl::setPangoData() {
+    PangoFontMap* font_map = pango_cairo_font_map_get_default();
+    PangoContext* context  = pango_font_map_create_context(font_map);
+    PangoLayout*  layout   = pango_layout_new(context);
+
+    pangoData = {layout, context};
+
+    setPangoFont();
+    setPangoAlign();
+    setPangoEllipsize();
+}
+
+void STextImpl::setPangoFont() {
     PangoFontDescription* fontDesc = pango_font_description_from_string(data.fontFamily.c_str());
-    pango_font_description_set_size(fontDesc, std::round(lastFontSizeUnscaled * lastScale) * PANGO_SCALE);
-    pango_layout_set_font_description(layout, fontDesc);
+    pango_font_description_set_size(fontDesc, std::round(data.fontSize.ptSize() * lastScale) * PANGO_SCALE);
+    pango_layout_set_font_description(pangoData.layout, fontDesc);
     pango_font_description_free(fontDesc);
+}
 
+void STextImpl::setPangoAlign() {
     if (data.align == HT_FONT_ALIGN_LEFT)
-        pango_layout_set_alignment(layout, PANGO_ALIGN_LEFT);
+        pango_layout_set_alignment(pangoData.layout, PANGO_ALIGN_LEFT);
     else if (data.align == HT_FONT_ALIGN_CENTER)
-        pango_layout_set_alignment(layout, PANGO_ALIGN_CENTER);
+        pango_layout_set_alignment(pangoData.layout, PANGO_ALIGN_CENTER);
     else
-        pango_layout_set_alignment(layout, PANGO_ALIGN_RIGHT);
+        pango_layout_set_alignment(pangoData.layout, PANGO_ALIGN_RIGHT);
+}
 
+void STextImpl::setPangoText() {
     PangoAttrList* attrList = nullptr;
     GError*        gError   = nullptr;
     char*          buf      = nullptr;
     if (pango_parse_markup(parsedText.c_str(), -1, 0, &attrList, &buf, nullptr, &gError))
-        pango_layout_set_text(layout, buf, -1);
+        pango_layout_set_text(pangoData.layout, buf, -1);
     else {
         g_error_free(gError);
-        pango_layout_set_text(layout, parsedText.c_str(), -1);
+        pango_layout_set_text(pangoData.layout, parsedText.c_str(), -1);
     }
 
     if (!attrList)
@@ -214,52 +349,30 @@ std::tuple<UP<Abyssgraphics::CCairoSurface>, cairo_t*, PangoLayout*, Vector2D> S
         free(buf);
 
     pango_attr_list_insert(attrList, pango_attr_scale_new(1));
-    pango_layout_set_attributes(layout, attrList);
+    pango_layout_set_attributes(pangoData.layout, attrList);
     pango_attr_list_unref(attrList);
-
-    int layoutWidth, layoutHeight;
-    pango_layout_get_size(layout, &layoutWidth, &layoutHeight);
-
-    PangoRectangle ink, logical;
-    pango_layout_get_pixel_extents(layout, &ink, &logical);
-
-    std::optional<Vector2D> maxSize = data.clampSize.value_or(lastMaxSize).round();
-    if (maxSize == Vector2D{0, 0})
-        maxSize = std::nullopt;
-
-    if (maxSize.has_value())
-        (*maxSize) *= lastScale;
-
-    if (maxSize.has_value()) {
-        const auto CLAMP_SIZE = maxSize.value();
-        if (!data.noEllipsize && maxSize.has_value() && maxSize->y >= 0)
-            pango_layout_set_ellipsize(layout, PANGO_ELLIPSIZE_END);
-        if (CLAMP_SIZE.x >= 0)
-            pango_layout_set_width(layout, std::min(logical.width * PANGO_SCALE, sc<int>(CLAMP_SIZE.x * PANGO_SCALE)));
-        if (CLAMP_SIZE.y >= 0)
-            pango_layout_set_height(layout, std::min(logical.height * PANGO_SCALE, sc<int>(CLAMP_SIZE.y * PANGO_SCALE)));
-        if (CLAMP_SIZE.x >= 0)
-            pango_layout_set_wrap(layout, PANGO_WRAP_WORD_CHAR);
-
-        pango_layout_get_pixel_extents(layout, &ink, &logical);
-    }
-
-    pango_layout_get_pixel_extents(layout, &ink, &logical);
-
-    return std::make_tuple<>(std::move(CAIROSURFACE), CAIRO, layout, Vector2D{logical.width, logical.height});
 }
 
-Abyssutils::Math::Vector2D STextImpl::getTextSizePreferred() {
-    auto [CAIROSURFACE, CAIRO, LAYOUT, LAYOUTSIZE] = prepPangoLayout();
+void STextImpl::setPangoEllipsize() {
+    if (data.noEllipsize) {
+        pango_layout_set_wrap(pangoData.layout, PANGO_WRAP_WORD_CHAR);
+        pango_layout_set_ellipsize(pangoData.layout, PANGO_ELLIPSIZE_NONE);
+    } else {
+        pango_layout_set_wrap(pangoData.layout, PANGO_WRAP_NONE);
+        pango_layout_set_ellipsize(pangoData.layout, PANGO_ELLIPSIZE_END);
+    }
+}
 
-    g_object_unref(LAYOUT);
-    cairo_destroy(CAIRO);
-
-    return LAYOUTSIZE / lastScale;
+void STextImpl::updateScale() {
+    if (self && self->impl->window && self->impl->window->scale() != lastScale) {
+        lastScale = self->impl->window->scale();
+        setPangoFont();
+        needsTexRefresh = true;
+    }
 }
 
 CBox STextImpl::getCharBox(size_t offset) {
-    auto [CAIROSURFACE, CAIRO, LAYOUT, LAYOUTSIZE] = prepPangoLayout();
+    auto           LAYOUT = pangoData.layout;
 
     PangoRectangle rect;
 
@@ -274,23 +387,17 @@ CBox STextImpl::getCharBox(size_t offset) {
         }
             .scale(1.F / lastScale);
 
-    g_object_unref(LAYOUT);
-    cairo_destroy(CAIRO);
-
     return charBox;
 }
 
 std::optional<size_t> STextImpl::vecToOffset(const Vector2D& vec) {
-    auto [CAIROSURFACE, CAIRO, LAYOUT, LAYOUTSIZE] = prepPangoLayout();
+    auto LAYOUT = pangoData.layout;
 
     auto pangoX = sc<int>(vec.x * PANGO_SCALE), //
         pangoY  = sc<int>(vec.y * PANGO_SCALE);
 
     int index = 0, trailing = 0;
     pango_layout_xy_to_index(LAYOUT, pangoX, pangoY, &index, &trailing);
-
-    g_object_unref(LAYOUT);
-    cairo_destroy(CAIRO);
 
     if (index == -1)
         return std::nullopt;
@@ -299,8 +406,11 @@ std::optional<size_t> STextImpl::vecToOffset(const Vector2D& vec) {
 }
 
 float STextImpl::getCursorPos(size_t offset) {
-    if (offset >= parsedText.length())
-        return preferred.x;
+    if (offset >= parsedText.length() && !parsedText.empty()) {
+        auto box = getCharBox(parsedText.length() - 1);
+        return box.x + box.size().x;
+    } else if (parsedText.empty())
+        return 0;
 
     if (offset == 0)
         return 0;
@@ -321,10 +431,7 @@ Vector2D STextImpl::unscale(const Vector2D& x) {
 }
 
 void STextImpl::scheduleTexRefresh() {
-    if (data.async) {
-        needsTexRefresh = true;
-        return;
-    }
+    needsTexRefresh = true;
 }
 
 void STextImpl::renderTex() {
@@ -337,41 +444,32 @@ void STextImpl::renderTex() {
 
     waitingForTex = true;
 
-    lastScale = self->impl->window ? self->impl->window->scale() : 1.F;
-
     self->impl->damageEntire();
 
-    std::optional<Vector2D> maxSize = data.clampSize.value_or(lastMaxSize).round();
-    if (maxSize == Vector2D{0, 0})
-        maxSize = std::nullopt;
-
-    if (maxSize.has_value())
-        (*maxSize) *= lastScale;
-
-    auto col = data.color();
-
-    resource = makeAtomicShared<CTextResource>(CTextResource::STextResourceData{
+    const Vector2D MAX_SIZE = applyClampSize(self->impl->position.size()) * lastScale;
+    const auto     COLOR    = colorAnimationEnabled ? CHyprColor{1.F, 1.F, 1.F, 1.F} : data.color();
+    resource                = makeAtomicShared<CTextResource>(CTextResource::STextResourceData{
         .text      = parsedText,
         .font      = data.fontFamily,
-        .fontSize  = sc<size_t>(std::round(lastFontSizeUnscaled * lastScale)),
-        .color     = CColor{CColor::SSRGB{.r = col.r, .g = col.g, .b = col.b}},
+        .fontSize  = sc<size_t>(std::round(data.fontSize.ptSize() * lastScale)),
+        .color     = CColor{CColor::SSRGB{.r = COLOR.r, .g = COLOR.g, .b = COLOR.b}},
         .align     = data.align == HT_FONT_ALIGN_LEFT ?
-                Abyssgraphics::CTextResource::TEXT_ALIGN_LEFT :
-                (data.align == HT_FONT_ALIGN_CENTER ? Abyssgraphics::CTextResource::TEXT_ALIGN_CENTER : Abyssgraphics::CTextResource::TEXT_ALIGN_RIGHT),
-        .maxSize   = maxSize,
-        .ellipsize = !data.noEllipsize && maxSize.has_value() && maxSize->y >= 0,
-        .wrap      = maxSize.has_value() && maxSize->x >= 0,
+            Hyprgraphics::CTextResource::TEXT_ALIGN_LEFT :
+            (data.align == HT_FONT_ALIGN_CENTER ? Hyprgraphics::CTextResource::TEXT_ALIGN_CENTER : Hyprgraphics::CTextResource::TEXT_ALIGN_RIGHT),
+        .maxSize   = MAX_SIZE,
+        .ellipsize = !data.noEllipsize,
+        .wrap      = data.noEllipsize,
     });
 
     if (Env::isTrace()) {
         const std::string TEXT_SHORT = data.text.size() > 20 ? data.text.substr(0, 20) + "..." : data.text;
         g_logger->log(HT_LOG_TRACE, "TextImpl: scheduling rendering of text \"{}\", with the following params:\nfont: {}, fontSize: {}, maxSize: {}, ellipsize: {}, wrap: {}",
-                      TEXT_SHORT,                                                       //
-                      data.fontFamily,                                                  //
-                      sc<size_t>(std::round(lastFontSizeUnscaled * lastScale)),         //
-                      maxSize.has_value() ? std::format("{}", *maxSize) : "<no value>", //
-                      !data.noEllipsize && maxSize.has_value() && maxSize->y >= 0,      //
-                      maxSize.has_value() && maxSize->x >= 0                            //
+                      TEXT_SHORT,                                                 //
+                      data.fontFamily,                                            //
+                      sc<size_t>(std::round(data.fontSize.ptSize() * lastScale)), //
+                      MAX_SIZE,                                                   //
+                      !data.noEllipsize,                                          //
+                      data.noEllipsize                                            //
         );
     }
 
@@ -382,14 +480,14 @@ void STextImpl::renderTex() {
         g_asyncResourceGatherer->await(resourceGeneric);
         postTexLoad();
     } else {
-        resource->m_events.finished.listenStatic([this, self = self->impl->self] {
-            if (self.expired())
+        resource->m_events.finished.listenStatic([this, self = self->impl->self, lifetime = WP<SBackendLifetime>{g_backendServices->lifetime}] {
+            if (self.expired() || !lifetime)
                 return;
             if (!g_backend)
                 return;
 
-            g_backend->addIdle([this, self = self]() {
-                if (self.expired())
+            g_backend->addIdle([this, self = self, lifetime] {
+                if (self.expired() || !lifetime)
                     return;
 
                 postTexLoad();
@@ -405,8 +503,9 @@ void STextImpl::postTexLoad() {
         return;
 
     ASP<IAsyncResource> resourceGeneric(resource);
-    size = resource->m_asset.pixelSize;
-    tex  = g_renderer->uploadTexture({.resource = resourceGeneric});
+    size               = resource->m_asset.pixelSize;
+    tex                = g_renderer->uploadTexture({.resource = resourceGeneric});
+    renderColorAtPaint = colorAnimationEnabled;
     oldTex.reset();
     if (self->impl->window)
         self->impl->window->scheduleReposition(self->impl->self);
@@ -492,6 +591,8 @@ void STextImpl::parseText() {
     }
 
     parsedText = std::move(newString);
+
+    setPangoText();
 }
 
 void STextImpl::recheckTextBoxes() {
@@ -526,4 +627,16 @@ void STextImpl::onMouseMove() {
         hoveredTextLink = &link;
         break;
     }
+}
+
+Vector2D STextImpl::applyClampSize(Vector2D size) {
+    if (!data.clampSize.has_value())
+        return size;
+
+    if (size.x <= 0 || (data.clampSize->x < size.x && data.clampSize->x > 0))
+        size.x = data.clampSize->x;
+    if (size.y <= 0 || (data.clampSize->y < size.y && data.clampSize->y > 0))
+        size.y = data.clampSize->y;
+
+    return size;
 }

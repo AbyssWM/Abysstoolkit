@@ -5,6 +5,8 @@ libdir=@LIBDIR@
 Name: abysstoolkit
 URL: https://github.com/AbyssWM/abysstoolkit
 Description: A modern C++ Wayland-native GUI toolkit
-Version: @ABYSSTOOLKIT_VERSION@
+Version: @HYPRTOOLKIT_VERSION@
+Requires: @HYPRTOOLKIT_PUBLIC_REQUIRES@
+Requires.private: @HYPRTOOLKIT_PRIVATE_REQUIRES@
 Cflags: -I${includedir}
 Libs: -L${libdir} -labysstoolkit

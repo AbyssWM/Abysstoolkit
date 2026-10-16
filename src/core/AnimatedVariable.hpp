@@ -1,8 +1,10 @@
 #pragma once
 
-#include <abysstoolkit/palette/Color.hpp>
-#include <abyssutils/animation/AnimatedVariable.hpp>
-#include <abyssutils/math/Vector2D.hpp>
+#include <hyprtoolkit/palette/Color.hpp>
+#include <hyprtoolkit/palette/Gradient.hpp>
+#include <hyprutils/animation/AnimatedVariable.hpp>
+#include <hyprutils/math/Vector2D.hpp>
+#include <hyprutils/math/Box.hpp>
 
 #include "../helpers/Memory.hpp"
 
@@ -13,7 +15,8 @@ namespace Abysstoolkit {
         AVARTYPE_FLOAT,
         AVARTYPE_VECTOR,
         AVARTYPE_COLOR,
-        AVARTYPE_GRADIENT
+        AVARTYPE_GRADIENT,
+        AVARTYPE_BOX,
     };
 
     // Utility to bind a type with its corresponding eAnimatedVarType
@@ -38,11 +41,15 @@ namespace Abysstoolkit {
         static constexpr eAnimatedVarType value = AVARTYPE_COLOR;
     };
 
-    // TODO:
-    // template <>
-    // struct STypeToAnimatedVarType_t<CGradientValueData> {
-    //     static constexpr eAnimatedVarType value = AVARTYPE_GRADIENT;
-    // };
+    template <>
+    struct STypeToAnimatedVarType_t<CGradientValueData> {
+        static constexpr eAnimatedVarType value = AVARTYPE_GRADIENT;
+    };
+
+    template <>
+    struct STypeToAnimatedVarType_t<Hyprutils::Math::CBox> {
+        static constexpr eAnimatedVarType value = AVARTYPE_BOX;
+    };
 
     template <class T>
     inline constexpr eAnimatedVarType typeToeAnimatedVarType = STypeToAnimatedVarType_t<T>::value;
@@ -55,7 +62,7 @@ namespace Abysstoolkit {
     // This is mainly to get better errors if we put a type that's not supported
     // Otherwise template errors are ugly
     template <class T>
-    concept Animable = OneOf<T, Abyssutils::Math::Vector2D, float, CAbyssColor /*, CGradientValueData*/>;
+    concept Animable = OneOf<T, Hyprutils::Math::Vector2D, Hyprutils::Math::CBox, float, CHyprColor, CGradientValueData>;
 
     struct SAnimationContext {};
 

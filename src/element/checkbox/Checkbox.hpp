@@ -24,11 +24,12 @@ namespace Abysstoolkit {
         CCheckmarkElement(const SCheckmarkData& data);
 
         virtual void                                     paint();
-        virtual void                                     reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize = {-1, -1});
-        virtual Abyssutils::Math::Vector2D                size();
-        virtual std::optional<Abyssutils::Math::Vector2D> preferredSize(const Abyssutils::Math::Vector2D& parent);
-        virtual std::optional<Abyssutils::Math::Vector2D> minimumSize(const Abyssutils::Math::Vector2D& parent);
-        virtual std::optional<Abyssutils::Math::Vector2D> maximumSize(const Abyssutils::Math::Vector2D& parent);
+        virtual void                                     recheckColor();
+        virtual void                                     reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize = {-1, -1});
+        virtual Hyprutils::Math::Vector2D                size();
+        virtual std::optional<Hyprutils::Math::Vector2D> preferredSize(const Hyprutils::Math::Vector2D& parent);
+        virtual std::optional<Hyprutils::Math::Vector2D> minimumSize(const Hyprutils::Math::Vector2D& parent);
+        virtual std::optional<Hyprutils::Math::Vector2D> maximumSize(const Hyprutils::Math::Vector2D& parent);
 
         SCheckmarkData                                   m_data;
 
@@ -39,21 +40,22 @@ namespace Abysstoolkit {
 
     struct SCheckboxData {
         bool                                                                           toggled = false;
-        std::function<void(Abyssutils::Memory::CSharedPointer<CCheckboxElement>, bool)> onToggled;
+        eCheckboxStyle                                                                 style   = HT_CHECKBOX_STYLE_CHECKMARK;
+        std::function<void(Hyprutils::Memory::CSharedPointer<CCheckboxElement>, bool)> onToggled;
         CDynamicSize                                                                   size{CDynamicSize::HT_SIZE_AUTO, CDynamicSize::HT_SIZE_AUTO, {}};
     };
 
     struct SCheckboxImpl {
-        SCheckboxData               data;
+        SCheckboxData                                   data;
 
-        WP<CCheckboxElement>        self;
-        SP<CRectangleElement>       background;
-        SP<CCheckmarkElement>       foreground;
+        std::function<void(SP<CCheckboxElement>, bool)> onToggledInternal;
 
-        bool                        labelChanged = true;
+        WP<CCheckboxElement>                            self;
+        SP<CRectangleElement>                           background;
+        SP<IElement>                                    foreground;
 
-        bool                        primedForUp = false;
+        bool                                            labelChanged = true;
 
-        std::function<CAbyssColor()> getFgColor();
+        bool                                            primedForUp = false;
     };
 }

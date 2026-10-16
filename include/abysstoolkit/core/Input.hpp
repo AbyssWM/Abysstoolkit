@@ -3,7 +3,9 @@
 #include <cstdint>
 #include <string>
 
-namespace Abysstoolkit::Input {
+#include <hyprutils/math/Vector2D.hpp>
+
+namespace Hyprtoolkit::Input {
     enum eMouseButton : uint8_t {
         MOUSE_BUTTON_UNKNOWN,
         MOUSE_BUTTON_LEFT,
@@ -35,5 +37,11 @@ namespace Abysstoolkit::Input {
         bool        repeat    = false;
         std::string utf8      = "";
         uint32_t    modMask   = 0; // eKeyboardModifier
+    };
+
+    struct STouchEvent {
+        int32_t                   id = 0;
+        Hyprutils::Math::Vector2D local;
+        uint32_t                  timeMs = 0;
     };
 }

@@ -9,10 +9,11 @@ namespace Abysstoolkit {
 
     class CSyncTimeline;
     class CEGLSync;
+    class COpenGLRenderer;
 
     class CRenderbuffer {
       public:
-        CRenderbuffer(SP<Abyssal::IBuffer> buffer, uint32_t format);
+        CRenderbuffer(COpenGLRenderer& renderer, SP<Aquamarine::IBuffer> buffer, uint32_t format);
         ~CRenderbuffer();
 
         bool                    good();
@@ -27,11 +28,12 @@ namespace Abysstoolkit {
         SP<CSyncTimeline>       m_syncTimeline;
 
       private:
-        void*        m_image = nullptr;
-        GLuint       m_rbo   = 0;
-        CFramebuffer m_framebuffer;
-        uint32_t     m_drmFormat = 0;
-        bool         m_good      = false;
+        COpenGLRenderer& m_renderer;
+        void*            m_image = nullptr;
+        GLuint           m_rbo   = 0;
+        CFramebuffer     m_framebuffer;
+        uint32_t         m_drmFormat = 0;
+        bool             m_good      = false;
 
         struct {
             Abyssutils::Signal::CAbyssSignalListener destroyBuffer;

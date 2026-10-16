@@ -7,6 +7,7 @@
 
 #include "../helpers/Memory.hpp"
 #include "../core/Input.hpp"
+#include "../core/AnimatedVariable.hpp"
 
 #include <abyssutils/math/Box.hpp>
 
@@ -33,7 +34,18 @@ namespace Abysstoolkit {
         bool                                                     growH                   = false;
         float                                                    margin                  = 0;
         bool                                                     userRequestedMouseInput = false;
+        bool                                                     userRequestedTouchInput = false;
         bool                                                     grouped                 = false;
+        bool                                                     hasBeenPresented        = false;
+
+        float                                                    opacity          = 1.F;
+        bool                                                     opacityAnimated  = false;
+        bool                                                     geometryAnimated = false;
+        PHLANIMVAR<float>                                        animatedOpacity;
+        PHLANIMVAR<Hyprutils::Math::CBox>                        animatedGeometry;
+        SP<Hyprutils::Animation::SAnimationPropertyConfig>       opacityAnimationConfig;
+        SP<Hyprutils::Animation::SAnimationPropertyConfig>       geometryAnimationConfig;
+        Hyprutils::Math::CBox                                    lastPresentationBounds;
 
         // tooltip
         std::string tooltip    = "";
@@ -47,14 +59,18 @@ namespace Abysstoolkit {
         bool         failedPositioning = false;
 
         struct {
-            Abyssutils::Signal::CSignalT<Abyssutils::Math::Vector2D> mouseEnter; // local coords
-            Abyssutils::Signal::CSignalT<Abyssutils::Math::Vector2D> mouseMove;  // local coords
-            Abyssutils::Signal::CSignalT<Input::eMouseButton, bool> mouseButton;
-            Abyssutils::Signal::CSignalT<>                          mouseLeave;
-            Abyssutils::Signal::CSignalT<Input::eAxisAxis, float>   mouseAxis;
-            Abyssutils::Signal::CSignalT<Input::SKeyboardKeyEvent>  key;
-            Abyssutils::Signal::CSignalT<>                          keyboardEnter;
-            Abyssutils::Signal::CSignalT<>                          keyboardLeave;
+            Hyprutils::Signal::CSignalT<Hyprutils::Math::Vector2D> mouseEnter; // local coords
+            Hyprutils::Signal::CSignalT<Hyprutils::Math::Vector2D> mouseMove;  // local coords
+            Hyprutils::Signal::CSignalT<Input::eMouseButton, bool> mouseButton;
+            Hyprutils::Signal::CSignalT<>                          mouseLeave;
+            Hyprutils::Signal::CSignalT<Input::eAxisAxis, float>   mouseAxis;
+            Hyprutils::Signal::CSignalT<Input::SKeyboardKeyEvent>  key;
+            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchDown;
+            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchMotion;
+            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchUp;
+            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchCancel;
+            Hyprutils::Signal::CSignalT<>                          keyboardEnter;
+            Hyprutils::Signal::CSignalT<>                          keyboardLeave;
         } m_externalEvents;
 
         struct {
@@ -63,6 +79,10 @@ namespace Abysstoolkit {
             std::function<void(const Abyssutils::Math::Vector2D&)> mouseMove;
             std::function<void(Input::eMouseButton, bool)>        mouseButton;
             std::function<void(Input::eAxisAxis, float)>          mouseAxis;
+            std::function<void(const Input::STouchEvent&)>        touchDown;
+            std::function<void(const Input::STouchEvent&)>        touchMotion;
+            std::function<void(const Input::STouchEvent&)>        touchUp;
+            std::function<void(const Input::STouchEvent&)>        touchCancel;
             std::function<void()>                                 repositioned;
         } userFns;
 
@@ -71,7 +91,12 @@ namespace Abysstoolkit {
         void                      breadthfirst(const std::function<void(SP<IElement>)>& fn);
         void                      setWindow(SP<IToolkitWindow> w);
         void                      damageEntire();
-        void                      setPosition(const Abyssutils::Math::CBox& box);
+        void                      damagePresentation();
+        void                      setPosition(const Hyprutils::Math::CBox& box);
+        Hyprutils::Math::CBox     presentationBox(const Hyprutils::Math::CBox& box) const;
+        Hyprutils::Math::CBox     presentationSubtreeBox() const;
+        float                     effectiveOpacity() const;
+        bool                      hasActiveGeometry() const;
         void                      setFailedPositioning(bool set);
         Abyssutils::Math::Vector2D maxChildSize(const Abyssutils::Math::Vector2D& parent);
         Abyssutils::Math::Vector2D getPreferredSizeGeneric(const CDynamicSize& size, const Abyssutils::Math::Vector2D& parent);

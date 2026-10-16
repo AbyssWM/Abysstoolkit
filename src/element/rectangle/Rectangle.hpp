@@ -9,16 +9,18 @@ namespace Abysstoolkit {
     struct SRectangleData {
         colorFn      color           = [] { return CAbyssColor{1.F, 1.F, 1.F, 1.F}; };
         int          rounding        = 0;
-        colorFn      borderColor     = [] { return CAbyssColor{1.F, 1.F, 1.F, 1.F}; };
+        gradientFn   borderColor     = [] { return CGradientValueData{CHyprColor{1.F, 1.F, 1.F, 1.F}}; };
         int          borderThickness = 0;
         CDynamicSize size{CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1, 1}};
     };
     struct SRectangleImpl {
-        SRectangleData         data;
+        SRectangleData                                     data;
 
-        PHLANIMVAR<CAbyssColor> color;
-        PHLANIMVAR<CAbyssColor> borderColor;
+        PHLANIMVAR<CHyprColor>                             color;
+        PHLANIMVAR<CGradientValueData>                     borderColor;
+        SP<Hyprutils::Animation::SAnimationPropertyConfig> colorAnimationConfig;
+        SP<Hyprutils::Animation::SAnimationPropertyConfig> borderAnimationConfig;
 
-        WP<CRectangleElement>  self;
+        WP<CRectangleElement>                              self;
     };
 }

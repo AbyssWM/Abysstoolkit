@@ -25,6 +25,7 @@
 #include <wlr-layer-shell-unstable-v1.hpp>
 #include <linux-drm-syncobj-v1.hpp>
 #include <ext-session-lock-v1.hpp>
+#include <keyboard-shortcuts-inhibit-unstable-v1.hpp>
 
 #include <abyssal/allocator/GBM.hpp>
 #include <abyssal/backend/Misc.hpp>
@@ -49,14 +50,21 @@ namespace Abysstoolkit {
         void                         initShell();
         bool                         initDmabuf();
         void                         initIM();
+        void                         initClipboard();
         void                         setCursor(ePointerShape shape);
 
         bool                         dispatchEvents();
+
+        void                         setClipboard(const std::string& text);
+        std::string                  readClipboard();
 
         SP<IWaylandWindow>           windowForSurf(wl_proxy* proxy);
         WP<CWaylandOutput>           outputForHandle(uint32_t handle);
 
         void                         onKey(uint32_t keycode, bool state);
+        void                         onKeyboardEnter(wl_proxy* surf, wl_array* keys);
+        void                         onKeyboardLeave();
+        void                         resetKeyboardState();
         void                         startRepeatTimer();
         void                         stopRepeatTimer();
 
@@ -73,24 +81,31 @@ namespace Abysstoolkit {
             wl_display* display = nullptr;
 
             // hw-s types
-            Abyssutils::Memory::CSharedPointer<CCWlRegistry>                 registry;
-            Abyssutils::Memory::CSharedPointer<CCWlSeat>                     seat;
-            Abyssutils::Memory::CSharedPointer<CCWlShm>                      shm;
-            Abyssutils::Memory::CSharedPointer<CCXdgWmBase>                  xdg;
-            Abyssutils::Memory::CSharedPointer<CCWlCompositor>               compositor;
-            Abyssutils::Memory::CSharedPointer<CCZwpLinuxDmabufV1>           dmabuf;
-            Abyssutils::Memory::CSharedPointer<CCZwpLinuxDmabufFeedbackV1>   dmabufFeedback;
-            Abyssutils::Memory::CSharedPointer<CCWpFractionalScaleManagerV1> fractional;
-            Abyssutils::Memory::CSharedPointer<CCWpViewporter>               viewporter;
-            Abyssutils::Memory::CSharedPointer<CCWlKeyboard>                 keyboard;
-            Abyssutils::Memory::CSharedPointer<CCWlPointer>                  pointer;
-            Abyssutils::Memory::CSharedPointer<CCWpCursorShapeManagerV1>     cursorShapeMgr;
-            Abyssutils::Memory::CSharedPointer<CCWpCursorShapeDeviceV1>      cursorShapeDev;
-            Abyssutils::Memory::CSharedPointer<CCZwpTextInputManagerV3>      textInputManager;
-            Abyssutils::Memory::CSharedPointer<CCZwpTextInputV3>             textInput;
-            Abyssutils::Memory::CSharedPointer<CCZwlrLayerShellV1>           layerShell;
-            Abyssutils::Memory::CSharedPointer<CCWpLinuxDrmSyncobjManagerV1> syncobj;
-            Abyssutils::Memory::CSharedPointer<CCExtSessionLockManagerV1>    sessionLock;
+            Hyprutils::Memory::CSharedPointer<CCWlRegistry>                           registry;
+            Hyprutils::Memory::CSharedPointer<CCWlSeat>                               seat;
+            Hyprutils::Memory::CSharedPointer<CCWlShm>                                shm;
+            Hyprutils::Memory::CSharedPointer<CCXdgWmBase>                            xdg;
+            Hyprutils::Memory::CSharedPointer<CCWlCompositor>                         compositor;
+            Hyprutils::Memory::CSharedPointer<CCZwpLinuxDmabufV1>                     dmabuf;
+            Hyprutils::Memory::CSharedPointer<CCZwpLinuxDmabufFeedbackV1>             dmabufFeedback;
+            Hyprutils::Memory::CSharedPointer<CCWpFractionalScaleManagerV1>           fractional;
+            Hyprutils::Memory::CSharedPointer<CCWpViewporter>                         viewporter;
+            Hyprutils::Memory::CSharedPointer<CCWlKeyboard>                           keyboard;
+            Hyprutils::Memory::CSharedPointer<CCWlPointer>                            pointer;
+            Hyprutils::Memory::CSharedPointer<CCWpCursorShapeManagerV1>               cursorShapeMgr;
+            Hyprutils::Memory::CSharedPointer<CCWpCursorShapeDeviceV1>                cursorShapeDev;
+            Hyprutils::Memory::CSharedPointer<CCZwpTextInputManagerV3>                textInputManager;
+            Hyprutils::Memory::CSharedPointer<CCZwpTextInputV3>                       textInput;
+            Hyprutils::Memory::CSharedPointer<CCZwlrLayerShellV1>                     layerShell;
+            Hyprutils::Memory::CSharedPointer<CCWpLinuxDrmSyncobjManagerV1>           syncobj;
+            Hyprutils::Memory::CSharedPointer<CCExtSessionLockManagerV1>              sessionLock;
+            Hyprutils::Memory::CSharedPointer<CCZwpKeyboardShortcutsInhibitManagerV1> shortcutsInhibitMgr;
+            Hyprutils::Memory::CSharedPointer<CCWlDataDeviceManager>                  dataDeviceManager;
+            Hyprutils::Memory::CSharedPointer<CCWlDataDevice>                         dataDevice;
+            std::vector<Hyprutils::Memory::CSharedPointer<CCWlDataOffer>>             pendingOffers;
+            Hyprutils::Memory::CSharedPointer<CCWlDataOffer>                          currentOffer;
+            Hyprutils::Memory::CSharedPointer<CCWlDataSource>                         currentSource;
+            std::string                                                               currentSourceText;
 
             // control
             bool initialized  = false;
@@ -128,11 +143,14 @@ namespace Abysstoolkit {
 
         std::vector<WP<CWaylandWindow>> m_windows;
         std::vector<WP<CWaylandLayer>>  m_layers;
-        WP<IWaylandWindow>              m_currentWindow;
+        WP<IWaylandWindow>              m_currentWindow;       // window the pointer is over
+        WP<IWaylandWindow>              m_keyboardWindow;      // window the compositor gave keyboard focus
         uint32_t                        m_currentMods     = 0; // HT modifiers, not xkb
         uint32_t                        m_lastEnterSerial = 0;
+        // xdg_toplevel.resize requires the serial of a button PRESS, not release.
+        uint32_t                     m_lastPointerButtonPressSerial = 0;
 
-        WP<CWaylandSessionLockState>    m_sessionLockState;
+        WP<CWaylandSessionLockState> m_sessionLockState;
     };
 
     inline UP<CWaylandPlatform> g_waylandPlatform;

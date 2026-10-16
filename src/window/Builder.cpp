@@ -1,6 +1,7 @@
 #include "Window.hpp"
 #include "../core/InternalBackend.hpp"
-#include <abysstoolkit/core/Output.hpp>
+#include "../core/BackendContext.hpp"
+#include <hyprtoolkit/core/Output.hpp>
 #include "ToolkitWindow.hpp"
 
 using namespace Abysstoolkit;
@@ -39,6 +40,16 @@ SP<CWindowBuilder> CWindowBuilder::minSize(const Abyssutils::Math::Vector2D& x) 
 
 SP<CWindowBuilder> CWindowBuilder::maxSize(const Abyssutils::Math::Vector2D& x) {
     m_data->maxSize = x;
+    return m_self.lock();
+}
+
+SP<CWindowBuilder> CWindowBuilder::resizable(bool x) {
+    m_data->resizable = x;
+    return m_self.lock();
+}
+
+SP<CWindowBuilder> CWindowBuilder::autosize(bool x) {
+    m_data->autosize = x;
     return m_self.lock();
 }
 
@@ -92,6 +103,11 @@ SP<CWindowBuilder> CWindowBuilder::kbInteractive(uint32_t x) {
     return m_self.lock();
 }
 
+SP<CWindowBuilder> CWindowBuilder::inhibitShortcuts(bool x) {
+    m_data->inhibitShortcuts = x;
+    return m_self.lock();
+}
+
 SP<IWindow> CWindowBuilder::commence() {
     switch (m_data->type) {
         case HT_WINDOW_POPUP:
@@ -101,7 +117,10 @@ SP<IWindow> CWindowBuilder::commence() {
             return reinterpretPointerCast<IToolkitWindow>(m_data->parent)->openPopup(*m_data);
         case HT_WINDOW_TOPLEVEL:
         case HT_WINDOW_LAYER:
-        case HT_WINDOW_LOCK_SURFACE: return g_backend->openWindow(*m_data);
+        case HT_WINDOW_LOCK_SURFACE:
+            if (!g_backendServices || !g_backendServices->openWindow)
+                return nullptr;
+            return g_backendServices->openWindow(*m_data);
     }
     return nullptr;
 }

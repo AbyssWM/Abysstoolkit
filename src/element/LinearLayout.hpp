@@ -17,15 +17,16 @@ namespace Abysstoolkit::LinearLayout {
     // children flow along x (row layout); false means they flow along y (column).
     // childSize must return the layout's preferred-or-minimum size for a child.
     template <bool Horizontal>
-    inline void reposition(IElement* self, const Abyssutils::Math::CBox& box, const std::vector<SP<IElement>>& C, float gap, const std::function<Abyssutils::Math::Vector2D(SP<IElement>)>& childSize) {
-        using Vector2D = Abyssutils::Math::Vector2D;
-        using CBox     = Abyssutils::Math::CBox;
+    inline void reposition(IElement* self, const Hyprutils::Math::CBox& box, const std::vector<SP<IElement>>& C, float gap,
+                           const std::function<Hyprutils::Math::Vector2D(SP<IElement>)>& childSize) {
+        using Vector2D = Hyprutils::Math::Vector2D;
+        using CBox     = Hyprutils::Math::CBox;
 
-        auto axisPrimary = [](const Vector2D& v) -> double { return Horizontal ? v.x : v.y; };
-        auto boxPrimary  = [](const CBox& b) -> double { return Horizontal ? b.w : b.h; };
-        auto grows       = [](const SP<IElement>& e) -> bool { return Horizontal ? e->impl->growH : e->impl->growV; };
+        auto                axisPrimary = [](const Vector2D& v) -> double { return Horizontal ? v.x : v.y; };
+        auto                boxPrimary  = [](const CBox& b) -> double { return Horizontal ? b.w : b.h; };
+        auto                grows       = [](const SP<IElement>& e) -> bool { return Horizontal ? e->impl->growH : e->impl->growV; };
 
-        const double        MAX = (double)(uint64_t)boxPrimary(box); // floor to match upstream behavior
+        const double        MAX  = (double)(uint64_t)boxPrimary(box); // floor to match upstream behavior
         double              used = 0;
 
         std::vector<size_t> sizes;
@@ -50,8 +51,11 @@ namespace Abysstoolkit::LinearLayout {
                 cSize = *child->minimumSize(box.size());
 
                 if (used + axisPrimary(cSize) > MAX + 1) {
-                    // doesn't fit: try to shrink any previous element if it allows to do so
-                    // FIXME: if we resize and fail to fit, it will mess up the layout a bit
+                    // doesn't fit: try to shrink any previous element if it
+                    // allows to do so. if we still can't fit after shrinking
+                    // (needs > 0 below), the current child is dropped and we
+                    // expand the previous one to cover the gap; minor visual
+                    // artefact in degenerate cases but the layout stays sane.
                     float needs = (used + axisPrimary(cSize)) - (MAX + 1);
                     for (int j = (int)i - 1; j >= 0; --j) {
                         const auto& prevChild = C.at(j);
@@ -140,14 +144,14 @@ namespace Abysstoolkit::LinearLayout {
 
             Vector2D cSize = childSize(child);
 
-            CBox childBox;
+            CBox     childBox;
             if constexpr (Horizontal) {
-                cSize.y       = std::clamp(cSize.y, 0.0, box.h);
-                childBox      = CBox{box.x + (double)cursor, box.y + ((box.h - cSize.y) / 2), (double)sizes.at(i), cSize.y};
+                cSize.y  = std::clamp(cSize.y, 0.0, box.h);
+                childBox = CBox{box.x + (double)cursor, box.y + ((box.h - cSize.y) / 2), (double)sizes.at(i), cSize.y};
                 g_positioner->position(child, childBox, Vector2D{childBox.w + (MAX - used), box.h});
             } else {
-                cSize.x       = std::clamp(cSize.x, 0.0, box.w);
-                childBox      = CBox{box.x + ((box.w - cSize.x) / 2), box.y + (double)cursor, cSize.x, (double)sizes.at(i)};
+                cSize.x  = std::clamp(cSize.x, 0.0, box.w);
+                childBox = CBox{box.x + ((box.w - cSize.x) / 2), box.y + (double)cursor, cSize.x, (double)sizes.at(i)};
                 g_positioner->position(child, childBox, Vector2D{box.w, childBox.h + (MAX - used)});
             }
 
