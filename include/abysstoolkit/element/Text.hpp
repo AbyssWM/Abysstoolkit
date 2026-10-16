@@ -57,7 +57,7 @@ namespace Abysstoolkit {
         void                                            setText(std::string text);
         void                                            animateColor(const SAnimation& animation);
 
-        HT_HIDDEN : CTextElement(const STextData& data);
+        AT_HIDDEN : CTextElement(const STextData& data);
         static Abyssutils::Memory::CSharedPointer<CTextElement> create(const STextData& data);
 
         void                                                   replaceData(const STextData& data);

@@ -87,7 +87,7 @@ namespace Abysstoolkit {
         // forces a reposition right now, useful for pre-calculating expected sizes
         virtual void forceReposition();
 
-        HT_HIDDEN :
+        AT_HIDDEN :
 
             /* Sizes for auto positioning in layouts */
             virtual std::optional<Abyssutils::Math::Vector2D>

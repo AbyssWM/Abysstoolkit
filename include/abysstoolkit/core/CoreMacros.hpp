@@ -1,5 +1,5 @@
 #pragma once
 
-#ifndef HT_HIDDEN
-#define HT_HIDDEN private
+#ifndef AT_HIDDEN
+#define AT_HIDDEN private
 #endif

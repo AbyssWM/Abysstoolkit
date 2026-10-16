@@ -18,7 +18,7 @@ namespace Abysstoolkit {
 
         Abyssutils::Math::Vector2D calculate(Abyssutils::Math::Vector2D elSize) const;
 
-        HT_HIDDEN :
+        AT_HIDDEN :
 
             bool
             hasAuto();

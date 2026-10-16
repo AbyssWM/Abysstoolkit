@@ -69,7 +69,7 @@ else()
   set(BUILD_TESTING OFF)
 endif()
 
-add_compile_definitions(HT_HIDDEN=public)
+add_compile_definitions(AT_HIDDEN=public)
 
 file(GLOB_RECURSE SRCFILES CONFIGURE_DEPENDS "src/*.cpp" "include/*.hpp")
 file(GLOB_RECURSE PUBLIC_HEADERS CONFIGURE_DEPENDS "include/*.hpp")
@@ -136,7 +136,7 @@ function(protocolWayland)
                                      protocols/wayland.hpp)
 endfunction()
 
-protocolwayland()
+protocolWayland()
 
 protocolnew("stable/xdg-shell" "xdg-shell" false)
 protocolnew("stable/linux-dmabuf" "linux-dmabuf-v1" false)

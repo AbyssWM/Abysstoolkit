@@ -100,6 +100,6 @@ namespace Abysstoolkit {
 
         Abyssutils::Memory::CSharedPointer<IElement> m_rootElement;
 
-        HT_HIDDEN : IWindow() = default;
+        AT_HIDDEN : IWindow() = default;
     };
 };
