@@ -1,0 +1,361 @@
+#!/usr/bin/env python3
+"""
+abyss-preprocess - Config preprocessor for #include.abyss system
+Scans ~/.config/abyss/*.hpp, parses DSL, generates C++ code
+"""
+
+import argparse
+import hashlib
+import json
+import os
+import re
+import sys
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Tuple
+
+
+class ConfigParser:
+    """Parser for abyss DSL config files"""
+    
+    def __init__(self, filepath: Path, app_name: str):
+        self.filepath = filepath
+        self.app_name = app_name
+        self.fields: Dict[str, Tuple[str, Any]] = {}  # name -> (type, value)
+        
+    def parse(self) -> bool:
+        """Parse config file, return True on success"""
+        try:
+            with open(self.filepath, 'r') as f:
+                lines = f.readlines()
+                
+            if not lines:
+                self._error(1, "Empty config file")
+                return False
+                
+            # Check first line for #include.abyss directive
+            first_line = lines[0].strip()
+            if not first_line.startswith('#include.abyss'):
+                return True  # Not an abyss config, skip silently
+                
+            # Parse directive: #include.abyss <app>
+            match = re.match(r'#include\.abyss\s+<(\w+)>', first_line)
+            if not match:
+                self._error(1, f"Invalid #include.abyss syntax: {first_line}\n"
+                           f"  Expected: #include.abyss <app>")
+                return False
+                
+            directive_app = match.group(1)
+            if directive_app != self.app_name:
+                # Wrong app, skip silently
+                return True
+                
+            # Parse rest of file as DSL
+            for line_num, line in enumerate(lines[1:], start=2):
+                line = line.strip()
+                
+                # Skip empty lines and comments
+                if not line or line.startswith('//') or line.startswith('#'):
+                    continue
+                    
+                # Parse key = value
+                if '=' not in line:
+                    self._error(line_num, f"Expected key = value, got: {line}")
+                    return False
+                    
+                key, value = line.split('=', 1)
+                key = key.strip()
+                value = value.strip()
+                
+                if not key:
+                    self._error(line_num, "Empty key name")
+                    return False
+                    
+                # Infer type and parse value
+                parsed_type, parsed_value = self._infer_type(value, line_num)
+                if parsed_type is None:
+                    return False
+                    
+                self.fields[key] = (parsed_type, parsed_value)
+                
+            return True
+            
+        except Exception as e:
+            print(f"ERROR: Failed to parse {self.filepath}: {e}", file=sys.stderr)
+            return False
+            
+    def _infer_type(self, value: str, line_num: int) -> Tuple[Optional[str], Any]:
+        """Infer type from value string, return (type, parsed_value)"""
+        value = value.strip()
+        
+        # String: quoted with ""
+        if value.startswith('"') and value.endswith('"'):
+            content = value[1:-1]
+            # Expand ~ and environment variables
+            expanded = os.path.expanduser(content)
+            expanded = os.path.expandvars(expanded)
+            return ('string', expanded)
+            
+        # Boolean
+        if value == 'true':
+            return ('bool', True)
+        if value == 'false':
+            return ('bool', False)
+            
+        # Float: contains '.'
+        if '.' in value:
+            try:
+                return ('float', float(value))
+            except ValueError:
+                self._error(line_num, f"Invalid float value: {value}")
+                return (None, None)
+                
+        # Int
+        try:
+            return ('int', int(value))
+        except ValueError:
+            self._error(line_num, f"Cannot infer type for value: {value}\n"
+                       f"  Strings must be quoted: \"{value}\"")
+            return (None, None)
+            
+    def _error(self, line_num: int, message: str):
+        """Print error message with line number"""
+        print(f"ERROR in {self.filepath}:{line_num}", file=sys.stderr)
+        print(f"  {message}", file=sys.stderr)
+
+
+class CodeGenerator:
+    """Generate C++ code from parsed config"""
+    
+    def __init__(self, parser: ConfigParser, config_name: str):
+        self.parser = parser
+        self.config_name = config_name
+        
+    def generate(self) -> str:
+        """Generate C++ header code"""
+        # Sanitize config name for namespace (replace - with _)
+        namespace_name = self.config_name.replace('-', '_').replace('.', '_')
+        
+        lines = [
+            "#pragma once",
+            "// Auto-generated by abyss-preprocess",
+            "// DO NOT EDIT",
+            "",
+            "#include <string>",
+            "#include <map>",
+            "#include <vector>",
+            "",
+            f"namespace abyss::{self.parser.app_name}::{namespace_name} {{",
+            "",
+        ]
+        
+        # Generate constexpr variables for each field
+        for key, (type_name, value) in self.parser.fields.items():
+            cpp_type, cpp_value = self._to_cpp(type_name, value)
+            lines.append(f"    inline constexpr {cpp_type} {key} = {cpp_value};")
+            
+        lines.extend([
+            "",
+            f"}} // namespace abyss::{self.parser.app_name}::{namespace_name}",
+            ""
+        ])
+        
+        return '\n'.join(lines)
+        
+    def _to_cpp(self, type_name: str, value: Any) -> Tuple[str, str]:
+        """Convert Python type/value to C++ type/value"""
+        if type_name == 'string':
+            # For strings, use const char* with inline storage
+            escaped = value.replace('\\', '\\\\').replace('"', '\\"')
+            return ('const char*', f'"{escaped}"')
+        elif type_name == 'bool':
+            return ('bool', 'true' if value else 'false')
+        elif type_name == 'int':
+            return ('int', str(value))
+        elif type_name == 'float':
+            return ('float', f'{value}f')
+        else:
+            raise ValueError(f"Unknown type: {type_name}")
+
+
+class Preprocessor:
+    """Main preprocessor class"""
+    
+    def __init__(self, app_name: str, config_dir: Path, output_dir: Path):
+        self.app_name = app_name
+        self.config_dir = config_dir
+        self.output_dir = output_dir
+        self.manifest: Dict[str, Any] = {
+            'app': app_name,
+            'configs': []
+        }
+        
+    def process_all(self) -> bool:
+        """Process all config files for this app"""
+        # Create output directory
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Find all .hpp files in config dir
+        if not self.config_dir.exists():
+            print(f"Config directory {self.config_dir} does not exist, creating empty manifest", 
+                  file=sys.stderr)
+            self._write_manifest()
+            return True
+            
+        hpp_files = list(self.config_dir.glob('*.hpp'))
+        
+        if not hpp_files:
+            print(f"No .hpp files found in {self.config_dir}, creating empty manifest")
+            self._write_manifest()
+            return True
+            
+        # Process each file
+        success = True
+        for hpp_file in hpp_files:
+            if not self._process_file(hpp_file):
+                success = False
+                
+        # Write manifest
+        self._write_manifest()
+        
+        return success
+        
+    def _process_file(self, filepath: Path) -> bool:
+        """Process single config file"""
+        config_name = filepath.stem  # filename without extension
+        
+        # Parse file
+        parser = ConfigParser(filepath, self.app_name)
+        parse_result = parser.parse()
+        
+        # If parse failed with error, return False
+        # If parse succeeded but no fields (wrong app), return True (skip silently)
+        if not parse_result:
+            return True  # Skip files for other apps
+            
+        # Check if this file is for our app
+        if not parser.fields:
+            return True  # Skip empty configs
+            
+        # Generate C++ code
+        generator = CodeGenerator(parser, config_name)
+        cpp_code = generator.generate()
+        
+        # Write processed file
+        output_file = self.output_dir / f"{config_name}.processed.hpp"
+        output_file.write_text(cpp_code)
+        
+        # Calculate hash for caching
+        file_hash = self._hash_file(filepath)
+        
+        # Add to manifest
+        self.manifest['configs'].append({
+            'name': config_name,
+            'source': str(filepath.absolute()),
+            'processed': str(output_file.absolute()),
+            'hash': file_hash
+        })
+        
+        print(f"Processed: {config_name}.hpp -> {config_name}.processed.hpp")
+        return True
+        
+    def _hash_file(self, filepath: Path) -> str:
+        """Calculate SHA256 hash of file"""
+        sha256 = hashlib.sha256()
+        with open(filepath, 'rb') as f:
+            sha256.update(f.read())
+        return f"sha256:{sha256.hexdigest()}"
+        
+    def _write_manifest(self):
+        """Write manifest.json"""
+        manifest_file = self.output_dir / 'manifest.json'
+        with open(manifest_file, 'w') as f:
+            json.dump(self.manifest, f, indent=2)
+        print(f"Wrote manifest: {manifest_file}")
+        
+    def generate_cmake_header(self, output_file: Path) -> bool:
+        """Generate CMake header that includes all processed configs"""
+        if not self.manifest['configs']:
+            # No configs, generate empty header
+            lines = [
+                "#pragma once",
+                "// Auto-generated by abyss-preprocess",
+                "// No configurations found",
+                "",
+                f"namespace abyss::{self.app_name} {{",
+                "    // No configs available",
+                "}",
+                ""
+            ]
+        else:
+            lines = [
+                "#pragma once",
+                "// Auto-generated by abyss-preprocess",
+                "// DO NOT EDIT",
+                "",
+            ]
+            
+            # Include all processed headers
+            for config in self.manifest['configs']:
+                lines.append(f"#include \"{config['processed']}\"")
+                
+            lines.extend([
+                "",
+                "// Config names for runtime access",
+                f"namespace abyss::{self.app_name} {{",
+                "",
+            ])
+            
+            # Generate config name list
+            config_names = [f'    "{c["name"]}"' for c in self.manifest['configs']]
+            lines.append("    inline constexpr const char* AVAILABLE_CONFIGS[] = {")
+            lines.append(',\n'.join(config_names))
+            lines.append("    };")
+            lines.append("")
+            lines.append(f"    inline constexpr int NUM_CONFIGS = {len(self.manifest['configs'])};")
+            
+            lines.extend([
+                "",
+                f"}} // namespace abyss::{self.app_name}",
+                ""
+            ])
+            
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        output_file.write_text('\n'.join(lines))
+        print(f"Generated CMake header: {output_file}")
+        return True
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Preprocess #include.abyss config files'
+    )
+    parser.add_argument('--app', required=True,
+                       help='App name (e.g., paper, lock, picker)')
+    parser.add_argument('--config-dir', required=True,
+                       help='Config directory (e.g., ~/.config/abyss)')
+    parser.add_argument('--output-dir', required=True,
+                       help='Output directory for processed files')
+    parser.add_argument('--generate-header',
+                       help='Generate CMake header file at this path')
+    
+    args = parser.parse_args()
+    
+    # Expand paths
+    config_dir = Path(args.config_dir).expanduser()
+    output_dir = Path(args.output_dir).expanduser()
+    
+    # Process configs
+    preprocessor = Preprocessor(args.app, config_dir, output_dir)
+    success = preprocessor.process_all()
+    
+    # Generate CMake header if requested
+    if args.generate_header:
+        header_path = Path(args.generate_header)
+        if not preprocessor.generate_cmake_header(header_path):
+            success = False
+            
+    return 0 if success else 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())
