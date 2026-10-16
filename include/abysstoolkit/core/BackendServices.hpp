@@ -7,15 +7,15 @@
 #include <string>
 #include <vector>
 
-#include <hyprutils/math/Box.hpp>
-#include <hyprutils/memory/Atomic.hpp>
-#include <hyprutils/memory/SharedPtr.hpp>
-#include <hyprutils/signal/Signal.hpp>
+#include <abyssutils/math/Box.hpp>
+#include <abyssutils/memory/Atomic.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
+#include <abyssutils/signal/Signal.hpp>
 
 #include "../types/PointerShape.hpp"
 #include "SessionLock.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CTimer;
     class IOutput;
 
@@ -30,8 +30,8 @@ namespace Hyprtoolkit {
         // surfaces. The host retains callbacks until they run or are removed.
         virtual void addFd(int fd, std::function<void()>&& callback) = 0;
         virtual void removeFd(int fd)                                = 0;
-        virtual Hyprutils::Memory::CAtomicSharedPointer<CTimer>
-        addTimer(const TimerDuration& timeout, std::function<void(Hyprutils::Memory::CAtomicSharedPointer<CTimer> self, void* data)> callback, void* data, bool force = false) = 0;
+        virtual Abyssutils::Memory::CAtomicSharedPointer<CTimer>
+        addTimer(const TimerDuration& timeout, std::function<void(Abyssutils::Memory::CAtomicSharedPointer<CTimer> self, void* data)> callback, void* data, bool force = false) = 0;
         virtual void addIdle(const std::function<void()>& callback)                                                                                                            = 0;
         virtual void cancelPending()                                                                                                                                           = 0;
 
@@ -52,7 +52,7 @@ namespace Hyprtoolkit {
         virtual ~ITextInput() = default;
 
         // surface is zero for native backend windows.
-        virtual void activate(EmbeddedSurfaceID surface, const Hyprutils::Math::CBox& cursorBox, const std::string& surroundingText, size_t cursor) = 0;
+        virtual void activate(EmbeddedSurfaceID surface, const Abyssutils::Math::CBox& cursorBox, const std::string& surroundingText, size_t cursor) = 0;
         virtual void deactivate(EmbeddedSurfaceID surface)                                                                                          = 0;
     };
 
@@ -68,10 +68,10 @@ namespace Hyprtoolkit {
       public:
         virtual ~IOutputProvider() = default;
 
-        virtual std::vector<Hyprutils::Memory::CSharedPointer<IOutput>> outputs() = 0;
+        virtual std::vector<Abyssutils::Memory::CSharedPointer<IOutput>> outputs() = 0;
 
         struct {
-            Hyprutils::Signal::CSignalT<Hyprutils::Memory::CSharedPointer<IOutput>> outputAdded;
+            Abyssutils::Signal::CSignalT<Abyssutils::Memory::CSharedPointer<IOutput>> outputAdded;
         } m_events;
     };
 
@@ -79,6 +79,6 @@ namespace Hyprtoolkit {
       public:
         virtual ~ISessionLockProvider() = default;
 
-        virtual std::expected<Hyprutils::Memory::CSharedPointer<ISessionLockState>, eSessionLockError> acquire() = 0;
+        virtual std::expected<Abyssutils::Memory::CSharedPointer<ISessionLockState>, eSessionLockError> acquire() = 0;
     };
 }

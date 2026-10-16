@@ -5,14 +5,14 @@
 #include <functional>
 #include <vector>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     struct CGradientValueData {
-        std::vector<CHyprColor> m_vColors;
+        std::vector<CAbyssColor> m_vColors;
         float                   m_fAngle = 0.F;
 
         CGradientValueData() = default;
-        CGradientValueData(const CHyprColor& col) : m_vColors{col} {}
+        CGradientValueData(const CAbyssColor& col) : m_vColors{col} {}
 
         bool operator==(const CGradientValueData& rhs) const;
     };

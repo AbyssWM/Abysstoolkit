@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 
-#include <hyprtoolkit/element/Combobox.hpp>
+#include <abysstoolkit/element/Combobox.hpp>
 
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 TEST(Element, comboboxNormalizesSelection) {
     Tests::Tricks::createBackendSupport();

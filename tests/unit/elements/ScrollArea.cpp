@@ -1,17 +1,17 @@
 #include <gtest/gtest.h>
 
-#include <hyprtoolkit/element/ScrollArea.hpp>
-#include <hyprtoolkit/element/Null.hpp>
-#include <hyprtoolkit/element/ColumnLayout.hpp>
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/core/Input.hpp>
+#include <abysstoolkit/element/ScrollArea.hpp>
+#include <abysstoolkit/element/Null.hpp>
+#include <abysstoolkit/element/ColumnLayout.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/core/Input.hpp>
 #include <layout/Positioner.hpp>
 
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 // the scrollbar thumb is sized and placed from the max scroll offset, so the
 // clamp has to report the real content overflow. content 500 tall in a 100 tall

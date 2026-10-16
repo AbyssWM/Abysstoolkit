@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <hyprtoolkit/core/Animation.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/core/Animation.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
 
 #include <element/Element.hpp>
 #include <layout/Positioner.hpp>
 
 #include "../tricks/Tricks.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 using namespace std::chrono_literals;
 
 TEST(Animation, opacityPolicyAppliesToFutureChanges) {

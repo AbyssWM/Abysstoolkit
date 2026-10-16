@@ -1,12 +1,12 @@
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/window/Window.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/window/Window.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
 
-#include <hyprutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
 
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
-using namespace Hyprtoolkit;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
+using namespace Abysstoolkit;
 
 #define SP CSharedPointer
 #define WP CWeakPointer
@@ -16,11 +16,11 @@ static SP<CRectangleElement> anchor;
 static int                   step = 0;
 
 static void schedule();
-static void tick(Hyprutils::Memory::CAtomicSharedPointer<CTimer>, void*) {
+static void tick(Abyssutils::Memory::CAtomicSharedPointer<CTimer>, void*) {
     const float sizes[][2] = {{240, 80}, {300, 200}, {500, 350}, {180, 120}, {900, 700}};
     const auto& s          = sizes[step++ % 5];
     anchor->rebuild()
-        ->color([] { return CHyprColor{0.F, 0.F, 0.F, 0.F}; })
+        ->color([] { return CAbyssColor{0.F, 0.F, 0.F, 0.F}; })
         ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {s[0], s[1]}})
         ->commence();
     schedule();
@@ -38,12 +38,12 @@ int main() {
                       ->maxSize({1600, 1200})
                       ->autosize(true)
                       ->appTitle("Autosize Demo")
-                      ->appClass("hyprtoolkit-autosize")
+                      ->appClass("abysstoolkit-autosize")
                       ->commence();
 
     // green fill covers whatever size the window ends up at, including fullscreen
     auto fill = CRectangleBuilder::begin()
-                    ->color([] { return CHyprColor{0.3F, 0.7F, 0.4F, 1.F}; })
+                    ->color([] { return CAbyssColor{0.3F, 0.7F, 0.4F, 1.F}; })
                     ->rounding(6)
                     ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}})
                     ->commence();
@@ -51,7 +51,7 @@ int main() {
 
     // invisible ABSOLUTE-sized anchor drives autosize via its preferredSize
     anchor = CRectangleBuilder::begin()
-                 ->color([] { return CHyprColor{0.F, 0.F, 0.F, 0.F}; })
+                 ->color([] { return CAbyssColor{0.F, 0.F, 0.F, 0.F}; })
                  ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {240.F, 80.F}})
                  ->commence();
     window->m_rootElement->addChild(anchor);

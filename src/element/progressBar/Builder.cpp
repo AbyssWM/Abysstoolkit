@@ -1,6 +1,6 @@
 #include "ProgressBar.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<CProgressBarBuilder> CProgressBarBuilder::begin() {
     SP<CProgressBarBuilder> p = SP<CProgressBarBuilder>(new CProgressBarBuilder());

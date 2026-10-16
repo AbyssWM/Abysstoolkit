@@ -2,9 +2,9 @@
 #include <cmath>
 #include <algorithm>
 
-#include <hyprtoolkit/element/Null.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/element/Null.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 
 #include "../../layout/Positioner.hpp"
 #include "../../core/InternalBackend.hpp"
@@ -12,8 +12,8 @@
 
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 constexpr float SCROLLBAR_W   = 6.F;  // thickness of the bar
 constexpr float SCROLLBAR_PAD = 2.F;  // gap at each end of the track

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/core/BackendServices.hpp>
-#include <hyprutils/eventLoop/EventLoop.hpp>
-#include <hyprutils/os/FileDescriptor.hpp>
-#include <hyprutils/cli/Logger.hpp>
-#include <hyprgraphics/resource/AsyncResourceGatherer.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/core/BackendServices.hpp>
+#include <abyssutils/eventLoop/EventLoop.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
+#include <abyssutils/cli/Logger.hpp>
+#include <abyssgraphics/resource/AsyncResourceGatherer.hpp>
 
 #include <atomic>
 #include <mutex>
@@ -53,7 +53,7 @@ namespace Abysstoolkit {
 
         //
 
-        Hyprutils::Memory::CSharedPointer<Aquamarine::CBackend> m_aqBackend;
+        Abyssutils::Memory::CSharedPointer<Abyssal::CBackend> m_aqBackend;
 
         std::atomic<bool>                                       m_terminate = false;
         std::atomic<bool>                                       m_cleaned   = false;
@@ -63,26 +63,26 @@ namespace Abysstoolkit {
 
         struct SFDListener {
             int                                                                fd = -1;
-            Hyprutils::Memory::CSharedPointer<Hyprutils::EventLoop::IFDSource> source;
+            Abyssutils::Memory::CSharedPointer<Abyssutils::EventLoop::IFDSource> source;
         };
 
         struct STimer {
-            Hyprutils::Memory::CAtomicSharedPointer<CTimer>                 timer;
-            Hyprutils::Memory::CSharedPointer<Hyprutils::EventLoop::ITimer> loopTimer;
+            Abyssutils::Memory::CAtomicSharedPointer<CTimer>                 timer;
+            Abyssutils::Memory::CSharedPointer<Abyssutils::EventLoop::ITimer> loopTimer;
         };
 
         bool initializeEventLoop();
-        void dispatchWayland(Hyprutils::EventLoop::IFDSource& source, Hyprutils::EventLoop::FdEventMask events);
-        void flushWayland(Hyprutils::EventLoop::IFDSource& source);
+        void dispatchWayland(Abyssutils::EventLoop::IFDSource& source, Abyssutils::EventLoop::FdEventMask events);
+        void flushWayland(Abyssutils::EventLoop::IFDSource& source);
         void cleanup();
-        void registerTimer(const Hyprutils::Memory::CAtomicSharedPointer<CTimer>& timer, const std::chrono::steady_clock::time_point& expires);
+        void registerTimer(const Abyssutils::Memory::CAtomicSharedPointer<CTimer>& timer, const std::chrono::steady_clock::time_point& expires);
         void removeTimer(CTimer* timer);
 
-        Hyprutils::Memory::CSharedPointer<Hyprutils::EventLoop::IEventLoop>          m_eventLoop;
-        Hyprutils::Memory::CAtomicSharedPointer<Hyprutils::EventLoop::ILoopExecutor> m_eventLoopExecutor;
-        Hyprutils::Memory::CSharedPointer<Hyprutils::EventLoop::IFDSource>           m_waylandSource;
-        Hyprutils::Memory::CSharedPointer<Hyprutils::EventLoop::IFDSource>           m_configSource;
-        Hyprutils::Memory::CSharedPointer<Hyprutils::EventLoop::IPostDispatchHook>   m_waylandPostDispatch;
+        Abyssutils::Memory::CSharedPointer<Abyssutils::EventLoop::IEventLoop>          m_eventLoop;
+        Abyssutils::Memory::CAtomicSharedPointer<Abyssutils::EventLoop::ILoopExecutor> m_eventLoopExecutor;
+        Abyssutils::Memory::CSharedPointer<Abyssutils::EventLoop::IFDSource>           m_waylandSource;
+        Abyssutils::Memory::CSharedPointer<Abyssutils::EventLoop::IFDSource>           m_configSource;
+        Abyssutils::Memory::CSharedPointer<Abyssutils::EventLoop::IPostDispatchHook>   m_waylandPostDispatch;
         bool                                                                         m_waylandWantsWrite = false;
         std::atomic<uint64_t>                                                        m_pendingGeneration = 0;
 

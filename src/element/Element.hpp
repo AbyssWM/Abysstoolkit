@@ -42,10 +42,10 @@ namespace Abysstoolkit {
         bool                                                     opacityAnimated  = false;
         bool                                                     geometryAnimated = false;
         PHLANIMVAR<float>                                        animatedOpacity;
-        PHLANIMVAR<Hyprutils::Math::CBox>                        animatedGeometry;
-        SP<Hyprutils::Animation::SAnimationPropertyConfig>       opacityAnimationConfig;
-        SP<Hyprutils::Animation::SAnimationPropertyConfig>       geometryAnimationConfig;
-        Hyprutils::Math::CBox                                    lastPresentationBounds;
+        PHLANIMVAR<Abyssutils::Math::CBox>                        animatedGeometry;
+        SP<Abyssutils::Animation::SAnimationPropertyConfig>       opacityAnimationConfig;
+        SP<Abyssutils::Animation::SAnimationPropertyConfig>       geometryAnimationConfig;
+        Abyssutils::Math::CBox                                    lastPresentationBounds;
 
         // tooltip
         std::string tooltip    = "";
@@ -59,18 +59,18 @@ namespace Abysstoolkit {
         bool         failedPositioning = false;
 
         struct {
-            Hyprutils::Signal::CSignalT<Hyprutils::Math::Vector2D> mouseEnter; // local coords
-            Hyprutils::Signal::CSignalT<Hyprutils::Math::Vector2D> mouseMove;  // local coords
-            Hyprutils::Signal::CSignalT<Input::eMouseButton, bool> mouseButton;
-            Hyprutils::Signal::CSignalT<>                          mouseLeave;
-            Hyprutils::Signal::CSignalT<Input::eAxisAxis, float>   mouseAxis;
-            Hyprutils::Signal::CSignalT<Input::SKeyboardKeyEvent>  key;
-            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchDown;
-            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchMotion;
-            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchUp;
-            Hyprutils::Signal::CSignalT<Input::STouchEvent>        touchCancel;
-            Hyprutils::Signal::CSignalT<>                          keyboardEnter;
-            Hyprutils::Signal::CSignalT<>                          keyboardLeave;
+            Abyssutils::Signal::CSignalT<Abyssutils::Math::Vector2D> mouseEnter; // local coords
+            Abyssutils::Signal::CSignalT<Abyssutils::Math::Vector2D> mouseMove;  // local coords
+            Abyssutils::Signal::CSignalT<Input::eMouseButton, bool> mouseButton;
+            Abyssutils::Signal::CSignalT<>                          mouseLeave;
+            Abyssutils::Signal::CSignalT<Input::eAxisAxis, float>   mouseAxis;
+            Abyssutils::Signal::CSignalT<Input::SKeyboardKeyEvent>  key;
+            Abyssutils::Signal::CSignalT<Input::STouchEvent>        touchDown;
+            Abyssutils::Signal::CSignalT<Input::STouchEvent>        touchMotion;
+            Abyssutils::Signal::CSignalT<Input::STouchEvent>        touchUp;
+            Abyssutils::Signal::CSignalT<Input::STouchEvent>        touchCancel;
+            Abyssutils::Signal::CSignalT<>                          keyboardEnter;
+            Abyssutils::Signal::CSignalT<>                          keyboardLeave;
         } m_externalEvents;
 
         struct {
@@ -92,9 +92,9 @@ namespace Abysstoolkit {
         void                      setWindow(SP<IToolkitWindow> w);
         void                      damageEntire();
         void                      damagePresentation();
-        void                      setPosition(const Hyprutils::Math::CBox& box);
-        Hyprutils::Math::CBox     presentationBox(const Hyprutils::Math::CBox& box) const;
-        Hyprutils::Math::CBox     presentationSubtreeBox() const;
+        void                      setPosition(const Abyssutils::Math::CBox& box);
+        Abyssutils::Math::CBox     presentationBox(const Abyssutils::Math::CBox& box) const;
+        Abyssutils::Math::CBox     presentationSubtreeBox() const;
         float                     effectiveOpacity() const;
         bool                      hasActiveGeometry() const;
         void                      setFailedPositioning(bool set);

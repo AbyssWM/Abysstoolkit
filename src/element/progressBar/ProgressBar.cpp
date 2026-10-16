@@ -1,6 +1,6 @@
 #include "ProgressBar.hpp"
 
-#include <hyprtoolkit/palette/Palette.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
 #include <algorithm>
 
 #include "../../core/AnimationManager.hpp"
@@ -9,9 +9,9 @@
 #include "../../window/ToolkitWindow.hpp"
 #include "../Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
-using CBAV = Hyprutils::Animation::CBaseAnimatedVariable;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
+using CBAV = Abyssutils::Animation::CBaseAnimatedVariable;
 
 SP<CProgressBarElement> CProgressBarElement::create(const SProgressBarData& data) {
     auto p          = SP<CProgressBarElement>(new CProgressBarElement(data));
@@ -99,7 +99,7 @@ void CProgressBarElement::paint() {
     ;
 }
 
-void CProgressBarElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CProgressBarElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
     g_positioner->positionChildren(impl->self.lock());
 }
@@ -142,19 +142,19 @@ void CProgressBarElement::setValue(float v) {
         m_impl->applyValue();
 }
 
-Hyprutils::Math::Vector2D CProgressBarElement::size() {
+Abyssutils::Math::Vector2D CProgressBarElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CProgressBarElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CProgressBarElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CProgressBarElement::minimumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CProgressBarElement::minimumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 
-std::optional<Vector2D> CProgressBarElement::maximumSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CProgressBarElement::maximumSize(const Abyssutils::Math::Vector2D& parent) {
     return m_impl->data.size.calculate(parent);
 }
 

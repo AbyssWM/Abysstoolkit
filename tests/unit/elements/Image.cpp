@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <element/image/Image.hpp>
-#include <hyprgraphics/resource/resources/ImageResource.hpp>
-#include <hyprtoolkit/system/Icons.hpp>
+#include <abyssgraphics/resource/resources/ImageResource.hpp>
+#include <abysstoolkit/system/Icons.hpp>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 class CDummyIcon final : public ISystemIconDescription {
   public:
@@ -19,7 +19,7 @@ class CDummyIcon final : public ISystemIconDescription {
 
 // the cache key has to encode the fit mode, otherwise two elements sharing a path but rendering
 // with different fit modes collide on one cached texture (the texture bakes in the fit mode). this
-// is the hyprpaper "same image, two monitors, different fit_mode" bug.
+// is the abysspaper "same image, two monitors, different fit_mode" bug.
 TEST(Element, imageCacheStringEncodesFitMode) {
     SImageImpl a, b;
     a.data.path = b.data.path = "wallpaper.png";

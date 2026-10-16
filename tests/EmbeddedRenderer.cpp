@@ -4,13 +4,13 @@
 #include <EGL/eglext.h>
 #include <GLES3/gl32.h>
 
-#include <hyprtoolkit/core/EmbeddedBackend.hpp>
-#include <hyprtoolkit/core/Timer.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/window/EmbeddedSurface.hpp>
+#include <abysstoolkit/core/EmbeddedBackend.hpp>
+#include <abysstoolkit/core/Timer.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/window/EmbeddedSurface.hpp>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Memory;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Memory;
 
 class CTestEventLoop final : public IEventLoop {
   public:
@@ -98,7 +98,7 @@ TEST_F(CEmbeddedRendererTest, rendersAndRestoresHostState) {
     ASSERT_TRUE(surface);
 
     surface->rootElement()->addChild(CRectangleBuilder::begin()
-                                         ->color([] { return CHyprColor{1.F, 0.F, 0.F, 1.F}; })
+                                         ->color([] { return CAbyssColor{1.F, 0.F, 0.F, 1.F}; })
                                          ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_PERCENT, {1.F, 1.F}})
                                          ->commence());
     surface->resize({64, 64}, {64, 64}, 1.F);

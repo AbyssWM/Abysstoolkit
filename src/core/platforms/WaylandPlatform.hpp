@@ -81,30 +81,30 @@ namespace Abysstoolkit {
             wl_display* display = nullptr;
 
             // hw-s types
-            Hyprutils::Memory::CSharedPointer<CCWlRegistry>                           registry;
-            Hyprutils::Memory::CSharedPointer<CCWlSeat>                               seat;
-            Hyprutils::Memory::CSharedPointer<CCWlShm>                                shm;
-            Hyprutils::Memory::CSharedPointer<CCXdgWmBase>                            xdg;
-            Hyprutils::Memory::CSharedPointer<CCWlCompositor>                         compositor;
-            Hyprutils::Memory::CSharedPointer<CCZwpLinuxDmabufV1>                     dmabuf;
-            Hyprutils::Memory::CSharedPointer<CCZwpLinuxDmabufFeedbackV1>             dmabufFeedback;
-            Hyprutils::Memory::CSharedPointer<CCWpFractionalScaleManagerV1>           fractional;
-            Hyprutils::Memory::CSharedPointer<CCWpViewporter>                         viewporter;
-            Hyprutils::Memory::CSharedPointer<CCWlKeyboard>                           keyboard;
-            Hyprutils::Memory::CSharedPointer<CCWlPointer>                            pointer;
-            Hyprutils::Memory::CSharedPointer<CCWpCursorShapeManagerV1>               cursorShapeMgr;
-            Hyprutils::Memory::CSharedPointer<CCWpCursorShapeDeviceV1>                cursorShapeDev;
-            Hyprutils::Memory::CSharedPointer<CCZwpTextInputManagerV3>                textInputManager;
-            Hyprutils::Memory::CSharedPointer<CCZwpTextInputV3>                       textInput;
-            Hyprutils::Memory::CSharedPointer<CCZwlrLayerShellV1>                     layerShell;
-            Hyprutils::Memory::CSharedPointer<CCWpLinuxDrmSyncobjManagerV1>           syncobj;
-            Hyprutils::Memory::CSharedPointer<CCExtSessionLockManagerV1>              sessionLock;
-            Hyprutils::Memory::CSharedPointer<CCZwpKeyboardShortcutsInhibitManagerV1> shortcutsInhibitMgr;
-            Hyprutils::Memory::CSharedPointer<CCWlDataDeviceManager>                  dataDeviceManager;
-            Hyprutils::Memory::CSharedPointer<CCWlDataDevice>                         dataDevice;
-            std::vector<Hyprutils::Memory::CSharedPointer<CCWlDataOffer>>             pendingOffers;
-            Hyprutils::Memory::CSharedPointer<CCWlDataOffer>                          currentOffer;
-            Hyprutils::Memory::CSharedPointer<CCWlDataSource>                         currentSource;
+            Abyssutils::Memory::CSharedPointer<CCWlRegistry>                           registry;
+            Abyssutils::Memory::CSharedPointer<CCWlSeat>                               seat;
+            Abyssutils::Memory::CSharedPointer<CCWlShm>                                shm;
+            Abyssutils::Memory::CSharedPointer<CCXdgWmBase>                            xdg;
+            Abyssutils::Memory::CSharedPointer<CCWlCompositor>                         compositor;
+            Abyssutils::Memory::CSharedPointer<CCZwpLinuxDmabufV1>                     dmabuf;
+            Abyssutils::Memory::CSharedPointer<CCZwpLinuxDmabufFeedbackV1>             dmabufFeedback;
+            Abyssutils::Memory::CSharedPointer<CCWpFractionalScaleManagerV1>           fractional;
+            Abyssutils::Memory::CSharedPointer<CCWpViewporter>                         viewporter;
+            Abyssutils::Memory::CSharedPointer<CCWlKeyboard>                           keyboard;
+            Abyssutils::Memory::CSharedPointer<CCWlPointer>                            pointer;
+            Abyssutils::Memory::CSharedPointer<CCWpCursorShapeManagerV1>               cursorShapeMgr;
+            Abyssutils::Memory::CSharedPointer<CCWpCursorShapeDeviceV1>                cursorShapeDev;
+            Abyssutils::Memory::CSharedPointer<CCZwpTextInputManagerV3>                textInputManager;
+            Abyssutils::Memory::CSharedPointer<CCZwpTextInputV3>                       textInput;
+            Abyssutils::Memory::CSharedPointer<CCZwlrLayerShellV1>                     layerShell;
+            Abyssutils::Memory::CSharedPointer<CCWpLinuxDrmSyncobjManagerV1>           syncobj;
+            Abyssutils::Memory::CSharedPointer<CCExtSessionLockManagerV1>              sessionLock;
+            Abyssutils::Memory::CSharedPointer<CCZwpKeyboardShortcutsInhibitManagerV1> shortcutsInhibitMgr;
+            Abyssutils::Memory::CSharedPointer<CCWlDataDeviceManager>                  dataDeviceManager;
+            Abyssutils::Memory::CSharedPointer<CCWlDataDevice>                         dataDevice;
+            std::vector<Abyssutils::Memory::CSharedPointer<CCWlDataOffer>>             pendingOffers;
+            Abyssutils::Memory::CSharedPointer<CCWlDataOffer>                          currentOffer;
+            Abyssutils::Memory::CSharedPointer<CCWlDataSource>                         currentSource;
             std::string                                                               currentSourceText;
 
             // control

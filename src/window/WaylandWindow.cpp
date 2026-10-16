@@ -319,7 +319,7 @@ void CWaylandWindow::onPreRender() {
         return;
 
     // skip when the compositor must control our size. MAXIMIZED is intentionally
-    // not in this list: hyprland tags floating windows with it and we'd never
+    // not in this list: abyssland tags floating windows with it and we'd never
     // autosize otherwise. on strict compositors this risks a protocol error.
     if (m_isFullscreen || m_isResizing)
         return;

@@ -20,24 +20,24 @@ set(LIBDIR ${CMAKE_INSTALL_FULL_LIBDIR})
 
 find_package(PkgConfig REQUIRED)
 find_package(OpenGL REQUIRED COMPONENTS "GLES3")
-find_package(hyprwayland-scanner 0.4.0 REQUIRED)
+find_package(abyss-scanner 0.4.0 REQUIRED)
 
-set(AQUAMARINE_MINIMUM_VERSION 0.10.0)
-set(HYPRLANG_MINIMUM_VERSION 0.6.0)
-set(HYPRUTILS_MINIMUM_VERSION 0.14.2)
-set(HYPRGRAPHICS_MINIMUM_VERSION 0.3.0)
+set(ABYSSAL_MINIMUM_VERSION 0.10.0)
+set(ABYSSPARSE_MINIMUM_VERSION 0.6.0)
+set(ABYSSUTILS_MINIMUM_VERSION 0.14.2)
+set(ABYSSGRAPHICS_MINIMUM_VERSION 0.3.0)
 
 # quotes and the spaces around '>=' in the list below are necessary for compability with pkg-config grama
 set(PUBLIC_PKG_DEPS
-    "aquamarine >= ${AQUAMARINE_MINIMUM_VERSION}"
-    "hyprgraphics >= ${HYPRGRAPHICS_MINIMUM_VERSION}"
-    "hyprutils >= ${HYPRUTILS_MINIMUM_VERSION}"
+    "abyssal >= ${ABYSSAL_MINIMUM_VERSION}"
+    "abyssgraphics >= ${ABYSSGRAPHICS_MINIMUM_VERSION}"
+    "abyssutils >= ${ABYSSUTILS_MINIMUM_VERSION}"
 )
 set(PRIVATE_PKG_DEPS
     wayland-client
     wayland-protocols
     egl
-    "hyprlang >= ${HYPRLANG_MINIMUM_VERSION}"
+    "abyssparse >= ${ABYSSPARSE_MINIMUM_VERSION}"
     pixman-1
     libdrm
     gbm
@@ -49,8 +49,8 @@ set(PRIVATE_PKG_DEPS
     absl_flat_hash_map)
 
 set(ALL_PKG_DEPS ${PUBLIC_PKG_DEPS} ${PRIVATE_PKG_DEPS})
-set(HYPRTOOLKIT_PUBLIC_REQUIRES ${PUBLIC_PKG_DEPS})
-set(HYPRTOOLKIT_PRIVATE_REQUIRES ${PRIVATE_PKG_DEPS})
+set(ABYSSTOOLKIT_PUBLIC_REQUIRES ${PUBLIC_PKG_DEPS})
+set(ABYSSTOOLKIT_PRIVATE_REQUIRES ${PRIVATE_PKG_DEPS})
 
 pkg_check_modules(deps REQUIRED IMPORTED_TARGET ${ALL_PKG_DEPS})
 
@@ -82,25 +82,25 @@ target_include_directories(
   abysstoolkit
   PUBLIC "./include"
   PRIVATE "./src" "./src/include" "./protocols" "${CMAKE_BINARY_DIR}")
-set_target_properties(hyprtoolkit PROPERTIES VERSION ${HYPRTOOLKIT_VERSION}
+set_target_properties(abysstoolkit PROPERTIES VERSION ${ABYSSTOOLKIT_VERSION}
                                               SOVERSION 6)
-target_link_libraries(hyprtoolkit PUBLIC OpenGL::EGL OpenGL::OpenGL
+target_link_libraries(abysstoolkit PUBLIC OpenGL::EGL OpenGL::OpenGL
                                          PkgConfig::deps)
 
 check_include_file("sys/inotify.h" HAS_INOTIFY)
 pkg_check_modules(inotify IMPORTED_TARGET libinotify)
 if(NOT HAS_INOTIFY AND inotify_FOUND)
-  target_link_libraries(hyprtoolkit PUBLIC PkgConfig::inotify)
-  list(APPEND HYPRTOOLKIT_PRIVATE_REQUIRES "libinotify")
+  target_link_libraries(abysstoolkit PUBLIC PkgConfig::inotify)
+  list(APPEND ABYSSTOOLKIT_PRIVATE_REQUIRES "libinotify")
 endif()
 
 # convert cmake list to pkg-config `Requires` string
-string(REPLACE ";" ", " HYPRTOOLKIT_PUBLIC_REQUIRES "${HYPRTOOLKIT_PUBLIC_REQUIRES}")
-string(REPLACE ";" ", " HYPRTOOLKIT_PRIVATE_REQUIRES "${HYPRTOOLKIT_PRIVATE_REQUIRES}")
+string(REPLACE ";" ", " ABYSSTOOLKIT_PUBLIC_REQUIRES "${ABYSSTOOLKIT_PUBLIC_REQUIRES}")
+string(REPLACE ";" ", " ABYSSTOOLKIT_PRIVATE_REQUIRES "${ABYSSTOOLKIT_PRIVATE_REQUIRES}")
 
 # configure pkg-config after all actual dependencies have been determined,
 # so that conditional dependencies can be correctly included.
-configure_file(hyprtoolkit.pc.in hyprtoolkit.pc @ONLY)
+configure_file(abysstoolkit.pc.in abysstoolkit.pc @ONLY)
 
 # Protocols
 pkg_get_variable(WAYLAND_PROTOCOLS_DIR wayland-protocols pkgdatadir)
@@ -170,7 +170,7 @@ if(BUILD_TESTING)
   add_dependencies(tests controls)
 
   add_executable(autosizeTest "tests/AutosizeTest.cpp")
-  target_link_libraries(autosizeTest PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(autosizeTest PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests autosizeTest)
 
   add_executable(simpleSessionLock "tests/SimpleSessionLock.cpp")
@@ -178,15 +178,15 @@ if(BUILD_TESTING)
   add_dependencies(tests simpleSessionLock)
 
   add_executable(shortcutsInhibit "tests/ShortcutsInhibit.cpp")
-  target_link_libraries(shortcutsInhibit PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(shortcutsInhibit PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests shortcutsInhibit)
 
   add_executable(accentButton "tests/AccentButton.cpp")
-  target_link_libraries(accentButton PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(accentButton PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests accentButton)
 
   add_executable(animations "tests/Animations.cpp")
-  target_link_libraries(animations PRIVATE PkgConfig::deps hyprtoolkit)
+  target_link_libraries(animations PRIVATE PkgConfig::deps abysstoolkit)
   add_dependencies(tests animations)
 
 
@@ -208,12 +208,12 @@ if(BUILD_TESTING)
   gtest_discover_tests(abysstoolkit_tests)
 
   add_executable(embeddedRendererTest "tests/EmbeddedRenderer.cpp")
-  target_link_libraries(embeddedRendererTest PRIVATE hyprtoolkit GTest::gtest_main OpenGL::EGL OpenGL::OpenGL PkgConfig::deps)
+  target_link_libraries(embeddedRendererTest PRIVATE abysstoolkit GTest::gtest_main OpenGL::EGL OpenGL::OpenGL PkgConfig::deps)
   gtest_discover_tests(embeddedRendererTest)
 
-  # Add coverage to hyprtoolkit
-  target_compile_options(hyprtoolkit PRIVATE --coverage)
-  target_link_options(hyprtoolkit PRIVATE --coverage)
+  # Add coverage to abysstoolkit
+  target_compile_options(abysstoolkit PRIVATE --coverage)
+  target_link_options(abysstoolkit PRIVATE --coverage)
 endif()
 
 # Installation

@@ -1,10 +1,10 @@
 #pragma once
 
-#include <hyprtoolkit/palette/Color.hpp>
-#include <hyprtoolkit/palette/Gradient.hpp>
-#include <hyprutils/animation/AnimatedVariable.hpp>
-#include <hyprutils/math/Vector2D.hpp>
-#include <hyprutils/math/Box.hpp>
+#include <abysstoolkit/palette/Color.hpp>
+#include <abysstoolkit/palette/Gradient.hpp>
+#include <abyssutils/animation/AnimatedVariable.hpp>
+#include <abyssutils/math/Vector2D.hpp>
+#include <abyssutils/math/Box.hpp>
 
 #include "../helpers/Memory.hpp"
 
@@ -47,7 +47,7 @@ namespace Abysstoolkit {
     };
 
     template <>
-    struct STypeToAnimatedVarType_t<Hyprutils::Math::CBox> {
+    struct STypeToAnimatedVarType_t<Abyssutils::Math::CBox> {
         static constexpr eAnimatedVarType value = AVARTYPE_BOX;
     };
 
@@ -62,7 +62,7 @@ namespace Abysstoolkit {
     // This is mainly to get better errors if we put a type that's not supported
     // Otherwise template errors are ugly
     template <class T>
-    concept Animable = OneOf<T, Hyprutils::Math::Vector2D, Hyprutils::Math::CBox, float, CHyprColor, CGradientValueData>;
+    concept Animable = OneOf<T, Abyssutils::Math::Vector2D, Abyssutils::Math::CBox, float, CAbyssColor, CGradientValueData>;
 
     struct SAnimationContext {};
 

@@ -1,7 +1,7 @@
 #include "Window.hpp"
 #include "../core/InternalBackend.hpp"
 #include "../core/BackendContext.hpp"
-#include <hyprtoolkit/core/Output.hpp>
+#include <abysstoolkit/core/Output.hpp>
 #include "ToolkitWindow.hpp"
 
 using namespace Abysstoolkit;

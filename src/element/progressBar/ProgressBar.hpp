@@ -1,13 +1,13 @@
 #pragma once
 
-#include <hyprtoolkit/element/ProgressBar.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/element/ProgressBar.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/Null.hpp>
 
 #include "../../core/AnimatedVariable.hpp"
 #include "../../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     struct SProgressBarData {
         float        value         = 0.F;

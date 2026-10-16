@@ -1,7 +1,7 @@
 #include "EmbeddedSurface.hpp"
 
 #include <atomic>
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/element/Null.hpp>
 
 #include "../core/AnimationManager.hpp"
 #include "../core/BackendContext.hpp"
@@ -9,8 +9,8 @@
 #include "../element/Element.hpp"
 #include "../renderer/Renderer.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 CEmbeddedSurface::CEmbeddedSurface() {
     m_rootElement = CNullBuilder::begin()->commence();

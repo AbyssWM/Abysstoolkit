@@ -6,8 +6,8 @@
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 // SSliderImpl::maxLabelSize is a heuristic but it had two real bugs:
 // (a) floor(log10(N)) undercounts digits by 1 (log10(100)=2 but "100" is 3 chars)

@@ -143,7 +143,7 @@ void CWaylandLayer::render() {
     IWaylandWindow::render();
 }
 
-void CWaylandLayer::setSize(const Hyprutils::Math::Vector2D& size) {
+void CWaylandLayer::setSize(const Abyssutils::Math::Vector2D& size) {
     if (m_waylandState.logicalSize == size)
         return;
 

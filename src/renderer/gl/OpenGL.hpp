@@ -31,7 +31,7 @@ namespace Abysstoolkit {
         COpenGLRenderer();
         virtual ~COpenGLRenderer();
 
-        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Aquamarine::IBuffer> buf);
+        virtual void                 beginRendering(SP<IToolkitWindow> window, SP<Abyssal::IBuffer> buf);
         virtual void                 beginRenderingExternal(SP<IToolkitWindow> window, uint32_t bufferAge);
         virtual void                 render(bool ignoreSync);
         virtual void                 endRendering();

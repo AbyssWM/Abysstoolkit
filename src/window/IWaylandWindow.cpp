@@ -72,7 +72,7 @@ void IWaylandWindow::resizeSwapchain(const Vector2D& pixelSize) {
     m_damageRing.setSize(pixelSize);
 
     if (!m_waylandState.swapchain)
-        m_waylandState.swapchain = Aquamarine::CSwapchain::create(g_waylandPlatform->m_allocator, g_waylandBackend->m_aqBackend->getImplementations().at(0));
+        m_waylandState.swapchain = Abyssal::CSwapchain::create(g_waylandPlatform->m_allocator, g_waylandBackend->m_aqBackend->getImplementations().at(0));
 
     m_waylandState.swapchain->reconfigure(Abyssal::SSwapchainOptions{
         .length = 2,
@@ -275,7 +275,7 @@ void IWaylandWindow::mouseAxis(const Input::eAxisAxis axis, float delta) {
     IToolkitWindow::mouseAxis(axis, delta);
 }
 
-void IWaylandWindow::setIMTo(const Hyprutils::Math::CBox& box, const std::string& str, size_t cursor) {
+void IWaylandWindow::setIMTo(const Abyssutils::Math::CBox& box, const std::string& str, size_t cursor) {
     g_backendServices->textInput->activate(0, box, str, cursor);
 
     m_currentInput       = str;

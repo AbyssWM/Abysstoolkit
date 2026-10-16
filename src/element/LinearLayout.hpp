@@ -17,10 +17,10 @@ namespace Abysstoolkit::LinearLayout {
     // children flow along x (row layout); false means they flow along y (column).
     // childSize must return the layout's preferred-or-minimum size for a child.
     template <bool Horizontal>
-    inline void reposition(IElement* self, const Hyprutils::Math::CBox& box, const std::vector<SP<IElement>>& C, float gap,
-                           const std::function<Hyprutils::Math::Vector2D(SP<IElement>)>& childSize) {
-        using Vector2D = Hyprutils::Math::Vector2D;
-        using CBox     = Hyprutils::Math::CBox;
+    inline void reposition(IElement* self, const Abyssutils::Math::CBox& box, const std::vector<SP<IElement>>& C, float gap,
+                           const std::function<Abyssutils::Math::Vector2D(SP<IElement>)>& childSize) {
+        using Vector2D = Abyssutils::Math::Vector2D;
+        using CBox     = Abyssutils::Math::CBox;
 
         auto                axisPrimary = [](const Vector2D& v) -> double { return Horizontal ? v.x : v.y; };
         auto                boxPrimary  = [](const CBox& b) -> double { return Horizontal ? b.w : b.h; };

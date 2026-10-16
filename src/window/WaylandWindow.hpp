@@ -11,10 +11,10 @@ namespace Abysstoolkit {
         virtual void close();
         virtual void open();
 
-        virtual void setSize(const Hyprutils::Math::Vector2D& size);
+        virtual void setSize(const Abyssutils::Math::Vector2D& size);
         virtual void startInteractiveResize(eResizeEdge edges);
 
-        virtual void mouseMove(const Hyprutils::Math::Vector2D& local);
+        virtual void mouseMove(const Abyssutils::Math::Vector2D& local);
         virtual void mouseButton(const Input::eMouseButton button, bool state);
 
         virtual void onPreRender();
@@ -24,13 +24,13 @@ namespace Abysstoolkit {
 
         // pixel proximity (logical) that triggers an edge-resize cursor/grab
         static constexpr int kResizeBorderPx = 6;
-        eResizeEdge          edgeForPos(const Hyprutils::Math::Vector2D& local) const;
+        eResizeEdge          edgeForPos(const Abyssutils::Math::Vector2D& local) const;
 
         // setSize pins min == max == requested temporarily; the next configure restores
         // the user's original constraints from m_creationData.
         struct {
             bool                      pending = false;
-            Hyprutils::Math::Vector2D size;
+            Abyssutils::Math::Vector2D size;
         } m_pendingResize;
         void restoreUserSizeConstraints();
         void deferCloseRequest();

@@ -25,11 +25,11 @@ namespace Abysstoolkit {
 
         virtual void                                     paint();
         virtual void                                     recheckColor();
-        virtual void                                     reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize = {-1, -1});
-        virtual Hyprutils::Math::Vector2D                size();
-        virtual std::optional<Hyprutils::Math::Vector2D> preferredSize(const Hyprutils::Math::Vector2D& parent);
-        virtual std::optional<Hyprutils::Math::Vector2D> minimumSize(const Hyprutils::Math::Vector2D& parent);
-        virtual std::optional<Hyprutils::Math::Vector2D> maximumSize(const Hyprutils::Math::Vector2D& parent);
+        virtual void                                     reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize = {-1, -1});
+        virtual Abyssutils::Math::Vector2D                size();
+        virtual std::optional<Abyssutils::Math::Vector2D> preferredSize(const Abyssutils::Math::Vector2D& parent);
+        virtual std::optional<Abyssutils::Math::Vector2D> minimumSize(const Abyssutils::Math::Vector2D& parent);
+        virtual std::optional<Abyssutils::Math::Vector2D> maximumSize(const Abyssutils::Math::Vector2D& parent);
 
         SCheckmarkData                                   m_data;
 
@@ -41,7 +41,7 @@ namespace Abysstoolkit {
     struct SCheckboxData {
         bool                                                                           toggled = false;
         eCheckboxStyle                                                                 style   = HT_CHECKBOX_STYLE_CHECKMARK;
-        std::function<void(Hyprutils::Memory::CSharedPointer<CCheckboxElement>, bool)> onToggled;
+        std::function<void(Abyssutils::Memory::CSharedPointer<CCheckboxElement>, bool)> onToggled;
         CDynamicSize                                                                   size{CDynamicSize::HT_SIZE_AUTO, CDynamicSize::HT_SIZE_AUTO, {}};
     };
 

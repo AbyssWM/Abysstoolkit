@@ -54,7 +54,7 @@ CConfigManager::CConfigManager() : m_inotifyFd(inotify_init()) {
 
     if (CFGPATH.empty())
         g_logger->log(HT_LOG_DEBUG,
-                      "CConfigManager: no hyprtoolkit.conf found, using defaults (expected at $XDG_CONFIG_HOME/hypr/hyprtoolkit.conf or ~/.config/hypr/hyprtoolkit.conf)");
+                      "CConfigManager: no abysstoolkit.conf found, using defaults (expected at $XDG_CONFIG_HOME/abyss/abysstoolkit.conf or ~/.config/abyss/abysstoolkit.conf)");
 
     m_config = makeUnique<Abyssparse::CConfig>(CFGPATH.c_str(), Abyssparse::SConfigOptions{.allowMissingConfig = true});
 

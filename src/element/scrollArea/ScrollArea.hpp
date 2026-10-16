@@ -3,7 +3,7 @@
 #include "../../helpers/Memory.hpp"
 #include "../../helpers/Signal.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CNullElement;
     class CRectangleElement;
 
@@ -13,7 +13,7 @@ namespace Hyprtoolkit {
         bool                      scrollY         = false;
         bool                      blockUserScroll = false;
         bool                      showScrollbar   = false;
-        Hyprutils::Math::Vector2D currentScroll;
+        Abyssutils::Math::Vector2D currentScroll;
     };
 
     // one draggable scrollbar (track + thumb) living in the element tree, so it can take input
@@ -33,13 +33,13 @@ namespace Hyprtoolkit {
         float                     thumbOff = 0.F;
         float                     thumbLen = 0.F;
         float                     maxOff   = 0.F;
-        Hyprutils::Math::Vector2D lastLocal;
+        Abyssutils::Math::Vector2D lastLocal;
 
         struct {
-            CHyprSignalListener button;
-            CHyprSignalListener move;
-            CHyprSignalListener enter;
-            CHyprSignalListener leave;
+            CAbyssSignalListener button;
+            CAbyssSignalListener move;
+            CAbyssSignalListener enter;
+            CAbyssSignalListener leave;
         } listeners;
     };
 
@@ -59,10 +59,10 @@ namespace Hyprtoolkit {
         // clamp (a wheel event between layouts) does not re-measure the content mid-reflow and
         // snap the scroll. recalcMaxScroll() refreshes it once per reposition once the content
         // is laid out, maxScroll() just returns the cache.
-        Hyprutils::Math::Vector2D maxScroll();
+        Abyssutils::Math::Vector2D maxScroll();
         void                      recalcMaxScroll();
 
-        Hyprutils::Math::Vector2D cachedMaxScroll;
+        Abyssutils::Math::Vector2D cachedMaxScroll;
 
         struct {
             CAbyssSignalListener axis;

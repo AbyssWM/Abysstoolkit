@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <element/textbox/Textbox.hpp>
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/element/Null.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/element/Null.hpp>
 #include <layout/Positioner.hpp>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
@@ -10,8 +10,8 @@
 #include "element/Element.hpp"
 #include "abysstoolkit/core/Input.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 TEST(Element, textboxNavigation) {
     Tests::Tricks::createBackendSupport();

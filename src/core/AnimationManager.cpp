@@ -2,13 +2,13 @@
 
 #include "../Macros.hpp"
 
-#include <hyprtoolkit/palette/Gradient.hpp>
+#include <abysstoolkit/palette/Gradient.hpp>
 
 #include <algorithm>
 #include <format>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 CHTAnimationManager::CHTAnimationManager() {
     addBezierWithName("linear", {0, 0}, {1, 1});
@@ -80,13 +80,13 @@ static void updateGradientVariable(CAnimatedVariable<CGradientValueData>& av, co
     static const auto lerp = [](const float one, const float two, const float progress) -> float { return one + ((two - one) * progress); };
 
     for (size_t i = 0; i < av.value().m_vColors.size(); ++i) {
-        const CHyprColor&          sourceCol = (i < av.begun().m_vColors.size()) ? av.begun().m_vColors[i] : av.begun().m_vColors.back();
-        const CHyprColor&          targetCol = av.goal().m_vColors[i];
+        const CAbyssColor&          sourceCol = (i < av.begun().m_vColors.size()) ? av.begun().m_vColors[i] : av.begun().m_vColors.back();
+        const CAbyssColor&          targetCol = av.goal().m_vColors[i];
 
         const auto&                L1 = sourceCol.asOkLab();
         const auto&                L2 = targetCol.asOkLab();
 
-        const Hyprgraphics::CColor lerped = Hyprgraphics::CColor::SOkLab{
+        const Abyssgraphics::CColor lerped = Abyssgraphics::CColor::SOkLab{
             .l = lerp(L1.l, L2.l, POINTY),
             .a = lerp(L1.a, L2.a, POINTY),
             .b = lerp(L1.b, L2.b, POINTY),
@@ -139,7 +139,7 @@ SP<CHTAnimationManager::SAnimationPropertyConfig> CHTAnimationManager::configFor
         return config;
     }
 
-    const auto NAME = std::format("hyprtoolkit-{}", m_nextCurveID++);
+    const auto NAME = std::format("abysstoolkit-{}", m_nextCurveID++);
 
     if (const auto* bezier = std::get_if<SBezierAnimation>(&animation)) {
         addBezierWithName(NAME, bezier->control1, bezier->control2);
@@ -148,7 +148,7 @@ SP<CHTAnimationManager::SAnimationPropertyConfig> CHTAnimationManager::configFor
     } else {
         const auto& spring = std::get<SSpringAnimation>(animation);
         addSpringWithName(NAME,
-                          Hyprutils::Animation::SSpringCurve{
+                          Abyssutils::Animation::SSpringCurve{
                               .stiffness       = std::max(0.001F, spring.stiffness),
                               .damping         = std::max(0.F, spring.damping),
                               .mass            = std::max(0.001F, spring.mass),

@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
-#include <hyprtoolkit/element/Null.hpp>
-#include <hyprtoolkit/element/ProgressBar.hpp>
+#include <abysstoolkit/element/Null.hpp>
+#include <abysstoolkit/element/ProgressBar.hpp>
 
 #include <layout/Positioner.hpp>
 
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 TEST(Element, progressBarRebuildSizesIndeterminatePulse) {
     Tests::Tricks::createBackendSupport();

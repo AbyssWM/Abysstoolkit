@@ -13,7 +13,7 @@ namespace Abysstoolkit {
 
     class CRenderbuffer {
       public:
-        CRenderbuffer(COpenGLRenderer& renderer, SP<Aquamarine::IBuffer> buffer, uint32_t format);
+        CRenderbuffer(COpenGLRenderer& renderer, SP<Abyssal::IBuffer> buffer, uint32_t format);
         ~CRenderbuffer();
 
         bool                    good();

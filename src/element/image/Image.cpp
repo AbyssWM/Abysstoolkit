@@ -165,7 +165,7 @@ void SImageImpl::postImageLoad(const SP<SImageLoadRequest>& request) {
         }
     } else {
         request->cacheEntry->fail();
-        g_logger->log(HT_LOG_ERROR, "Image: failed loading, hyprgraphics couldn't load asset {}", request->path);
+        g_logger->log(HT_LOG_ERROR, "Image: failed loading, abyssgraphics couldn't load asset {}", request->path);
     }
 
     const bool CURRENT = request->generation == requestGeneration;

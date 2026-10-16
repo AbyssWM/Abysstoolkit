@@ -11,7 +11,7 @@ CGLTexture::CGLTexture() {
         m_lifetime = g_backendServices->lifetime;
 }
 
-void CGLTexture::attachAsync(WP<CGLTexture> self, ASP<Hyprgraphics::IAsyncResource> resource) {
+void CGLTexture::attachAsync(WP<CGLTexture> self, ASP<Abyssgraphics::IAsyncResource> resource) {
     if (resource->m_ready) {
         m_resource = resource;
         uploadOnContext(self);

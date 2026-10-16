@@ -1,16 +1,16 @@
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/window/Window.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/Text.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/window/Window.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/Text.hpp>
 
-#include <hyprutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
 
 #include <print>
 #include <string_view>
 
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::Math;
-using namespace Hyprtoolkit;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::Math;
+using namespace Abysstoolkit;
 
 #define SP CSharedPointer
 
@@ -24,12 +24,12 @@ int main(int argc, char** argv) {
     backend = IBackend::create();
 
     auto window =
-        CWindowBuilder::begin()->preferredSize({440, 160})->appTitle("shortcuts inhibit test")->appClass("hyprtoolkit-shortcuts-inhibit")->inhibitShortcuts(inhibit)->commence();
+        CWindowBuilder::begin()->preferredSize({440, 160})->appTitle("shortcuts inhibit test")->appClass("abysstoolkit-shortcuts-inhibit")->inhibitShortcuts(inhibit)->commence();
 
-    window->m_rootElement->addChild(CRectangleBuilder::begin()->color([] { return CHyprColor{0.1F, 0.1F, 0.1F}; })->commence());
+    window->m_rootElement->addChild(CRectangleBuilder::begin()->color([] { return CAbyssColor{0.1F, 0.1F, 0.1F}; })->commence());
     window->m_rootElement->addChild(CTextBuilder::begin()
                                         ->text(inhibit ? "inhibit ON: keybinds should not fire while focused" : "inhibit OFF (control): keybinds fire")
-                                        ->color([] { return CHyprColor{0.9F, 0.9F, 0.9F}; })
+                                        ->color([] { return CAbyssColor{0.9F, 0.9F, 0.9F}; })
                                         ->commence());
 
     std::println("shortcuts inhibitor requested: {}", inhibit ? "ON" : "OFF (control)");

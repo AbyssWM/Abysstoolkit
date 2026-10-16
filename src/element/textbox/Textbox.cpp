@@ -475,7 +475,7 @@ void STextboxImpl::updateEyeIcon() {
         return;
 
     eyeBg   = CRectangleBuilder::begin()
-                  ->color([] { return CHyprColor{0.F, 0.F, 0.F, 0.F}; })
+                  ->color([] { return CAbyssColor{0.F, 0.F, 0.F, 0.F}; })
                   ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_PERCENT, {EYE_W, 1.F}})
                   ->commence();
     eyeText = CTextBuilder::begin()

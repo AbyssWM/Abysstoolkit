@@ -6,7 +6,7 @@
 
 **GUI toolkit for Abyss tools.**
 
-Part of [**Abyss**](https://github.com/AbyssWM) · Based on [hyprtoolkit](https://github.com/hyprwm/hyprtoolkit) by [hyprwm](https://github.com/hyprwm)
+Part of [**Abyss**](https://github.com/AbyssWM) · Based on [abysstoolkit](https://github.com/AbyssWM/abysstoolkit) by [abysswm](https://github.com/AbyssWM)
 
 </div>
 
@@ -19,34 +19,34 @@ Part of [**Abyss**](https://github.com/AbyssWM) · Based on [hyprtoolkit](https:
 
 Abysstoolkit is the small Wayland GUI toolkit (layer-shell, windows, buttons, text, sliders ...) that Abyss helper tools draw their interfaces with.
 
-Abysstoolkit is a fork of [hyprtoolkit](https://github.com/hyprwm/hyprtoolkit). Every Abyss library and tool is forked and renamed, so the whole ecosystem builds and updates as one – independent of system packages.
+Abysstoolkit is a fork of [abysstoolkit](https://github.com/AbyssWM/abysstoolkit). Every Abyss library and tool is forked and renamed, so the whole ecosystem builds and updates as one – independent of system packages.
 
 ## The Abyss ecosystem
 
 | Repository | Based on |
 |---|---|
-| [Abyssland](https://github.com/AbyssWM/Abyssland) | [Hyprland](https://github.com/hyprwm/Hyprland) |
-| [Abyssal](https://github.com/AbyssWM/Abyssal) | [aquamarine](https://github.com/hyprwm/aquamarine) |
-| [Abyssutils](https://github.com/AbyssWM/Abyssutils) | [hyprutils](https://github.com/hyprwm/hyprutils) |
-| [Abyssparse](https://github.com/AbyssWM/Abyssparse) | [hyprlang](https://github.com/hyprwm/hyprlang) |
-| [Abysscursor](https://github.com/AbyssWM/Abysscursor) | [hyprcursor](https://github.com/hyprwm/hyprcursor) |
-| [Abyssgraphics](https://github.com/AbyssWM/Abyssgraphics) | [hyprgraphics](https://github.com/hyprwm/hyprgraphics) |
-| [Abysswire](https://github.com/AbyssWM/Abysswire) | [hyprwire](https://github.com/hyprwm/hyprwire) |
-| [Abyss-scanner](https://github.com/AbyssWM/Abyss-scanner) | [hyprwayland-scanner](https://github.com/hyprwm/hyprwayland-scanner) |
-| [Abyssland-protocols](https://github.com/AbyssWM/Abyssland-protocols) | [hyprland-protocols](https://github.com/hyprwm/hyprland-protocols) |
-| [Xdg-desktop-portal-abyss](https://github.com/AbyssWM/Xdg-desktop-portal-abyss) | [xdg-desktop-portal-hyprland](https://github.com/hyprwm/xdg-desktop-portal-hyprland) |
-| **Abysstoolkit** | [hyprtoolkit](https://github.com/hyprwm/hyprtoolkit) |
-| [Abyss-guiutils](https://github.com/AbyssWM/Abyss-guiutils) | [hyprland-guiutils](https://github.com/hyprwm/hyprland-guiutils) |
-| [AbyssDusk](https://github.com/AbyssWM/AbyssDusk) | [hyprsunset](https://github.com/hyprwm/hyprsunset) |
-| [AbyssLock](https://github.com/AbyssWM/AbyssLock) | [hyprlock](https://github.com/hyprwm/hyprlock) |
-| [AbyssPaper](https://github.com/AbyssWM/AbyssPaper) | [hyprpaper](https://github.com/hyprwm/hyprpaper) |
-| [AbyssPicker](https://github.com/AbyssWM/AbyssPicker) | [hyprpicker](https://github.com/hyprwm/hyprpicker) |
+| [Abyssland](https://github.com/AbyssWM/Abyssland) | [Abyssland](https://github.com/AbyssWM/Abyssland) |
+| [Abyssal](https://github.com/AbyssWM/Abyssal) | [abyssal](https://github.com/AbyssWM/abyssal) |
+| [Abyssutils](https://github.com/AbyssWM/Abyssutils) | [abyssutils](https://github.com/AbyssWM/abyssutils) |
+| [Abyssparse](https://github.com/AbyssWM/Abyssparse) | [abyssparse](https://github.com/AbyssWM/abyssparse) |
+| [Abysscursor](https://github.com/AbyssWM/Abysscursor) | [abysscursor](https://github.com/AbyssWM/abysscursor) |
+| [Abyssgraphics](https://github.com/AbyssWM/Abyssgraphics) | [abyssgraphics](https://github.com/AbyssWM/abyssgraphics) |
+| [Abysswire](https://github.com/AbyssWM/Abysswire) | [abysswire](https://github.com/AbyssWM/abysswire) |
+| [Abyss-scanner](https://github.com/AbyssWM/Abyss-scanner) | [abyss-scanner](https://github.com/AbyssWM/abyss-scanner) |
+| [Abyssland-protocols](https://github.com/AbyssWM/Abyssland-protocols) | [abyssland-protocols](https://github.com/AbyssWM/abyssland-protocols) |
+| [Xdg-desktop-portal-abyss](https://github.com/AbyssWM/Xdg-desktop-portal-abyss) | [xdg-desktop-portal-abyss](https://github.com/AbyssWM/xdg-desktop-portal-abyss) |
+| **Abysstoolkit** | [abysstoolkit](https://github.com/AbyssWM/abysstoolkit) |
+| [Abyss-guiutils](https://github.com/AbyssWM/Abyss-guiutils) | [abyss-guiutils](https://github.com/AbyssWM/abyss-guiutils) |
+| [AbyssDusk](https://github.com/AbyssWM/AbyssDusk) | [abysssunset](https://github.com/AbyssWM/abysssunset) |
+| [AbyssLock](https://github.com/AbyssWM/AbyssLock) | [abysslock](https://github.com/AbyssWM/abysslock) |
+| [AbyssPaper](https://github.com/AbyssWM/AbyssPaper) | [abysspaper](https://github.com/AbyssWM/abysspaper) |
+| [AbyssPicker](https://github.com/AbyssWM/AbyssPicker) | [abysspicker](https://github.com/AbyssWM/abysspicker) |
 
 ## Credits
 
-Abysstoolkit exists thanks to **[hyprtoolkit](https://github.com/hyprwm/hyprtoolkit)**, created by **Hypr Development** at **[hyprwm](https://github.com/hyprwm)**. All credit for the original work goes to them – please support the original project.
+Abysstoolkit exists thanks to **[abysstoolkit](https://github.com/AbyssWM/abysstoolkit)**, created by **Abyss Development** at **[abysswm](https://github.com/AbyssWM)**. All credit for the original work goes to them – please support the original project.
 
-Abyss is an independent project and is **not affiliated with or endorsed by hyprwm**.
+Abyss is an independent project and is **not affiliated with or endorsed by abysswm**.
 
 ## License
 

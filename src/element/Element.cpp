@@ -206,7 +206,7 @@ void IElement::setOpacity(float opacity) {
     impl->damagePresentation();
 }
 
-void IElement::addChild(Hyprutils::Memory::CSharedPointer<IElement> child) {
+void IElement::addChild(Abyssutils::Memory::CSharedPointer<IElement> child) {
     if (std::ranges::find(impl->children, child) != impl->children.end())
         return;
 

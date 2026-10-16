@@ -3,9 +3,9 @@
 #include <chrono>
 #include <variant>
 
-#include <hyprutils/math/Vector2D.hpp>
+#include <abyssutils/math/Vector2D.hpp>
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
 
     struct SNoAnimation {
         bool operator==(const SNoAnimation&) const = default;
@@ -13,8 +13,8 @@ namespace Hyprtoolkit {
 
     struct SBezierAnimation {
         std::chrono::milliseconds duration{200};
-        Hyprutils::Math::Vector2D control1{0.23, 1.0};
-        Hyprutils::Math::Vector2D control2{0.32, 1.0};
+        Abyssutils::Math::Vector2D control1{0.23, 1.0};
+        Abyssutils::Math::Vector2D control2{0.32, 1.0};
 
         bool                      operator==(const SBezierAnimation&) const = default;
     };

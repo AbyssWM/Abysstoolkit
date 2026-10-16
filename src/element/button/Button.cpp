@@ -14,15 +14,15 @@ using namespace Abyssgraphics;
 
 constexpr double  BUTTON_PAD = 5;
 
-static CHyprColor buttonColor(const SButtonImpl& impl) {
+static CAbyssColor buttonColor(const SButtonImpl& impl) {
     if (impl.data.accent)
         return impl.hovered ? g_palette->m_colors.accent.brighten(0.1F) : g_palette->m_colors.accent;
     if (impl.data.noBg)
-        return impl.hovered ? g_palette->m_colors.base.brighten(0.05F) : CHyprColor{g_palette->m_colors.base.asRGB(), 0.F};
+        return impl.hovered ? g_palette->m_colors.base.brighten(0.05F) : CAbyssColor{g_palette->m_colors.base.asRGB(), 0.F};
     return impl.hovered ? g_palette->m_colors.base.brighten(impl.data.noBorder ? 0.3F : 0.11F) : g_palette->m_colors.base;
 }
 
-static CHyprColor buttonBorderColor(const SButtonImpl& impl) {
+static CAbyssColor buttonBorderColor(const SButtonImpl& impl) {
     if (impl.hovered || impl.data.accent)
         return g_palette->m_colors.accent;
     return g_palette->m_colors.alternateBase;
@@ -199,7 +199,7 @@ Abyssutils::Math::Vector2D CButtonElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CButtonElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CButtonElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
 
     if (s.x != -1 && s.y != -1)

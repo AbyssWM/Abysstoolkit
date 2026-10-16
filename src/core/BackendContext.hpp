@@ -2,13 +2,13 @@
 
 #include <functional>
 
-#include <hyprutils/os/FileDescriptor.hpp>
+#include <abyssutils/os/FileDescriptor.hpp>
 
-#include <hyprtoolkit/core/BackendServices.hpp>
+#include <abysstoolkit/core/BackendServices.hpp>
 
 #include "../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class IWindow;
     struct SWindowCreationData;
 
@@ -28,7 +28,7 @@ namespace Hyprtoolkit {
         SP<ISessionLockProvider>                                                     sessionLock;
 
         std::function<SP<IWindow>(const SWindowCreationData&)>                       openWindow;
-        std::function<void(Hyprutils::OS::CFileDescriptor, std::function<void()>&&)> doOnReadable;
+        std::function<void(Abyssutils::OS::CFileDescriptor, std::function<void()>&&)> doOnReadable;
     };
 
     SBackendServices            makeDefaultBackendServices();

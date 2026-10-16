@@ -19,7 +19,7 @@ CRenderbuffer::~CRenderbuffer() {
     m_renderer.m_proc.eglDestroyImageKHR(m_renderer.m_eglDisplay, m_image);
 }
 
-CRenderbuffer::CRenderbuffer(COpenGLRenderer& renderer, SP<Aquamarine::IBuffer> buffer, uint32_t format) : m_hlBuffer(buffer), m_renderer(renderer), m_drmFormat(format) {
+CRenderbuffer::CRenderbuffer(COpenGLRenderer& renderer, SP<Abyssal::IBuffer> buffer, uint32_t format) : m_hlBuffer(buffer), m_renderer(renderer), m_drmFormat(format) {
     auto dma = buffer->dmabuf();
 
     m_image = m_renderer.createEGLImage(dma);

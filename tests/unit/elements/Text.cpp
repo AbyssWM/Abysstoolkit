@@ -1,31 +1,31 @@
 #include <gtest/gtest.h>
 
 #include <element/text/Text.hpp>
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/palette/Color.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/palette/Color.hpp>
 
 #include <core/InternalBackend.hpp>
 #include <layout/Positioner.hpp>
 
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
-#include "hyprtoolkit/element/Element.hpp"
-#include "hyprtoolkit/element/Null.hpp"
-#include "hyprtoolkit/element/Rectangle.hpp"
-#include "hyprtoolkit/element/RowLayout.hpp"
-#include "hyprtoolkit/types/FontTypes.hpp"
-#include "hyprtoolkit/types/SizeType.hpp"
+#include "abysstoolkit/element/Element.hpp"
+#include "abysstoolkit/element/Null.hpp"
+#include "abysstoolkit/element/Rectangle.hpp"
+#include "abysstoolkit/element/RowLayout.hpp"
+#include "abysstoolkit/types/FontTypes.hpp"
+#include "abysstoolkit/types/SizeType.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 TEST(Element, text) {
     Tests::Tricks::createBackendSupport();
 
     // pin the link color so the markup is deterministic regardless of the machine's theme
-    g_palette->m_colors.linkText = CHyprColor(1.F, 0.F, 0.F, 1.F);
+    g_palette->m_colors.linkText = CAbyssColor(1.F, 0.F, 0.F, 1.F);
 
-    auto text = CTextBuilder::begin()->text(R"(Hello <a href="https://hypr.land">link</a>! Hi <a href="https://hypr.land">link2</a>!)")->commence();
+    auto text = CTextBuilder::begin()->text(R"(Hello <a href="https://github.com/AbyssWM">link</a>! Hi <a href="https://github.com/AbyssWM">link2</a>!)")->commence();
 
     EXPECT_EQ(text->m_impl->parsedText, "Hello <u><span foreground=\"#ff0000ff\">link</span></u>! Hi <u><span foreground=\"#ff0000ff\">link2</span></u>!");
 
@@ -117,12 +117,12 @@ TEST(Element, textSideBySide) {
 
     auto       text1  = CTextBuilder::begin()
                             ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_AUTO, {0.5, 1.0}})
-                            ->text("First longish paragraph goes here. I love Hyprland it is the best.")
+                            ->text("First longish paragraph goes here. I love Abyssland it is the best.")
                             ->noEllipsize(true)
                             ->commence();
     auto       text2  = CTextBuilder::begin()
                             ->size({CDynamicSize::HT_SIZE_PERCENT, CDynamicSize::HT_SIZE_AUTO, {0.5, 1.0}})
-                            ->text("Second longish paragraph goes here. Who needs GTK and Qt when you have Hyprtoolkit?")
+                            ->text("Second longish paragraph goes here. Who needs GTK and Qt when you have Abysstoolkit?")
                             ->noEllipsize(true)
                             ->commence();
     auto       layout = CRowLayoutBuilder::begin()->commence();
@@ -152,7 +152,7 @@ TEST(Element, textShrinkingThenGrowing) {
     // This container is necessary because we need the text to auto size itself
     // if we position it directly, the text sizing code is never run
     auto container = CNullBuilder::begin()->commence();
-    auto text      = CTextBuilder::begin()->text("First longish paragraph goes here. I love Hyprland it is the best.")->commence();
+    auto text      = CTextBuilder::begin()->text("First longish paragraph goes here. I love Abyssland it is the best.")->commence();
 
     container->addChild(text);
 
@@ -172,7 +172,7 @@ TEST(Element, textShrinkingThenGrowing) {
 TEST(Element, textChangingSize) {
     Tests::Tricks::createBackendSupport();
 
-    auto       text = CTextBuilder::begin()->text("First longish paragraph goes here. I love Hyprland it is the best.")->commence();
+    auto       text = CTextBuilder::begin()->text("First longish paragraph goes here. I love Abyssland it is the best.")->commence();
 
     const auto FIRST_SIZE = text->preferredSize({0, 0});
 

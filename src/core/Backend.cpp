@@ -23,9 +23,9 @@
 #include <fcntl.h>
 #include <system_error>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Memory;
-using namespace Hyprutils::OS;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Memory;
+using namespace Abyssutils::OS;
 
 #define SP CSharedPointer
 #define WP CWeakPointer
@@ -43,7 +43,7 @@ class CWaylandClipboard final : public IClipboard {
 
 class CWaylandTextInput final : public ITextInput {
   public:
-    void activate(EmbeddedSurfaceID surface, const Hyprutils::Math::CBox& cursorBox, const std::string& surroundingText, size_t cursor) override {
+    void activate(EmbeddedSurfaceID surface, const Abyssutils::Math::CBox& cursorBox, const std::string& surroundingText, size_t cursor) override {
         if (!g_waylandPlatform->m_waylandState.textInput)
             return;
 
@@ -94,7 +94,7 @@ class CWaylandSessionLockProvider final : public ISessionLockProvider {
 };
 
 CBackend::CBackend() {
-    const auto eventLoop = Hyprutils::EventLoop::IEventLoop::create();
+    const auto eventLoop = Abyssutils::EventLoop::IEventLoop::create();
     if (!eventLoop) {
         g_logger->log(HT_LOG_ERROR, "couldn't create event loop: {}", eventLoop.error());
         return;
@@ -163,7 +163,7 @@ SP<IBackend> IBackend::create() {
             return locked->openWindow(data);
         return nullptr;
     };
-    g_backendServices->doOnReadable = [weak = WP<CBackend>{backend}](Hyprutils::OS::CFileDescriptor fd, std::function<void()>&& callback) {
+    g_backendServices->doOnReadable = [weak = WP<CBackend>{backend}](Abyssutils::OS::CFileDescriptor fd, std::function<void()>&& callback) {
         if (const auto locked = weak.lock())
             locked->doOnReadable(std::move(fd), std::move(callback));
     };
@@ -297,7 +297,7 @@ void CBackend::registerTimer(const ASP<CTimer>& timer, const std::chrono::steady
     if (m_terminate || timer->cancelled())
         return;
 
-    const auto loopTimer = m_eventLoop->addTimer(expires - std::chrono::steady_clock::now(), [this, timer](Hyprutils::EventLoop::ITimer& self) {
+    const auto loopTimer = m_eventLoop->addTimer(expires - std::chrono::steady_clock::now(), [this, timer](Abyssutils::EventLoop::ITimer& self) {
         if (timer->cancelled()) {
             removeTimer(timer.get());
             return;
@@ -441,13 +441,13 @@ void CBackend::addFd(int fd, std::function<void()>&& callback) {
         return;
     }
 
-    auto source = m_eventLoop->addFD(std::move(duplicatedFD), Hyprutils::EventLoop::eEventMask::READABLE,
-                                     [callback = std::move(callback)](Hyprutils::EventLoop::IFDSource& self, Hyprutils::EventLoop::FdEventMask events) {
-                                         if (events & Hyprutils::EventLoop::eEventMask::READABLE)
+    auto source = m_eventLoop->addFD(std::move(duplicatedFD), Abyssutils::EventLoop::eEventMask::READABLE,
+                                     [callback = std::move(callback)](Abyssutils::EventLoop::IFDSource& self, Abyssutils::EventLoop::FdEventMask events) {
+                                         if (events & Abyssutils::EventLoop::eEventMask::READABLE)
                                              callback();
 
-                                         if (events & (Hyprutils::EventLoop::eEventMask::HUP | Hyprutils::EventLoop::eEventMask::ERROR))
-                                             (void)self.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+                                         if (events & (Abyssutils::EventLoop::eEventMask::HUP | Abyssutils::EventLoop::eEventMask::ERROR))
+                                             (void)self.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
                                      });
     if (!source) {
         g_logger->log(HT_LOG_ERROR, "couldn't add fd {} to event loop: {}", fd, source.error());
@@ -470,15 +470,15 @@ void CBackend::removeFd(int fd) {
     });
 }
 
-void CBackend::doOnReadable(Hyprutils::OS::CFileDescriptor fd, std::function<void()>&& fn) {
+void CBackend::doOnReadable(Abyssutils::OS::CFileDescriptor fd, std::function<void()>&& fn) {
     if (!m_eventLoop || m_terminate)
         return;
 
     const int fdInt  = fd.get();
-    auto      source = m_eventLoop->addFD(std::move(fd), Hyprutils::EventLoop::eEventMask::READABLE,
-                                          [fn = std::move(fn)](Hyprutils::EventLoop::IFDSource& self, Hyprutils::EventLoop::FdEventMask events) mutable {
+    auto      source = m_eventLoop->addFD(std::move(fd), Abyssutils::EventLoop::eEventMask::READABLE,
+                                          [fn = std::move(fn)](Abyssutils::EventLoop::IFDSource& self, Abyssutils::EventLoop::FdEventMask events) mutable {
                                          self.remove();
-                                         if (events & Hyprutils::EventLoop::eEventMask::READABLE)
+                                         if (events & Abyssutils::EventLoop::eEventMask::READABLE)
                                              fn();
                                           });
     if (!source)
@@ -493,8 +493,8 @@ bool CBackend::initializeEventLoop() {
         return false;
     }
 
-    auto waylandSource = m_eventLoop->addFD(std::move(duplicatedWaylandFD), Hyprutils::EventLoop::eEventMask::READABLE,
-                                            [this](Hyprutils::EventLoop::IFDSource& source, Hyprutils::EventLoop::FdEventMask events) { dispatchWayland(source, events); });
+    auto waylandSource = m_eventLoop->addFD(std::move(duplicatedWaylandFD), Abyssutils::EventLoop::eEventMask::READABLE,
+                                            [this](Abyssutils::EventLoop::IFDSource& source, Abyssutils::EventLoop::FdEventMask events) { dispatchWayland(source, events); });
     if (!waylandSource) {
         g_logger->log(HT_LOG_ERROR, "couldn't add Wayland fd to event loop: {}", waylandSource.error());
         return false;
@@ -508,16 +508,16 @@ bool CBackend::initializeEventLoop() {
             return false;
         }
 
-        auto configSource = m_eventLoop->addFD(std::move(duplicatedConfigFD), Hyprutils::EventLoop::eEventMask::READABLE,
-                                               [this](Hyprutils::EventLoop::IFDSource& source, Hyprutils::EventLoop::FdEventMask events) {
-                                                   if (events & Hyprutils::EventLoop::eEventMask::READABLE) {
+        auto configSource = m_eventLoop->addFD(std::move(duplicatedConfigFD), Abyssutils::EventLoop::eEventMask::READABLE,
+                                               [this](Abyssutils::EventLoop::IFDSource& source, Abyssutils::EventLoop::FdEventMask events) {
+                                                   if (events & Abyssutils::EventLoop::eEventMask::READABLE) {
                                                        g_config->onInotifyEvent();
                                                        reloadTheme();
                                                    }
 
-                                                   if (events & (Hyprutils::EventLoop::eEventMask::HUP | Hyprutils::EventLoop::eEventMask::ERROR)) {
+                                                   if (events & (Abyssutils::EventLoop::eEventMask::HUP | Abyssutils::EventLoop::eEventMask::ERROR)) {
                                                        g_logger->log(HT_LOG_ERROR, "config event fd disconnected");
-                                                       (void)source.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+                                                       (void)source.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
                                                    }
                                                });
         if (!configSource) {
@@ -533,7 +533,7 @@ bool CBackend::initializeEventLoop() {
 
         if (wl_display_dispatch_pending(g_waylandPlatform->m_waylandState.display) < 0) {
             g_logger->log(HT_LOG_ERROR, "failed to dispatch pending Wayland events: {}", wl_display_get_error(g_waylandPlatform->m_waylandState.display));
-            (void)m_waylandSource->setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+            (void)m_waylandSource->setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
             terminate();
             return;
         }
@@ -545,17 +545,17 @@ bool CBackend::initializeEventLoop() {
     return true;
 }
 
-void CBackend::dispatchWayland(Hyprutils::EventLoop::IFDSource& source, Hyprutils::EventLoop::FdEventMask events) {
+void CBackend::dispatchWayland(Abyssutils::EventLoop::IFDSource& source, Abyssutils::EventLoop::FdEventMask events) {
     if (m_terminate)
         return;
 
     const auto DISPLAY = g_waylandPlatform->m_waylandState.display;
 
-    if (events & Hyprutils::EventLoop::eEventMask::READABLE) {
+    if (events & Abyssutils::EventLoop::eEventMask::READABLE) {
         while (wl_display_prepare_read(DISPLAY) != 0) {
             if (errno != EAGAIN || wl_display_dispatch_pending(DISPLAY) < 0) {
                 g_logger->log(HT_LOG_ERROR, "failed to prepare Wayland read: {}", wl_display_get_error(DISPLAY));
-                (void)source.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+                (void)source.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
                 terminate();
                 return;
             }
@@ -566,14 +566,14 @@ void CBackend::dispatchWayland(Hyprutils::EventLoop::IFDSource& source, Hyprutil
 
         if (wl_display_read_events(DISPLAY) < 0) {
             g_logger->log(HT_LOG_ERROR, "failed to read Wayland events: {}", wl_display_get_error(DISPLAY));
-            (void)source.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+            (void)source.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
             terminate();
             return;
         }
 
         if (wl_display_dispatch_pending(DISPLAY) < 0) {
             g_logger->log(HT_LOG_ERROR, "failed to dispatch Wayland events: {}", wl_display_get_error(DISPLAY));
-            (void)source.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+            (void)source.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
             terminate();
             return;
         }
@@ -585,18 +585,18 @@ void CBackend::dispatchWayland(Hyprutils::EventLoop::IFDSource& source, Hyprutil
     if (m_terminate)
         return;
 
-    if (events & (Hyprutils::EventLoop::eEventMask::HUP | Hyprutils::EventLoop::eEventMask::ERROR)) {
+    if (events & (Abyssutils::EventLoop::eEventMask::HUP | Abyssutils::EventLoop::eEventMask::ERROR)) {
         g_logger->log(HT_LOG_ERROR, "Wayland connection closed: {}", wl_display_get_error(DISPLAY));
-        (void)source.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+        (void)source.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
         terminate();
         return;
     }
 
-    if (events & Hyprutils::EventLoop::eEventMask::WRITABLE)
+    if (events & Abyssutils::EventLoop::eEventMask::WRITABLE)
         flushWayland(source);
 }
 
-void CBackend::flushWayland(Hyprutils::EventLoop::IFDSource& source) {
+void CBackend::flushWayland(Abyssutils::EventLoop::IFDSource& source) {
     int result = 0;
     do {
         result = wl_display_flush(g_waylandPlatform->m_waylandState.display);
@@ -606,7 +606,7 @@ void CBackend::flushWayland(Hyprutils::EventLoop::IFDSource& source) {
     if (result < 0) {
         if (errno != EAGAIN) {
             g_logger->log(HT_LOG_ERROR, "failed to flush Wayland connection: {}", wl_display_get_error(g_waylandPlatform->m_waylandState.display));
-            (void)source.setMask(Hyprutils::EventLoop::eEventMask::EMPTY);
+            (void)source.setMask(Abyssutils::EventLoop::eEventMask::EMPTY);
             terminate();
             return;
         }
@@ -617,8 +617,8 @@ void CBackend::flushWayland(Hyprutils::EventLoop::IFDSource& source) {
     if (m_waylandWantsWrite == wantsWrite)
         return;
 
-    const auto mask = wantsWrite ? Hyprutils::EventLoop::eEventMask::READABLE | Hyprutils::EventLoop::eEventMask::WRITABLE :
-                                   Hyprutils::EventLoop::FdEventMask{Hyprutils::EventLoop::eEventMask::READABLE};
+    const auto mask = wantsWrite ? Abyssutils::EventLoop::eEventMask::READABLE | Abyssutils::EventLoop::eEventMask::WRITABLE :
+                                   Abyssutils::EventLoop::FdEventMask{Abyssutils::EventLoop::eEventMask::READABLE};
     if (const auto updated = source.setMask(mask); !updated) {
         g_logger->log(HT_LOG_ERROR, "failed to update Wayland event mask: {}", updated.error());
         terminate();

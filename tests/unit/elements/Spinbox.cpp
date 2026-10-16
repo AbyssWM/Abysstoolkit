@@ -5,7 +5,7 @@
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 static SP<IElement> spinboxArrow(const SP<CSpinboxElement>& spinbox, bool right) {
     const auto outerLayout = spinbox->impl->children.at(0);

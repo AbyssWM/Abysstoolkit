@@ -22,7 +22,7 @@ bool Abysstoolkit::Env::isTrace() {
     return TRACE;
 }
 
-std::optional<std::string_view> Hyprtoolkit::Env::getEnv(const std::string& env) {
+std::optional<std::string_view> Abysstoolkit::Env::getEnv(const std::string& env) {
     auto ret = getenv(env.c_str());
     if (!ret)
         return std::nullopt;

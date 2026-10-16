@@ -1,18 +1,18 @@
-#include <hyprtoolkit/core/Animation.hpp>
-#include <hyprtoolkit/core/Backend.hpp>
-#include <hyprtoolkit/element/Button.hpp>
-#include <hyprtoolkit/element/Combobox.hpp>
-#include <hyprtoolkit/element/Rectangle.hpp>
-#include <hyprtoolkit/element/Text.hpp>
-#include <hyprtoolkit/window/Window.hpp>
+#include <abysstoolkit/core/Animation.hpp>
+#include <abysstoolkit/core/Backend.hpp>
+#include <abysstoolkit/element/Button.hpp>
+#include <abysstoolkit/element/Combobox.hpp>
+#include <abysstoolkit/element/Rectangle.hpp>
+#include <abysstoolkit/element/Text.hpp>
+#include <abysstoolkit/window/Window.hpp>
 
-#include <hyprutils/memory/SharedPtr.hpp>
+#include <abyssutils/memory/SharedPtr.hpp>
 
 #include <array>
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
-using namespace Hyprutils::Memory;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
+using namespace Abyssutils::Memory;
 using namespace std::chrono_literals;
 
 #define SP CSharedPointer
@@ -46,11 +46,11 @@ static void toggleAnimations() {
     movingCard->setAbsolutePosition(alternate ? Vector2D{430, 115} : Vector2D{55, 115});
     movingCard->rebuild()->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, alternate ? Vector2D{210, 145} : Vector2D{150, 100}})->commence();
 
-    colorCard->rebuild()->color([alternate = alternate] { return alternate ? CHyprColor{0.94F, 0.35F, 0.28F, 1.F} : CHyprColor{0.20F, 0.62F, 0.86F, 1.F}; })->commence();
+    colorCard->rebuild()->color([alternate = alternate] { return alternate ? CAbyssColor{0.94F, 0.35F, 0.28F, 1.F} : CAbyssColor{0.20F, 0.62F, 0.86F, 1.F}; })->commence();
 
     fadingCard->setOpacity(alternate ? 0.15F : 1.F);
 
-    animatedText->rebuild()->color([alternate = alternate] { return alternate ? CHyprColor{0.98F, 0.75F, 0.20F, 1.F} : CHyprColor{0.50F, 0.90F, 0.68F, 1.F}; })->commence();
+    animatedText->rebuild()->color([alternate = alternate] { return alternate ? CAbyssColor{0.98F, 0.75F, 0.20F, 1.F} : CAbyssColor{0.50F, 0.90F, 0.68F, 1.F}; })->commence();
 }
 
 static void selectGeometrySpring(size_t index) {
@@ -72,14 +72,14 @@ static void scheduleToggle() {
 }
 
 static SP<CTextElement> label(std::string text, CFontSize size = {CFontSize::HT_FONT_TEXT}) {
-    return CTextBuilder::begin()->text(std::move(text))->fontSize(std::move(size))->color([] { return CHyprColor{0.93F, 0.94F, 0.97F, 1.F}; })->commence();
+    return CTextBuilder::begin()->text(std::move(text))->fontSize(std::move(size))->color([] { return CAbyssColor{0.93F, 0.94F, 0.97F, 1.F}; })->commence();
 }
 
 int main() {
     backend     = IBackend::create();
-    auto window = CWindowBuilder::begin()->preferredSize({720, 520})->appTitle("Animation playground")->appClass("hyprtoolkit-animations")->commence();
+    auto window = CWindowBuilder::begin()->preferredSize({720, 520})->appTitle("Animation playground")->appClass("abysstoolkit-animations")->commence();
 
-    auto background = CRectangleBuilder::begin()->color([] { return CHyprColor{0.055F, 0.065F, 0.09F, 1.F}; })->commence();
+    auto background = CRectangleBuilder::begin()->color([] { return CAbyssColor{0.055F, 0.065F, 0.09F, 1.F}; })->commence();
     window->m_rootElement->addChild(background);
 
     auto title = label("Animations!!! :D", {CFontSize::HT_FONT_H1});
@@ -88,7 +88,7 @@ int main() {
     background->addChild(title);
 
     movingCard = CRectangleBuilder::begin()
-                     ->color([] { return CHyprColor{0.42F, 0.28F, 0.82F, 1.F}; })
+                     ->color([] { return CAbyssColor{0.42F, 0.28F, 0.82F, 1.F}; })
                      ->rounding(18)
                      ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {150, 100}})
                      ->commence();
@@ -102,7 +102,7 @@ int main() {
     background->addChild(movingCard);
 
     colorCard = CRectangleBuilder::begin()
-                    ->color([] { return CHyprColor{0.20F, 0.62F, 0.86F, 1.F}; })
+                    ->color([] { return CAbyssColor{0.20F, 0.62F, 0.86F, 1.F}; })
                     ->rounding(16)
                     ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {250, 82}})
                     ->commence();
@@ -116,7 +116,7 @@ int main() {
     background->addChild(colorCard);
 
     fadingCard = CRectangleBuilder::begin()
-                     ->color([] { return CHyprColor{0.18F, 0.72F, 0.55F, 1.F}; })
+                     ->color([] { return CAbyssColor{0.18F, 0.72F, 0.55F, 1.F}; })
                      ->rounding(16)
                      ->size({CDynamicSize::HT_SIZE_ABSOLUTE, CDynamicSize::HT_SIZE_ABSOLUTE, {250, 82}})
                      ->commence();
@@ -130,7 +130,7 @@ int main() {
     background->addChild(fadingCard);
 
     animatedText =
-        CTextBuilder::begin()->text("Animated text foreground")->fontSize({CFontSize::HT_FONT_H2})->color([] { return CHyprColor{0.50F, 0.90F, 0.68F, 1.F}; })->commence();
+        CTextBuilder::begin()->text("Animated text foreground")->fontSize({CFontSize::HT_FONT_H2})->color([] { return CAbyssColor{0.50F, 0.90F, 0.68F, 1.F}; })->commence();
     animatedText->setPositionMode(IElement::HT_POSITION_ABSOLUTE);
     animatedText->setAbsolutePosition({55, 410});
     animatedText->animateColor(COLOR_CURVE);

@@ -2,17 +2,17 @@
 #include "../helpers/Memory.hpp"
 #include "../core/InternalBackend.hpp"
 #include "helpers/Env.hpp"
-#include "hyprtoolkit/core/LogTypes.hpp"
+#include "abysstoolkit/core/LogTypes.hpp"
 
 #include <optional>
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 
-#include <hyprutils/string/String.hpp>
-#include <hyprutils/string/ConstVarList.hpp>
-#include <hyprutils/string/VarList2.hpp>
-#include <hyprutils/utils/ScopeGuard.hpp>
+#include <abyssutils/string/String.hpp>
+#include <abyssutils/string/ConstVarList.hpp>
+#include <abyssutils/string/VarList2.hpp>
+#include <abyssutils/utils/ScopeGuard.hpp>
 #include <ranges>
 
 extern "C" {

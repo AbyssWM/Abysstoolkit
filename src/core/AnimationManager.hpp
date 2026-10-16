@@ -1,8 +1,8 @@
 #pragma once
 
-#include <hyprutils/animation/AnimationManager.hpp>
-#include <hyprutils/animation/AnimatedVariable.hpp>
-#include <hyprtoolkit/core/Animation.hpp>
+#include <abyssutils/animation/AnimationManager.hpp>
+#include <abyssutils/animation/AnimatedVariable.hpp>
+#include <abysstoolkit/core/Animation.hpp>
 
 #include <vector>
 
@@ -30,7 +30,7 @@ namespace Abysstoolkit {
             pav->setConfig(pConfig);
         }
 
-        Hyprutils::Animation::CAnimationConfigTree m_animationTree;
+        Abyssutils::Animation::CAnimationConfigTree m_animationTree;
 
       private:
         std::vector<std::pair<SAnimation, SP<SAnimationPropertyConfig>>> m_dynamicConfigs;

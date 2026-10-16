@@ -1,10 +1,10 @@
 #include "BackendContext.hpp"
 
-#include <hyprtoolkit/core/Output.hpp>
+#include <abysstoolkit/core/Output.hpp>
 
 #include <atomic>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SBackendLifetime::SBackendLifetime() :
     generation([] {
@@ -27,7 +27,7 @@ class CNullClipboard final : public IClipboard {
 
 class CNullTextInput final : public ITextInput {
   public:
-    void activate(EmbeddedSurfaceID surface, const Hyprutils::Math::CBox& cursorBox, const std::string& surroundingText, size_t cursor) override {
+    void activate(EmbeddedSurfaceID surface, const Abyssutils::Math::CBox& cursorBox, const std::string& surroundingText, size_t cursor) override {
         ;
     }
 
@@ -57,7 +57,7 @@ class CUnsupportedSessionLockProvider final : public ISessionLockProvider {
     }
 };
 
-SBackendServices Hyprtoolkit::makeDefaultBackendServices() {
+SBackendServices Abysstoolkit::makeDefaultBackendServices() {
     return SBackendServices{
         .clipboard   = makeShared<CNullClipboard>(),
         .textInput   = makeShared<CNullTextInput>(),

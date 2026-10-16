@@ -21,7 +21,7 @@ namespace Abysstoolkit {
 
     struct SImageLoadRequest {
         uint64_t                                                              generation = 0;
-        Hyprutils::Memory::CAtomicSharedPointer<Hyprgraphics::CImageResource> resource;
+        Abyssutils::Memory::CAtomicSharedPointer<Abyssgraphics::CImageResource> resource;
         SP<Asset::CAssetCacheEntry>                                           cacheEntry;
         eImageFitMode                                                         fitMode = IMAGE_FIT_MODE_STRETCH;
         std::string                                                           path;
@@ -34,9 +34,9 @@ namespace Abysstoolkit {
 
         float                                                      lastScale = 1.F;
 
-        Hyprutils::Memory::CSharedPointer<Asset::CAssetCacheEntry> cacheEntry;
-        Hyprutils::Memory::CSharedPointer<Asset::CAssetCacheEntry> oldCacheEntry; // while loading a new one
-        Hyprutils::Math::Vector2D                                  size;
+        Abyssutils::Memory::CSharedPointer<Asset::CAssetCacheEntry> cacheEntry;
+        Abyssutils::Memory::CSharedPointer<Asset::CAssetCacheEntry> oldCacheEntry; // while loading a new one
+        Abyssutils::Math::Vector2D                                  size;
 
         bool                                                       waitingForTex = false, failed = false;
         uint64_t                                                   requestGeneration = 0;
@@ -45,7 +45,7 @@ namespace Abysstoolkit {
         std::string                                                lastPath = "";
         void*                                                      lastData = nullptr;
 
-        Hyprutils::Math::Vector2D                                  preferredSvgSize();
+        Abyssutils::Math::Vector2D                                  preferredSvgSize();
         void                                                       postImageLoad(const SP<SImageLoadRequest>& request);
         void                                                       postImageScheduleRecalc();
         std::string                                                getCacheString();

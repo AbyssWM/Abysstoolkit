@@ -2,8 +2,8 @@
 
 #include <cmath>
 #include <glib-object.h>
-#include <hyprtoolkit/palette/Palette.hpp>
-#include <hyprgraphics/color/Color.hpp>
+#include <abysstoolkit/palette/Palette.hpp>
+#include <abyssgraphics/color/Color.hpp>
 #include <pango/pango.h>
 
 #include "../../window/ToolkitWindow.hpp"
@@ -170,12 +170,12 @@ void CTextElement::paint() {
         .texture           = textureToUse,
         .a                 = sc<float>(m_impl->data.a * (m_impl->renderColorAtPaint ? COLOR.a : 1.F)),
         .rounding          = 0,
-        .tint              = m_impl->renderColorAtPaint ? std::optional<CHyprColor>{COLOR.stripA()} : std::nullopt,
+        .tint              = m_impl->renderColorAtPaint ? std::optional<CAbyssColor>{COLOR.stripA()} : std::nullopt,
         .tintGrayscaleOnly = m_impl->renderColorAtPaint,
     });
 }
 
-void CTextElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CTextElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     auto initial_position = impl->position;
 
     IElement::reposition(box);
@@ -210,7 +210,7 @@ std::optional<Vector2D> CTextElement::maximumSize(const Abyssutils::Math::Vector
     return std::nullopt;
 }
 
-std::optional<Vector2D> CTextElement::preferredSize(const Hyprutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
     auto s = m_impl->data.size.calculate(parent);
     if (s.x != -1 && s.y != -1)
         return s;
@@ -447,15 +447,15 @@ void STextImpl::renderTex() {
     self->impl->damageEntire();
 
     const Vector2D MAX_SIZE = applyClampSize(self->impl->position.size()) * lastScale;
-    const auto     COLOR    = colorAnimationEnabled ? CHyprColor{1.F, 1.F, 1.F, 1.F} : data.color();
+    const auto     COLOR    = colorAnimationEnabled ? CAbyssColor{1.F, 1.F, 1.F, 1.F} : data.color();
     resource                = makeAtomicShared<CTextResource>(CTextResource::STextResourceData{
         .text      = parsedText,
         .font      = data.fontFamily,
         .fontSize  = sc<size_t>(std::round(data.fontSize.ptSize() * lastScale)),
         .color     = CColor{CColor::SSRGB{.r = COLOR.r, .g = COLOR.g, .b = COLOR.b}},
         .align     = data.align == HT_FONT_ALIGN_LEFT ?
-            Hyprgraphics::CTextResource::TEXT_ALIGN_LEFT :
-            (data.align == HT_FONT_ALIGN_CENTER ? Hyprgraphics::CTextResource::TEXT_ALIGN_CENTER : Hyprgraphics::CTextResource::TEXT_ALIGN_RIGHT),
+            Abyssgraphics::CTextResource::TEXT_ALIGN_LEFT :
+            (data.align == HT_FONT_ALIGN_CENTER ? Abyssgraphics::CTextResource::TEXT_ALIGN_CENTER : Abyssgraphics::CTextResource::TEXT_ALIGN_RIGHT),
         .maxSize   = MAX_SIZE,
         .ellipsize = !data.noEllipsize,
         .wrap      = data.noEllipsize,

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <hyprtoolkit/core/EmbeddedBackend.hpp>
-#include <hyprutils/signal/Listener.hpp>
+#include <abysstoolkit/core/EmbeddedBackend.hpp>
+#include <abyssutils/signal/Listener.hpp>
 
 #include "../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     class CEmbeddedSurface;
 
     class CEmbeddedBackend final : public IEmbeddedBackend {
@@ -37,7 +37,7 @@ namespace Hyprtoolkit {
         bool                                   m_destroyRequested = false;
         size_t                                 m_activeFrames     = 0;
         std::vector<WP<CEmbeddedSurface>>      m_surfaces;
-        Hyprutils::Signal::CHyprSignalListener m_outputAddedListener;
+        Abyssutils::Signal::CAbyssSignalListener m_outputAddedListener;
 
         friend class IEmbeddedBackend;
     };

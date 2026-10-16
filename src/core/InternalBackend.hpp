@@ -16,10 +16,10 @@ namespace Abysstoolkit {
     class CConfigManager;
     class CSystemIconFactory;
 
-    inline Hyprutils::Memory::CSharedPointer<IBackend>                             g_backend;
-    inline Hyprutils::Memory::CWeakPointer<CBackend>                               g_waylandBackend;
-    inline Hyprutils::Memory::CSharedPointer<Hyprgraphics::CAsyncResourceGatherer> g_asyncResourceGatherer;
-    inline Hyprutils::Memory::CSharedPointer<CPalette>                             g_palette;
-    inline Hyprutils::Memory::CSharedPointer<CConfigManager>                       g_config;
-    inline Hyprutils::Memory::CSharedPointer<CSystemIconFactory>                   g_iconFactory;
+    inline Abyssutils::Memory::CSharedPointer<IBackend>                             g_backend;
+    inline Abyssutils::Memory::CWeakPointer<CBackend>                               g_waylandBackend;
+    inline Abyssutils::Memory::CSharedPointer<Abyssgraphics::CAsyncResourceGatherer> g_asyncResourceGatherer;
+    inline Abyssutils::Memory::CSharedPointer<CPalette>                             g_palette;
+    inline Abyssutils::Memory::CSharedPointer<CConfigManager>                       g_config;
+    inline Abyssutils::Memory::CSharedPointer<CSystemIconFactory>                   g_iconFactory;
 }

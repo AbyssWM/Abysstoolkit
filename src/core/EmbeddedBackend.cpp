@@ -9,7 +9,7 @@
 #include "../system/Icons.hpp"
 #include "../window/EmbeddedSurface.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 SP<IEmbeddedBackend> IEmbeddedBackend::create(const SCreationData& data) {
     if (g_backend || !data.eventLoop)
@@ -32,7 +32,7 @@ SP<IEmbeddedBackend> IEmbeddedBackend::create(const SCreationData& data) {
     g_config->parse();
     g_palette               = CPalette::palette();
     g_iconFactory           = SP<CSystemIconFactory>(new CSystemIconFactory());
-    g_asyncResourceGatherer = makeShared<Hyprgraphics::CAsyncResourceGatherer>();
+    g_asyncResourceGatherer = makeShared<Abyssgraphics::CAsyncResourceGatherer>();
     g_animationManager      = makeShared<CHTAnimationManager>();
     g_openGL                = makeShared<COpenGLRenderer>();
     g_renderer              = g_openGL;

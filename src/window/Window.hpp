@@ -8,14 +8,14 @@
 namespace Abysstoolkit {
     struct SWindowCreationData {
         eWindowType                              type = HT_WINDOW_TOPLEVEL;
-        std::optional<Hyprutils::Math::Vector2D> preferredSize;
-        std::optional<Hyprutils::Math::Vector2D> minSize;
-        std::optional<Hyprutils::Math::Vector2D> maxSize;
+        std::optional<Abyssutils::Math::Vector2D> preferredSize;
+        std::optional<Abyssutils::Math::Vector2D> minSize;
+        std::optional<Abyssutils::Math::Vector2D> maxSize;
         bool                                     resizable         = false;
         bool                                     autosize          = false;
         bool                                     inhibitShortcuts  = false;
-        std::string                              title             = "Hyprtoolkit App";
-        std::string                              class_            = "hyprtoolkit-app";
+        std::string                              title             = "Abysstoolkit App";
+        std::string                              class_            = "abysstoolkit-app";
         uint32_t                                 prefferedOutputId = 0;
 
         // popups

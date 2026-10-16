@@ -10,7 +10,7 @@
 #include "../RendererTexture.hpp"
 #include "../../helpers/Memory.hpp"
 
-namespace Hyprtoolkit {
+namespace Abysstoolkit {
     struct SBackendLifetime;
     enum eGLTextureType : uint8_t {
         TEXTURE_INVALID,  // Invalid
@@ -45,7 +45,7 @@ namespace Hyprtoolkit {
         eImageFitMode                     m_fitMode   = IMAGE_FIT_MODE_STRETCH;
         Abyssutils::Math::Vector2D         m_size      = {};
 
-        ASP<Hyprgraphics::IAsyncResource> m_resource;
+        ASP<Abyssgraphics::IAsyncResource> m_resource;
         WP<SBackendLifetime>              m_lifetime;
 
         void                              upload();

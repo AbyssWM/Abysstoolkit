@@ -36,7 +36,7 @@ void CCheckmarkElement::recheckColor() {
     *m_color = m_data.color();
 }
 
-void CCheckmarkElement::reposition(const Hyprutils::Math::CBox& box, const Hyprutils::Math::Vector2D& maxSize) {
+void CCheckmarkElement::reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize) {
     IElement::reposition(box);
 
     g_positioner->positionChildren(impl->self.lock());

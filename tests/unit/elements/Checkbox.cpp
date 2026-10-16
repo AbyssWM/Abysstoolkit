@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
 #include <element/checkbox/Checkbox.hpp>
-#include <hyprtoolkit/element/RadioGroup.hpp>
+#include <abysstoolkit/element/RadioGroup.hpp>
 
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 TEST(Element, checkboxRebuildAppliesStyle) {
     Tests::Tricks::createBackendSupport();

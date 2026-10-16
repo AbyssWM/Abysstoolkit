@@ -45,12 +45,12 @@ namespace Abysstoolkit {
         bool                               eyeHover          = false;
 
         struct {
-            CHyprSignalListener key;
-            CHyprSignalListener enter;
-            CHyprSignalListener leave;
-            CHyprSignalListener mouseMove;
-            CHyprSignalListener mouseButton;
-            CHyprSignalListener mouseLeave;
+            CAbyssSignalListener key;
+            CAbyssSignalListener enter;
+            CAbyssSignalListener leave;
+            CAbyssSignalListener mouseMove;
+            CAbyssSignalListener mouseButton;
+            CAbyssSignalListener mouseLeave;
         } listeners;
 
         struct {

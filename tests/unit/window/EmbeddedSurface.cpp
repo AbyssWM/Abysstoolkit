@@ -2,13 +2,13 @@
 
 #include "core/BackendContext.hpp"
 #include "element/Element.hpp"
-#include "hyprtoolkit/element/Textbox.hpp"
+#include "abysstoolkit/element/Textbox.hpp"
 #include "window/EmbeddedSurface.hpp"
 
 #include "../tricks/Tricks.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 class CEmbeddedTestElement final : public IElement {
   public:

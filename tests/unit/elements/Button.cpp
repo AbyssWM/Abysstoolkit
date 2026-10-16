@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
 
-#include <hyprtoolkit/element/Button.hpp>
+#include <abysstoolkit/element/Button.hpp>
 
 #include "../tricks/Tricks.hpp"
 #include "element/Element.hpp"
 
-using namespace Hyprtoolkit;
-using namespace Hyprutils::Math;
+using namespace Abysstoolkit;
+using namespace Abyssutils::Math;
 
 TEST(Element, buttonRebuildAppliesLabelLayout) {
     Tests::Tricks::createBackendSupport();

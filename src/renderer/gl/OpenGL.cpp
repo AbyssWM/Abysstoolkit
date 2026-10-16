@@ -113,7 +113,7 @@ static GLuint createProgram(const std::string& vert, const std::string& frag) {
 static void glMessageCallbackA(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
     if (type != GL_DEBUG_TYPE_ERROR)
         return;
-    g_logger->log(Hyprtoolkit::HT_LOG_DEBUG, "[gl] {}", message);
+    g_logger->log(Abysstoolkit::HT_LOG_DEBUG, "[gl] {}", message);
 }
 
 static inline void loadGLProc(void* pProc, const char* name) {
@@ -613,7 +613,7 @@ float COpenGLRenderer::presentationOpacity() const {
     return m_currentElement ? m_currentElement->impl->effectiveOpacity() : 1.F;
 }
 
-SP<CRenderbuffer> COpenGLRenderer::getRBO(SP<Aquamarine::IBuffer> buf) {
+SP<CRenderbuffer> COpenGLRenderer::getRBO(SP<Abyssal::IBuffer> buf) {
     for (const auto& r : m_rbos) {
         if (r->m_hlBuffer == buf)
             return r;
@@ -831,7 +831,7 @@ void COpenGLRenderer::beginRenderingExternal(SP<IToolkitWindow> window, uint32_t
     runQueuedGL();
     prepareRenderState();
 
-    m_projection      = Mat3x3::outputProjection(window->pixelSize(), HYPRUTILS_TRANSFORM_FLIPPED_180);
+    m_projection      = Mat3x3::outputProjection(window->pixelSize(), ABYSSUTILS_TRANSFORM_FLIPPED_180);
     m_currentViewport = window->pixelSize();
     m_scale           = window->scale();
     m_window          = window;
@@ -981,7 +981,7 @@ void COpenGLRenderer::renderRectangle(const SRectangleRenderData& data) {
     const auto PRESENTED     = presentationBox(data.box);
     const auto ROUNDEDBOX    = logicalToGL(PRESENTED);
     const auto UNTRANSFORMED = logicalToGL(PRESENTED, false);
-    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, HYPRUTILS_TRANSFORM_FLIPPED_180, PRESENTED.rot);
+    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, ABYSSUTILS_TRANSFORM_FLIPPED_180, PRESENTED.rot);
     Mat3x3     glMatrix      = m_projection.copy().multiply(matrix);
 
     const auto DAMAGE = damageWithClip();
@@ -1129,7 +1129,7 @@ void COpenGLRenderer::renderTexture(const STextureRenderData& data) {
     const auto     SOURCE_BOX    = presentationBox(SOURCE_LAYOUT);
     const auto     ROUNDEDBOX    = logicalToGL(SOURCE_BOX);
     const auto     UNTRANSFORMED = logicalToGL(SOURCE_BOX, false);
-    Mat3x3         matrix        = m_projMatrix.projectBox(ROUNDEDBOX, Hyprutils::Math::HYPRUTILS_TRANSFORM_FLIPPED_180, SOURCE_BOX.rot);
+    Mat3x3         matrix        = m_projMatrix.projectBox(ROUNDEDBOX, Abyssutils::Math::ABYSSUTILS_TRANSFORM_FLIPPED_180, SOURCE_BOX.rot);
     Mat3x3         glMatrix      = m_projection.copy().multiply(matrix);
 
     const auto     DAMAGE = damageWithClip();
@@ -1200,7 +1200,7 @@ void COpenGLRenderer::renderBorder(const SBorderRenderData& data) {
     const auto PRESENTED     = presentationBox(data.box);
     const auto ROUNDEDBOX    = logicalToGL(PRESENTED);
     const auto UNTRANSFORMED = logicalToGL(PRESENTED, false);
-    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, HYPRUTILS_TRANSFORM_FLIPPED_180, PRESENTED.rot);
+    Mat3x3     matrix        = m_projMatrix.projectBox(ROUNDEDBOX, ABYSSUTILS_TRANSFORM_FLIPPED_180, PRESENTED.rot);
     Mat3x3     glMatrix      = m_projection.copy().multiply(matrix);
 
     const auto DAMAGE = damageWithClip();

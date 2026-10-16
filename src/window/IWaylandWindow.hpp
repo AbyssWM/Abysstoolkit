@@ -85,8 +85,8 @@ namespace Abysstoolkit {
             SP<Abyssal::CSwapchain>              swapchain;
             size_t                                  bufIdx = 0;
 
-            Hyprutils::Math::Vector2D               size;
-            Hyprutils::Math::Vector2D               logicalSize;
+            Abyssutils::Math::Vector2D               size;
+            Abyssutils::Math::Vector2D               logicalSize;
             float                                   appliedScale = 1.F;
             SP<CCWpFractionalScaleV1>               fractional   = nullptr;
             SP<CCWpViewport>                        viewport     = nullptr;

@@ -5,7 +5,7 @@
 #include <core/platforms/WaylandPlatform.hpp>
 #include <xkbcommon/xkbcommon-keysyms.h>
 
-using namespace Hyprtoolkit;
+using namespace Abysstoolkit;
 
 TEST(WaylandPlatform, keyboardEnterReplacesPressedKeys) {
     CWaylandPlatform platform;
