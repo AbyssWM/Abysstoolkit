@@ -807,7 +807,7 @@ Abyssutils::Math::Vector2D CTextboxElement::size() {
     return impl->position.size();
 }
 
-std::optional<Vector2D> CTextboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent) {
+std::optional<Vector2D> CTextboxElement::preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow) {
     return m_impl->data.size.calculate(parent);
 }
 

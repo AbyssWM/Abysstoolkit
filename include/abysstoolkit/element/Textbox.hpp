@@ -22,6 +22,7 @@ namespace Abysstoolkit {
         Abyssutils::Memory::CSharedPointer<CTextboxBuilder>        onTextEdited(std::function<void(Abyssutils::Memory::CSharedPointer<CTextboxElement>, const std::string&)>&&);
         Abyssutils::Memory::CSharedPointer<CTextboxBuilder>        multiline(bool);
         Abyssutils::Memory::CSharedPointer<CTextboxBuilder>        password(bool);
+        Abyssutils::Memory::CSharedPointer<CTextboxBuilder>        eyeIcon(bool);
         Abyssutils::Memory::CSharedPointer<CTextboxBuilder>        size(CDynamicSize&&);
 
         Abyssutils::Memory::CSharedPointer<CTextboxElement>        commence();
@@ -46,6 +47,8 @@ namespace Abysstoolkit {
         std::string_view                                   currentText();
         size_t                                             cursorPos() const;
         std::tuple<ssize_t, ssize_t>                       selection() const;
+        void                                               setText(std::string text);
+        void                                               setPassword(bool password);
 
       private:
         static Abyssutils::Memory::CSharedPointer<CTextboxElement> create(const STextboxData& data);
@@ -56,11 +59,12 @@ namespace Abysstoolkit {
 
         virtual void                                     paint();
         virtual void                                     reposition(const Abyssutils::Math::CBox& box, const Abyssutils::Math::Vector2D& maxSize = {-1, -1});
-        virtual std::optional<Abyssutils::Math::Vector2D> preferredSize(const Abyssutils::Math::Vector2D& parent);
+        virtual std::optional<Abyssutils::Math::Vector2D> preferredSize(const Abyssutils::Math::Vector2D& parent, bool grow = true);
         virtual std::optional<Abyssutils::Math::Vector2D> minimumSize(const Abyssutils::Math::Vector2D& parent);
         virtual std::optional<Abyssutils::Math::Vector2D> maximumSize(const Abyssutils::Math::Vector2D& parent);
         virtual bool                                     acceptsMouseInput();
         virtual ePointerShape                            pointerShape();
+        virtual std::function<ePointerShape()>           pointerShapeFn();
         virtual bool                                     acceptsKeyboardInput();
         virtual void                                     imCommitNewText(const std::string&);
         virtual void                                     imApplyText();

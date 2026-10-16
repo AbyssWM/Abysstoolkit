@@ -42,6 +42,8 @@ namespace Abysstoolkit {
         Abyssutils::Memory::CSharedPointer<CWindowBuilder>        preferredSize(const Abyssutils::Math::Vector2D&);
         Abyssutils::Memory::CSharedPointer<CWindowBuilder>        minSize(const Abyssutils::Math::Vector2D&);
         Abyssutils::Memory::CSharedPointer<CWindowBuilder>        maxSize(const Abyssutils::Math::Vector2D&);
+        Abyssutils::Memory::CSharedPointer<CWindowBuilder>        resizable(bool);
+        Abyssutils::Memory::CSharedPointer<CWindowBuilder>        autosize(bool);
 
         // only for LAYER and LOCK_SURFACE
         Abyssutils::Memory::CSharedPointer<CWindowBuilder> prefferedOutput(const Abyssutils::Memory::CSharedPointer<IOutput>& output);
@@ -54,6 +56,7 @@ namespace Abysstoolkit {
         Abyssutils::Memory::CSharedPointer<CWindowBuilder> exclusiveEdge(uint32_t);
         Abyssutils::Memory::CSharedPointer<CWindowBuilder> exclusiveZone(int32_t);
         Abyssutils::Memory::CSharedPointer<CWindowBuilder> kbInteractive(uint32_t);
+        Abyssutils::Memory::CSharedPointer<CWindowBuilder> inhibitShortcuts(bool);
 
         // only for HT_WINDOW_POPUP
         Abyssutils::Memory::CSharedPointer<CWindowBuilder> parent(const Abyssutils::Memory::CSharedPointer<IWindow>& parent);
