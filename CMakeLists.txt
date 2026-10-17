@@ -10,6 +10,12 @@ project(
   VERSION ${ABYSSTOOLKIT_VERSION}
   DESCRIPTION "A modern C++ Wayland-native GUI toolkit")
 
+# Keep the historical defaults while honoring an explicit cache/parent choice.
+if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES DEBUG)
+  option(BUILD_TESTING "Build tests" ON)
+else()
+  option(BUILD_TESTING "Build tests" OFF)
+endif()
 include(CTest)
 include(CheckIncludeFile)
 include(GNUInstallDirs)
@@ -62,11 +68,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 if(CMAKE_BUILD_TYPE MATCHES Debug OR CMAKE_BUILD_TYPE MATCHES DEBUG)
   message(STATUS "Configuring abysstoolkit in Debug")
   add_compile_definitions(ABYSSTOOLKIT_DEBUG)
-  set(BUILD_TESTING ON)
 else()
   add_compile_options(-O3)
   message(STATUS "Configuring abysstoolkit in Release")
-  set(BUILD_TESTING OFF)
 endif()
 
 add_compile_definitions(AT_HIDDEN=public)
